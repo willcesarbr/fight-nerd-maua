@@ -182,27 +182,111 @@
     }
     .form-group label { font-size: 11px; color: var(--accent-neon); font-weight: bold; text-transform: uppercase; }
 
+    /* ESTILO WHATSAPP DE AJUSTE DE FOTO */
     .preview-container {
       display: flex;
       gap: 15px;
       margin-bottom: 15px;
     }
+    @media (max-width: 650px) {
+      .preview-container { flex-direction: column; }
+    }
     .preview-box {
       flex: 1;
       text-align: center;
-      background: rgba(0,0,0,0.3);
-      padding: 10px;
+      background: rgba(0,0,0,0.4);
+      padding: 12px;
       border-radius: 20px;
       border: 1px solid var(--border);
     }
-    .preview-thumb {
-      width: 80px;
-      height: 80px;
+
+    /* Moldura Circular Estilo WhatsApp */
+    .wa-crop-frame {
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--accent-neon);
-      margin: 5px 0;
+      border: 3px solid var(--accent-neon);
+      margin: 8px auto;
+      overflow: hidden;
+      position: relative;
       background: #000;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+    .wa-crop-frame:active { cursor: grabbing; }
+
+    .wa-crop-img {
+      position: absolute;
+      user-select: none;
+      pointer-events: none;
+      max-width: none;
+    }
+
+    .wa-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .wa-controls label {
+      font-size: 9px;
+      color: #a8a8b3;
+    }
+    .wa-controls input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-neon);
+    }
+
+    /* Avatar nos Cards do Jogo */
+    .avatar-wrapper {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 4px solid var(--accent);
+      margin-bottom: 10px;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+      box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+    }
+    .card.ko .avatar-wrapper { 
+      border-color: var(--loss); 
+      box-shadow: 0 0 20px rgba(255, 0, 85, 0.5); 
+    }
+    .card-avatar-img {
+      position: absolute;
+      max-width: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .podium-circle-wrapper {
+      position: relative;
+      margin-bottom: 10px;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 4px solid var(--border);
+      overflow: hidden;
+      background: #12121a;
+      margin-left: auto;
+      margin-right: auto;
+      transition: transform 0.3s ease;
+    }
+    .podium-circle-wrapper:hover {
+      transform: scale(1.08);
+    }
+    .slot-1 .podium-circle-wrapper { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+    .slot-2 .podium-circle-wrapper { border-color: var(--silver); box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); }
+    .slot-3 .podium-circle-wrapper { border-color: var(--bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
+    .slot-duck .podium-circle-wrapper { border-color: var(--loss); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+
+    .podium-avatar-img {
+      position: absolute;
+      max-width: none;
+      user-select: none;
+      pointer-events: none;
     }
 
     .podium-panel {
@@ -269,30 +353,6 @@
       line-height: 1.2;
     }
 
-    .podium-circle-wrapper {
-      position: relative;
-      margin-bottom: 10px;
-    }
-
-    .podium-circle-avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--border);
-      background: #12121a;
-      transition: transform 0.3s ease;
-    }
-
-    .podium-circle-avatar:hover {
-      transform: scale(1.08);
-    }
-
-    .slot-1 .podium-circle-avatar { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-    .slot-2 .podium-circle-avatar { border-color: var(--silver); box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); }
-    .slot-3 .podium-circle-avatar { border-color: var(--bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
-    .slot-duck .podium-circle-avatar { border-color: var(--loss); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
-
     .identity-bar {
       background: var(--card);
       border: 2px solid var(--accent);
@@ -335,21 +395,6 @@
       transform: translateY(-5px); 
       border-color: var(--accent-neon); 
       box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-    }
-    
-    .avatar {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--accent);
-      margin-bottom: 10px;
-      box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
-    }
-    .card.ko .avatar { 
-      border-color: var(--loss); 
-      box-shadow: 0 0 20px rgba(255, 0, 85, 0.5); 
-      filter: grayscale(20%); 
     }
 
     .name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px; }
@@ -519,20 +564,33 @@
       <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleFileSelect(event, 'ko')">
     </div>
 
+    <!-- CROPPER ESTILO WHATSAPP -->
     <div class="preview-container">
+      
+      <!-- NORMAL CROPPER -->
       <div class="preview-box">
-        <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
-        <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
-        <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
-        <input type="range" id="posY-normal" min="0" max="100" value="50" oninput="updatePosPreview('normal')">
+        <label style="font-size:10px; color:var(--accent-neon); font-weight:bold;">AJUSTAR NORMAL (Zoom & Arraste)</label>
+        <div class="wa-crop-frame" id="frame-normal" onmousedown="startDrag(event, 'normal')" ontouchstart="startDrag(event, 'normal')">
+          <img id="crop-img-normal" class="wa-crop-img" src="https://i.pravatar.cc/150?img=11">
+        </div>
+        <div class="wa-controls">
+          <label>Zoom</label>
+          <input type="range" id="zoom-normal" min="50" max="300" value="100" oninput="updateCropTransform('normal')">
+        </div>
       </div>
 
+      <!-- KO CROPPER -->
       <div class="preview-box">
-        <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
-        <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
-        <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
-        <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updatePosPreview('ko')">
+        <label style="font-size:10px; color:var(--loss); font-weight:bold;">AJUSTAR KO (Zoom & Arraste)</label>
+        <div class="wa-crop-frame" id="frame-ko" onmousedown="startDrag(event, 'ko')" ontouchstart="startDrag(event, 'ko')">
+          <img id="crop-img-ko" class="wa-crop-img" src="https://i.pravatar.cc/150?img=33">
+        </div>
+        <div class="wa-controls">
+          <label>Zoom</label>
+          <input type="range" id="zoom-ko" min="50" max="300" value="100" oninput="updateCropTransform('ko')">
+        </div>
       </div>
+
     </div>
     
     <div style="display: flex; gap: 8px;">
@@ -638,6 +696,18 @@
 
     let newNormalBase64 = null;
     let newKoBase64 = null;
+
+    // Estado dos Croppers (Armazena Posição X, Y e Zoom de cada tipo)
+    let cropState = {
+      normal: { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 },
+      ko: { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 }
+    };
+
+    let activeDrag = null;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let initialX = 0;
+    let initialY = 0;
 
     let deviceId = localStorage.getItem('fnm_device_id');
     if (!deviceId) {
@@ -831,12 +901,14 @@
       document.getElementById('loginModal').style.display = 'none';
     }
 
-    function showVictimZoom(nome, fotoKO, posY) {
+    function showVictimZoom(nome, fotoKO, cropDataStr) {
       const fraseSemRepetir = pegarProximaFraseSemRepetir();
       const img = document.getElementById('zoomVictimImg');
       document.getElementById('zoomVictimName').innerText = nome;
       img.src = fotoKO;
-      img.style.objectPosition = `center ${posY || 50}%`;
+      
+      applyCropStylesToImg(img, cropDataStr, 180);
+
       document.getElementById('zoomVictimQuote').innerText = `"${fraseSemRepetir}"`;
       document.getElementById('victimModal').style.display = 'flex';
     }
@@ -864,29 +936,132 @@
       updateUI();
     }
 
+    // Gerenciamento de Upload e Leitura de Dimensões Reais da Imagem
     function handleFileSelect(event, type) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = (e) => {
+        const base64 = e.target.result;
         if (type === 'normal') {
-          newNormalBase64 = e.target.result;
-          const img = document.getElementById('preview-normal');
-          img.src = e.target.result;
+          newNormalBase64 = base64;
         } else {
-          newKoBase64 = e.target.result;
-          const img = document.getElementById('preview-ko');
-          img.src = e.target.result;
+          newKoBase64 = base64;
         }
+
+        const imgObj = new Image();
+        imgObj.onload = function() {
+          cropState[type].natW = imgObj.naturalWidth;
+          cropState[type].natH = imgObj.naturalHeight;
+          cropState[type].zoom = 100;
+          cropState[type].x = 0;
+          cropState[type].y = 0;
+
+          document.getElementById(`zoom-${type}`).value = 100;
+
+          const cropImgEl = document.getElementById(`crop-img-${type}`);
+          cropImgEl.src = base64;
+          updateCropTransform(type);
+        };
+        imgObj.src = base64;
       };
       reader.readAsDataURL(file);
     }
 
-    function updatePosPreview(type) {
-      const val = document.getElementById(`posY-${type}`).value;
-      const img = document.getElementById(`preview-${type}`);
-      img.style.objectPosition = `center ${val}%`;
+    // Atualiza visualmente o Cropper no Painel Admin
+    function updateCropTransform(type) {
+      const zoomVal = parseInt(document.getElementById(`zoom-${type}`).value);
+      cropState[type].zoom = zoomVal;
+
+      const natW = cropState[type].natW || 100;
+      const natH = cropState[type].natH || 100;
+
+      // Base width para caber no frame de 100px com o zoom
+      let baseScale = Math.max(100 / natW, 100 / natH);
+      let finalW = natW * baseScale * (zoomVal / 100);
+      let finalH = natH * baseScale * (zoomVal / 100);
+
+      const imgEl = document.getElementById(`crop-img-${type}`);
+      imgEl.style.width = finalW + 'px';
+      imgEl.style.height = finalH + 'px';
+      imgEl.style.left = cropState[type].x + 'px';
+      imgEl.style.top = cropState[type].y + 'px';
+    }
+
+    // Funcionalidade de Arrastar com Mouse ou Touch (Estilo WhatsApp)
+    function startDrag(e, type) {
+      activeDrag = type;
+      dragStartX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+      dragStartY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+      initialX = cropState[type].x;
+      initialY = cropState[type].y;
+
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('touchmove', onDragMove);
+      document.addEventListener('touchend', stopDrag);
+      e.preventDefault();
+    }
+
+    function onDragMove(e) {
+      if (!activeDrag) return;
+      let type = activeDrag;
+      let currentX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+      let currentY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+
+      let dx = currentX - dragStartX;
+      let dy = currentY - dragStartY;
+
+      cropState[type].x = initialX + dx;
+      cropState[type].y = initialY + dy;
+
+      updateCropTransform(type);
+    }
+
+    function stopDrag() {
+      activeDrag = null;
+      document.removeEventListener('mousemove', onDragMove);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchmove', onDragMove);
+      document.removeEventListener('touchend', stopDrag);
+    }
+
+    // Aplica o crop salvo em qualquer elemento <img> do site de forma responsiva
+    function applyCropStylesToImg(imgEl, cropDataStr, targetSize) {
+      if (!cropDataStr) {
+        imgEl.style.width = targetSize + 'px';
+        imgEl.style.height = targetSize + 'px';
+        imgEl.style.left = '0px';
+        imgEl.style.top = '0px';
+        return;
+      }
+
+      try {
+        let data = JSON.parse(cropDataStr);
+        let natW = data.natW || 100;
+        let natH = data.natH || 100;
+        let zoom = data.zoom || 100;
+
+        let baseScale = Math.max(targetSize / natW, targetSize / natH);
+        let finalW = natW * baseScale * (zoom / 100);
+        let finalH = natH * baseScale * (zoom / 100);
+
+        // Proporcionaliza o deslocamento (X, Y) do painel admin (100px) para o tamanho do alvo atual
+        let scaleFactor = targetSize / 100;
+        let finalX = (data.x || 0) * scaleFactor;
+        let finalY = (data.y || 0) * scaleFactor;
+
+        imgEl.style.width = finalW + 'px';
+        imgEl.style.height = finalH + 'px';
+        imgEl.style.left = finalX + 'px';
+        imgEl.style.top = finalY + 'px';
+      } catch (err) {
+        imgEl.style.width = targetSize + 'px';
+        imgEl.style.height = targetSize + 'px';
+        imgEl.style.left = '0px';
+        imgEl.style.top = '0px';
+      }
     }
 
     async function savePlayerAdm() {
@@ -903,16 +1078,13 @@
       let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
       let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
 
-      let posYNormal = document.getElementById('posY-normal').value;
-      let posYKO = document.getElementById('posY-ko').value;
-
       const playerData = {
         id: String(id),
         nome: nome,
         fotoNormal: fotoNormal,
         fotoKO: fotoKO,
-        posYNormal: posYNormal,
-        posYKO: posYKO
+        cropNormal: JSON.stringify(cropState.normal),
+        cropKO: JSON.stringify(cropState.ko)
       };
 
       db.ref('jogadores/' + id).update(playerData);
@@ -927,15 +1099,32 @@
       document.getElementById('adm-edit-id').value = String(p.id);
       document.getElementById('adm-name').value = p.nome;
       
-      const imgN = document.getElementById('preview-normal');
+      const imgN = document.getElementById('crop-img-normal');
       imgN.src = p.fotoNormal;
-      document.getElementById('posY-normal').value = p.posYNormal || 50;
-      imgN.style.objectPosition = `center ${p.posYNormal || 50}%`;
+      if (p.cropNormal) {
+        cropState.normal = JSON.parse(p.cropNormal);
+      } else {
+        cropState.normal = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
+      }
+      document.getElementById('zoom-normal').value = cropState.normal.zoom || 100;
 
-      const imgK = document.getElementById('preview-ko');
+      const imgK = document.getElementById('crop-img-ko');
       imgK.src = p.fotoKO;
-      document.getElementById('posY-ko').value = p.posYKO || 50;
-      imgK.style.objectPosition = `center ${p.posYKO || 50}%`;
+      if (p.cropKO) {
+        cropState.ko = JSON.parse(p.cropKO);
+      } else {
+        cropState.ko = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
+      }
+      document.getElementById('zoom-ko').value = cropState.ko.zoom || 100;
+
+      // Carrega dimensões para calcular o crop visual corretamente ao abrir edição
+      let tempImgN = new Image();
+      tempImgN.onload = function() { cropState.normal.natW = tempImgN.naturalWidth; cropState.normal.natH = tempImgN.naturalHeight; updateCropTransform('normal'); };
+      tempImgN.src = p.fotoNormal;
+
+      let tempImgK = new Image();
+      tempImgK.onload = function() { cropState.ko.natW = tempImgK.naturalWidth; cropState.ko.natH = tempImgK.naturalHeight; updateCropTransform('ko'); };
+      tempImgK.src = p.fotoKO;
 
       newNormalBase64 = null;
       newKoBase64 = null;
@@ -957,10 +1146,19 @@
       document.getElementById('adm-name').value = "";
       document.getElementById('adm-foto-normal').value = "";
       document.getElementById('adm-foto-ko').value = "";
-      document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
-      document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
-      document.getElementById('posY-normal').value = 50;
-      document.getElementById('posY-ko').value = 50;
+      
+      const defaultAvatar1 = "https://i.pravatar.cc/150?img=11";
+      const defaultAvatar2 = "https://i.pravatar.cc/150?img=33";
+      
+      document.getElementById('crop-img-normal').src = defaultAvatar1;
+      document.getElementById('crop-img-ko').src = defaultAvatar2;
+      document.getElementById('zoom-normal').value = 100;
+      document.getElementById('zoom-ko').value = 100;
+
+      cropState.normal = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
+      cropState.ko = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
+      updateCropTransform('normal');
+      updateCropTransform('ko');
       
       newNormalBase64 = null;
       newKoBase64 = null;
@@ -1062,17 +1260,26 @@
           if (!perdedor) return '';
           let fotoKOAtual = perdedor.fotoKO;
           let nomeAtual = perdedor.nome;
-          let posY = perdedor.posYKO || 50;
+          let cropKOStr = perdedor.cropKO;
 
           let auditHtml = "";
           if (isAdminLoggedIn) {
             auditHtml = `<div class="audit-info">🕒 ${v.auditData || 'N/D'} | 📱 ${v.auditModo || 'App'}</div>`;
           }
 
+          let tempImgId = 'badge_img_' + Math.random().toString(36).substring(2);
+
+          setTimeout(() => {
+            let el = document.getElementById(tempImgId);
+            if (el) applyCropStylesToImg(el, cropKOStr, 18);
+          }, 50);
+
           return `
             <div style="display:inline-block; margin:2px; vertical-align:top;">
-              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
-                <img src="${fotoKOAtual}" style="object-position: center ${posY}%"> ${nomeAtual}
+              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', '${encodeURIComponent(cropKOStr || '')}')" title="Clique para dar zoom em ${nomeAtual}">
+                <span style="display:inline-block; width:18px; height:18px; border-radius:50%; overflow:hidden; position:relative; vertical-align:middle; background:#000;">
+                  <img id="${tempImgId}" src="${fotoKOAtual}" style="position:absolute;">
+                </span> ${nomeAtual}
                 ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
               </span>
               ${auditHtml}
@@ -1081,11 +1288,18 @@
         }).join('');
 
         let isKOClass = (player.derrotasCalculadas || 0) > 0 ? "ko" : "";
-        let posN = player.posYNormal || 50;
+        
+        let cardAvatarId = 'card_avatar_' + player.id;
+        setTimeout(() => {
+          let el = document.getElementById(cardAvatarId);
+          if (el) applyCropStylesToImg(el, player.cropNormal, 110);
+        }, 50);
 
         grid.innerHTML += `
           <div class="card ${isKOClass}">
-            <img class="avatar" src="${player.fotoNormal}" style="object-position: center ${posN}%" alt="${player.nome}">
+            <div class="avatar-wrapper">
+              <img id="${cardAvatarId}" class="card-avatar-img" src="${player.fotoNormal}" alt="${player.nome}">
+            </div>
             <div class="name">${player.nome}</div>
             <div class="stats">
               <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
@@ -1110,14 +1324,20 @@
     function renderCircleSlot(player, isDuck = false) {
       if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
       const foto = isDuck ? player.fotoKO : player.fotoNormal;
-      const posY = isDuck ? (player.posYKO || 50) : (player.posYNormal || 50);
+      const cropData = isDuck ? player.cropKO : player.cropNormal;
       const statText = isDuck 
         ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>`
         : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
 
+      let podiumAvatarId = 'podium_avatar_' + (isDuck ? 'duck_' : '') + player.id;
+      setTimeout(() => {
+        let el = document.getElementById(podiumAvatarId);
+        if (el) applyCropStylesToImg(el, cropData, 90);
+      }, 50);
+
       return `
         <div class="podium-circle-wrapper">
-          <img class="podium-circle-avatar" src="${foto}" style="object-position: center ${posY}%" alt="${player.nome}">
+          <img id="${podiumAvatarId}" class="podium-avatar-img" src="${foto}" alt="${player.nome}">
         </div>
         <div style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff;">${player.nome}</div>
         <div>${statText}</div>
