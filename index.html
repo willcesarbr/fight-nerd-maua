@@ -9,6 +9,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+  <!-- Cropper.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <!-- Cropper.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
 
@@ -439,6 +444,20 @@
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; }
     th { background: rgba(0,0,0,0.4); color: var(--accent-neon); font-family: 'Orbitron', sans-serif; font-size: 11px; }
+
+    /* Estilos do Crop Modal */
+    .crop-container {
+      max-height: 350px;
+      width: 100%;
+      margin-bottom: 15px;
+      background: #000;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .crop-container img {
+      max-width: 100%;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -485,6 +504,21 @@
     </div>
   </div>
 
+  <!-- MODAL DE CROP DE IMAGEM -->
+  <div class="modal-overlay" id="cropModal">
+    <div class="modal-box" style="max-width: 420px;">
+      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">✂️ Ajustar e Recortar Foto</h3>
+      <p style="font-size: 11px; color: #a8a8b3; margin-bottom: 10px;">Enquadre perfeitamente no formato circular/quadrado:</p>
+      <div class="crop-container">
+        <img id="imageToCrop" src="" alt="Cortar">
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button onclick="applyCrop()" style="background: var(--win); border:none; padding:10px 22px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">✓ Recortar e Usar</button>
+        <button onclick="closeCropModal()" style="background: #444; color:#fff; border:none; padding:10px 22px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PAINEL DE ADMIN -->
   <div class="admin-panel" id="adminPanel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -498,25 +532,21 @@
     </div>
     <div class="form-group">
       <label>Foto Normal (WebP Animado / GIF / JPG):</label>
-      <input type="file" id="adm-foto-normal" accept="image/*" onchange="handleFileSelect(event, 'normal')">
+      <input type="file" id="adm-foto-normal" accept="image/*" onchange="initCrop(event, 'normal')">
     </div>
     <div class="form-group">
       <label>Foto KO (Cara Machucada):</label>
-      <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleFileSelect(event, 'ko')">
+      <input type="file" id="adm-foto-ko" accept="image/*" onchange="initCrop(event, 'ko')">
     </div>
 
     <div class="preview-container">
       <div class="preview-box">
         <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
         <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
-        <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
-        <input type="range" id="posY-normal" min="0" max="100" value="50" oninput="updatePosPreview('normal')">
       </div>
       <div class="preview-box">
         <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
         <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
-        <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
-        <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updatePosPreview('ko')">
       </div>
     </div>
 
@@ -616,6 +646,8 @@
     let jogadores = [];
     let newNormalBase64 = null;
     let newKoBase64 = null;
+    let cropper = null;
+    let currentCropType = null;
 
     let deviceId = localStorage.getItem('fnm_device_id');
     if (!deviceId) {
@@ -671,7 +703,7 @@
       "Apanhou tanto que o relógio inteligente marcou corrida de maratona!",
       "Apanhou tanto que se chacoalhar faz barulho de chocalho por dentro!",
       "Apanhou tanto que o sensor de colisão do carro disparou do lado de fora!",
-      "Apanhou tanto que até o Wi-Fi desconectou de妨gosto!",
+      "Apanhou tanto que até o Wi-Fi desconectou de desgosto!",
       "Apanhou tanto que o Google Fotos identificou o rosto como obra do Picasso!",
       "Apanhou tanto que a sombra se recusou a acompanhar no caminho de volta!",
       "Apanhou tanto que virou estampa de camiseta de liquidação!",
@@ -922,28 +954,69 @@
       updateUI();
     }
 
-    function handleFileSelect(event, type) {
+    // Funções do Cropper.js
+    function initCrop(event, type) {
       const file = event.target.files[0];
       if (!file) return;
+      currentCropType = type;
+
       const reader = new FileReader();
       reader.onload = (e) => {
-        if (type === 'normal') {
-          newNormalBase64 = e.target.result;
-          const img = document.getElementById('preview-normal');
-          img.src = e.target.result;
-        } else {
-          newKoBase64 = e.target.result;
-          const img = document.getElementById('preview-ko');
-          img.src = e.target.result;
+        const imageElement = document.getElementById('imageToCrop');
+        imageElement.src = e.target.result;
+        document.getElementById('cropModal').style.display = 'flex';
+
+        if (cropper) {
+          cropper.destroy();
         }
+
+        cropper = new Cropper(imageElement, {
+          aspectRatio: 1, // Quadrado perfeito para círculo
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.9,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+        });
       };
       reader.readAsDataURL(file);
+      event.target.value = ''; // Limpa input para permitir re-seleção do mesmo arquivo
     }
 
-    function updatePosPreview(type) {
-      const val = document.getElementById(`posY-${type}`).value;
-      const img = document.getElementById(`preview-${type}`);
-      img.style.objectPosition = `center ${val}%`;
+    function closeCropModal() {
+      document.getElementById('cropModal').style.display = 'none';
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    }
+
+    function applyCrop() {
+      if (!cropper) return;
+
+      const canvas = cropper.croppedCanvas || cropper.getCroppedCanvas({
+        width: 300,
+        height: 300,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      });
+
+      const croppedDataBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+      if (currentCropType === 'normal') {
+        newNormalBase64 = croppedDataBase64;
+        document.getElementById('preview-normal').src = croppedDataBase64;
+      } else if (currentCropType === 'ko') {
+        newKoBase64 = croppedDataBase64;
+        document.getElementById('preview-ko').src = croppedDataBase64;
+      }
+
+      closeCropModal();
     }
 
     async function savePlayerAdm() {
@@ -959,16 +1032,13 @@
       let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
       let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
 
-      let posYNormal = document.getElementById('posY-normal').value;
-      let posYKO = document.getElementById('posY-ko').value;
-
       const playerData = {
         id: String(id),
         nome: nome,
         fotoNormal: fotoNormal,
         fotoKO: fotoKO,
-        posYNormal: posYNormal,
-        posYKO: posYKO
+        posYNormal: 50,
+        posYKO: 50
       };
 
       db.ref('jogadores/' + id).update(playerData);
@@ -985,13 +1055,9 @@
 
       const imgN = document.getElementById('preview-normal');
       imgN.src = p.fotoNormal;
-      document.getElementById('posY-normal').value = p.posYNormal || 50;
-      imgN.style.objectPosition = `center ${p.posYNormal || 50}%`;
 
       const imgK = document.getElementById('preview-ko');
       imgK.src = p.fotoKO;
-      document.getElementById('posY-ko').value = p.posYKO || 50;
-      imgK.style.objectPosition = `center ${p.posYKO || 50}%`;
 
       newNormalBase64 = null;
       newKoBase64 = null;
@@ -1015,8 +1081,6 @@
       document.getElementById('adm-foto-ko').value = "";
       document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
       document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
-      document.getElementById('posY-normal').value = 50;
-      document.getElementById('posY-ko').value = 50;
       newNormalBase64 = null;
       newKoBase64 = null;
       document.getElementById('admin-form-title').innerText = "⚙️ Painel do Administrador";
@@ -1125,7 +1189,7 @@
 
           return `
             <div style="display:inline-block; margin:2px; vertical-align:top;">
-              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
+              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
                 <img src="${fotoKOAtual}" style="object-position: center ${posY}%"> ${nomeAtual}
                 ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
               </span>
