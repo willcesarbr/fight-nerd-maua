@@ -5,1442 +5,521 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fight Nerd Mauá - Arcade Arena</title>
   
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- Fontes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Cropper.js CSS (Para cortar foto estilo WhatsApp) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
-
     :root {
-      --bg: #0a0a10;
-      --card: rgba(20, 20, 32, 0.85);
-      --accent: #9d4edd;
-      --accent-neon: #00f0ff;
-      --gold: #ffd700;
-      --silver: #c0c0c0;
-      --bronze: #cd7f32;
-      --text: #f1f1f6;
-      --win: #00ff87;
-      --loss: #ff0055;
-      --border: rgba(255, 255, 255, 0.15);
+      --bg-dark: #0a0a0f;
+      --card-bg: rgba(20, 20, 35, 0.75);
+      --neon-cyan: #00e5ff;
+      --neon-pink: #ff0055;
+      --neon-gold: #ffd700;
+      --text-color: #f0f0f5;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
+      background-color: var(--bg-dark);
+      color: var(--text-color);
       font-family: 'Montserrat', sans-serif;
-      background: var(--bg);
+      min-height: 100vh;
       background-image: 
-        radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
-        linear-gradient(rgba(10, 10, 16, 0.9), rgba(10, 10, 16, 0.95)),
-        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop');
-      background-size: cover;
-      background-attachment: fixed;
-      background-position: center;
-      color: var(--text);
-      max-width: 950px;
-      margin: 0 auto;
-      padding: 16px;
+        radial-gradient(circle at 15% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(0, 229, 255, 0.15) 0%, transparent 40%);
+      padding-bottom: 50px;
+      overflow-x: hidden;
     }
 
-    h1.main-title {
-      font-family: 'Bangers', cursive;
-      font-size: 3.8rem;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      margin: 0;
+    /* Header */
+    header {
       text-align: center;
-      background: linear-gradient(180deg, #fff 20%, var(--accent-neon) 60%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.6));
-      transform: skewX(-4deg);
+      padding: 30px 15px;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--neon-pink);
+      box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+      margin-bottom: 30px;
     }
 
-    h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--accent-neon);
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .blink-infamy {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.6rem;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: var(--loss);
-      text-align: center;
-      margin-bottom: 15px;
-      text-shadow: 0 0 10px rgba(255, 0, 85, 0.9), 0 0 20px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.4);
-      animation: neonBlink 1.2s infinite alternate;
-    }
-
-    @keyframes neonBlink {
-      0%, 100% {
-        opacity: 1;
-        text-shadow: 0 0 10px rgba(255, 0, 85, 0.9), 0 0 20px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.4);
-      }
-      50% {
-        opacity: 0.3;
-        text-shadow: none;
-      }
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .btn-admin-toggle {
-      background: rgba(31, 31, 46, 0.8);
-      color: var(--accent-neon);
-      border: 1px solid var(--accent-neon);
-      padding: 6px 16px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
-    .btn-admin-toggle:hover {
-      background: var(--accent-neon);
-      color: #000;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
-    }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-box {
-      background: #12121a;
-      border: 2px solid var(--accent-neon);
-      padding: 25px;
-      border-radius: 30px;
-      text-align: center;
-      width: 90%;
-      max-width: 380px;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
-    }
-
-    /* POP-UP DE CONFIRMAÇÃO DE VITÓRIA (ESTILO IMPACTO K.O.) */
-    .success-ko-box {
-      background: rgba(20, 20, 32, 0.95);
-      border: 3px solid var(--win);
-      border-radius: 35px;
-      padding: 30px 20px;
-      text-align: center;
-      max-width: 340px;
-      box-shadow: 0 0 50px rgba(0, 255, 135, 0.6);
-      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .success-ko-title {
+    header h1 {
       font-family: 'Bangers', cursive;
       font-size: 3rem;
-      color: var(--win);
-      text-transform: uppercase;
-      margin: 0;
       letter-spacing: 2px;
-      text-shadow: 0 0 20px rgba(0, 255, 135, 0.8);
-      transform: skewX(-4deg);
+      color: var(--neon-gold);
+      text-shadow: 3px 3px 0px var(--neon-pink), 0 0 10px rgba(255, 215, 0, 0.5);
     }
 
-    .victim-zoom-box {
-      background: rgba(20, 20, 32, 0.95);
-      border: 3px solid var(--loss);
-      border-radius: 35px;
-      padding: 25px;
-      text-align: center;
-      max-width: 340px;
-      box-shadow: 0 0 40px rgba(255, 0, 85, 0.6);
-      animation: popIn 0.3s ease-out;
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.7); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .victim-zoom-img {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 5px solid var(--loss);
-      box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
-      margin: 15px 0 10px 0;
-    }
-
-    .admin-panel {
-      display: none;
-      background: rgba(18, 18, 28, 0.95);
-      border: 2px solid var(--accent-neon);
-      padding: 22px;
-      border-radius: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
-      backdrop-filter: blur(12px);
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-      text-align: left;
-    }
-    .form-group label { font-size: 11px; color: var(--accent-neon); font-weight: bold; text-transform: uppercase; }
-
-    .preview-container {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    @media (max-width: 650px) {
-      .preview-container { flex-direction: column; }
-    }
-    .preview-box {
-      flex: 1;
-      text-align: center;
-      background: rgba(0,0,0,0.4);
-      padding: 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-    }
-
-    .wa-crop-frame {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 3px solid var(--accent-neon);
-      margin: 8px auto;
-      overflow: hidden;
-      position: relative;
-      background: #000;
-      cursor: grab;
-      touch-action: none;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-    }
-    .wa-crop-frame:active { cursor: grabbing; }
-
-    .wa-crop-img {
-      position: absolute;
-      user-select: none;
-      pointer-events: none;
-      max-width: none;
-    }
-
-    .wa-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 6px;
-    }
-    .wa-controls label {
-      font-size: 9px;
-      color: #a8a8b3;
-    }
-    .wa-controls input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent-neon);
-    }
-
-    .avatar-wrapper {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      border: 4px solid var(--accent);
-      margin-bottom: 10px;
-      overflow: hidden;
-      position: relative;
-      background: #000;
-      box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
-    }
-    .card.ko .avatar-wrapper { 
-      border-color: var(--loss); 
-      box-shadow: 0 0 20px rgba(255, 0, 85, 0.5); 
-    }
-    .card-avatar-img {
-      position: absolute;
-      max-width: none;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .podium-circle-wrapper {
-      position: relative;
-      margin-bottom: 10px;
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      border: 4px solid var(--border);
-      overflow: hidden;
-      background: #12121a;
-      margin-left: auto;
-      margin-right: auto;
-      transition: transform 0.3s ease;
-    }
-    .podium-circle-wrapper:hover {
-      transform: scale(1.08);
-    }
-    .slot-1 .podium-circle-wrapper { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-    .slot-2 .podium-circle-wrapper { border-color: var(--silver); box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); }
-    .slot-3 .podium-circle-wrapper { border-color: var(--bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
-    .slot-duck .podium-circle-wrapper { border-color: var(--loss); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
-
-    .podium-avatar-img {
-      position: absolute;
-      max-width: none;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .podium-panel {
-      background: rgba(15, 15, 25, 0.9);
-      border: 2px solid var(--accent);
-      border-radius: 35px;
-      padding: 20px 10px;
-      margin-bottom: 35px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 25px rgba(157, 78, 221, 0.25);
-    }
-
-    .podium-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      align-items: center;
-    }
-
-    @media (max-width: 650px) {
-      .podium-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px 10px;
-      }
-    }
-
-    .podium-slot {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      padding: 0 5px;
-    }
-
-    .podium-slot:not(:last-child) {
-      border-right: 1px dashed rgba(255, 255, 255, 0.12);
-    }
-
-    @media (max-width: 650px) {
-      .podium-slot:not(:last-child) {
-        border-right: none;
-      }
-    }
-
-    .podium-badge-title {
+    header p {
       font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
+      font-size: 0.9rem;
+      color: var(--neon-cyan);
+      margin-top: 5px;
     }
 
-    .podium-subtitle {
-      font-size: 10px;
-      font-weight: bold;
-      color: #a8a8b3;
-      margin-bottom: 12px;
-      min-height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.2;
-    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
 
-    .identity-bar {
-      background: var(--card);
-      border: 2px solid var(--accent);
-      padding: 14px 20px;
-      border-radius: 50px;
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
-    }
-    input[type="text"], input[type="password"] {
-      background: #12121a;
-      color: #fff;
-      border: 1px solid var(--border);
-      padding: 10px 16px;
-      border-radius: 30px;
-      font-size: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 18px;
-    }
-    .card {
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 35px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      backdrop-filter: blur(10px);
-      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-    }
-    .card:hover { 
-      transform: translateY(-5px); 
-      border-color: var(--accent-neon); 
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-    }
-
-    .name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px; }
-    .stats { font-size: 13px; margin: 6px 0; color: #a8a8b3; }
-    .stats b.win { color: var(--win); }
-    .stats b.loss { color: var(--loss); }
-
-    /* ESTILO MELHORADO DO BOTÃO DE VOTO */
-    .vote-instruction-box {
-      width: 100%;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .vote-hint-text {
-      font-size: 10px;
-      color: var(--accent-neon);
-      text-transform: uppercase;
-      font-weight: bold;
-      margin-bottom: 5px;
-      letter-spacing: 0.5px;
-    }
-    .btn-vote {
-      background: linear-gradient(135deg, #00f0ff, var(--accent));
-      border: 2px solid #fff;
+    /* Botão Flutuante de Cadastro */
+    .btn-cadastrar-flutuante {
+      background: var(--neon-cyan);
       color: #000;
       font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      padding: 12px;
-      border-radius: 50px;
-      width: 100%;
+      font-weight: 800;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      border-radius: 8px;
       cursor: pointer;
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
-      transition: all 0.2s ease;
+      display: block;
+      margin: 0 auto 30px auto;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+      transition: transform 0.2s;
     }
-    .btn-vote:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
-      background: linear-gradient(135deg, #fff, var(--accent-neon));
-    }
-    .btn-vote:active { transform: scale(0.96); }
+    .btn-cadastrar-flutuante:hover { transform: scale(1.05); }
 
-    .voters-container {
-      width: 100%;
-      margin-top: 12px;
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--neon-cyan);
+      margin: 30px 0 15px 0;
+      text-transform: uppercase;
+      border-left: 4px solid var(--neon-pink);
+      padding-left: 10px;
+    }
+
+    /* Grid de Jogadores */
+    .grid-players {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .player-card {
+      background: var(--card-bg);
+      border: 2px solid rgba(0, 229, 255, 0.3);
+      border-radius: 12px;
+      padding: 20px;
       text-align: center;
+      backdrop-filter: blur(8px);
     }
-    .voter-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(255, 0, 85, 0.15);
-      border: 1px solid var(--loss);
-      padding: 3px 8px;
-      border-radius: 50px;
-      font-size: 10px;
-      margin: 2px;
-      color: #ff4d7d;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .voter-badge:hover {
-      transform: scale(1.1);
-      background: rgba(255, 0, 85, 0.35);
-    }
-    .voter-badge img {
-      width: 18px;
-      height: 18px;
+
+    .player-avatar {
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       object-fit: cover;
+      border: 4px solid var(--neon-gold);
+      margin-bottom: 15px;
+      background: #000;
     }
-    .btn-remove-vote {
-      background: transparent;
-      border: none;
+
+    .player-name {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
       color: #fff;
-      font-weight: bold;
+    }
+
+    /* O Botão Roxo Melhorado para Registro de Resultado */
+    .btn-votar {
+      background: linear-gradient(180deg, #8a2be2, #4b0082);
+      color: #fff;
+      border: 2px solid #a855f7;
+      padding: 12px 15px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      border-radius: 8px;
       cursor: pointer;
-      margin-left: 3px;
-      font-size: 12px;
-    }
-    .btn-remove-vote:hover { color: var(--loss); }
-
-    .audit-info {
-      font-size: 9px;
-      color: var(--accent-neon);
-      margin-top: 2px;
-      text-align: center;
-      background: rgba(0, 240, 255, 0.08);
-      padding: 2px 6px;
-      border-radius: 10px;
-      border: 1px dashed rgba(0, 240, 255, 0.3);
+      width: 100%;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px rgba(138, 43, 226, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.3);
+      transition: all 0.2s;
     }
 
-    .admin-player-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.05);
-      padding: 10px 16px;
-      border-radius: 30px;
-      margin-bottom: 8px;
+    .btn-votar:hover {
+      background: linear-gradient(180deg, #9f3cf3, #5c00a3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(138, 43, 226, 0.8), inset 0 2px 5px rgba(255, 255, 255, 0.4);
+    }
+    
+    .btn-votar:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 5px rgba(138, 43, 226, 0.8);
     }
 
-    .table-wrapper {
-      background: var(--card);
-      border-radius: 25px;
-      padding: 15px;
-      border: 1px solid var(--border);
+    /* Modais */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
       backdrop-filter: blur(10px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999; padding: 15px;
     }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; }
-    th { background: rgba(0,0,0,0.4); color: var(--accent-neon); font-family: 'Orbitron', sans-serif; font-size: 11px; }
+
+    .modal-card {
+      background: #12121c;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 16px;
+      padding: 25px;
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
+    }
+
+    /* Efeito Explosivo de K.O. */
+    .explosao-ko {
+      font-family: 'Bangers', cursive;
+      font-size: 5rem;
+      color: var(--neon-gold);
+      text-transform: uppercase;
+      margin: 10px 0;
+      animation: koExplode 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards, screenShake 0.5s;
+      text-shadow: 
+        5px 5px 0px var(--neon-pink), 
+        -5px -5px 0px var(--neon-cyan),
+        0 0 30px rgba(255, 215, 0, 1);
+    }
+
+    @keyframes koExplode {
+      0% { transform: scale(0.1) rotate(-15deg); opacity: 0; filter: brightness(3); }
+      50% { transform: scale(1.3) rotate(5deg); opacity: 1; filter: brightness(2); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1); }
+    }
+
+    @keyframes screenShake {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-10px, 10px); }
+      40% { transform: translate(10px, -10px); }
+      60% { transform: translate(-10px, -10px); }
+      80% { transform: translate(10px, 10px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .frase-epica {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--text-color);
+      margin-top: 20px;
+      font-style: italic;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    /* Editor de Imagem (Cropper) */
+    .cropper-container-wrapper {
+      width: 100%;
+      height: 300px;
+      background: #000;
+      margin: 15px 0;
+      display: none; /* Só mostra quando seleciona foto */
+    }
+
+    .modal-inputs {
+      display: flex; flex-direction: column; gap: 15px; margin: 20px 0;
+    }
+    
+    .modal-inputs input[type="text"] {
+      padding: 12px; font-family: 'Orbitron', sans-serif; font-size: 1rem;
+      border: 1px solid var(--neon-cyan); border-radius: 6px;
+      background: rgba(0,0,0,0.5); color: #fff;
+    }
+    
+    .modal-inputs input[type="file"] {
+      color: var(--neon-cyan); font-family: 'Montserrat', sans-serif;
+    }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    
+    .btn-confirmar {
+      flex: 1; background: var(--neon-cyan); color: #000; font-weight: 800;
+      font-family: 'Orbitron', sans-serif; border: none; padding: 12px;
+      border-radius: 6px; cursor: pointer; text-transform: uppercase;
+    }
+    
+    .btn-cancelar {
+      flex: 1; background: transparent; color: #aaa; border: 1px solid #555;
+      font-family: 'Orbitron', sans-serif; padding: 12px; border-radius: 6px; cursor: pointer;
+    }
+
+    /* Admin Panel */
+    .admin-list {
+      text-align: left; max-height: 250px; overflow-y: auto; margin: 15px 0;
+    }
+    .admin-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .btn-liberar {
+      background: var(--neon-pink); color: #fff; border: none; padding: 5px 10px;
+      border-radius: 4px; cursor: pointer; font-weight: bold;
+    }
+
+    footer { text-align: center; margin-top: 50px; color: #666; font-size: 0.8rem; }
+    .btn-admin-link { background: none; border: none; color: #555; cursor: pointer; text-decoration: underline; margin-top: 15px; }
   </style>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div style="flex: 1;"></div>
-    <h1 class="main-title" style="flex: 2;">Fight Nerd Mauá</h1>
-    <div style="flex: 1; text-align: right;">
-      <button class="btn-admin-toggle" onclick="openLoginModal()">⚙️ Admin</button>
-    </div>
-  </div>
+  <header>
+    <h1>FIGHT NERD MAUÁ</h1>
+    <p>ARCADE TOURNAMENT ARENA</p>
+  </header>
 
-  <!-- MODAL DE SENHA -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal-box">
-      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🔒 Acesso Restrito</h3>
-      <p style="font-size: 13px; color: #a8a8b3;">Digite a senha de administrador:</p>
-      <input type="password" id="modalPassInput" placeholder="•••••" style="text-align: center; width: 180px; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') checkPassword()">
-      <div style="display: flex; gap: 10px; justify-content: center;">
-        <button onclick="checkPassword()" style="background: var(--win); border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Entrar</button>
-        <button onclick="closeLoginModal()" style="background: #444; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE IDENTIFICAÇÃO DO APARELHO (TRAVADO CONTRA FRAUDES) -->
-  <div class="modal-overlay" id="deviceModal" style="display: flex;">
-    <div class="modal-box" style="max-width: 320px;">
-      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🎮 Quem é você?</h3>
-      <p style="font-size: 12px; color: #a8a8b3; line-height: 1.4;">Digite exatamente o seu **nome de lutador** cadastrado para vincular este aparelho ao torneio:</p>
-      <input type="text" id="deviceInputName" placeholder="Seu nome no torneio..." style="width: 80%; text-align: center; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') registerDevice()">
-      <button onclick="registerDevice()" style="background: var(--win); border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">Salvar Aparelho</button>
-      <p style="font-size: 10px; color: #777; margin-top: 12px;">* Aparelho travado. Errou o nome? Peca ao Administrador liberar para você de novo.</p>
-    </div>
-  </div>
-
-  <!-- MODAL DE CONFIRMAÇÃO DE VITÓRIA (ESTILO K.O. / IMPACTO) -->
-  <div class="modal-overlay" id="successModal">
-    <div class="success-ko-box">
-      <div class="success-ko-title">VITÓRIA!</div>
-      <p style="font-size: 15px; color: #fff; font-weight: bold; margin: 10px 0 20px 0;">Resultado computado na arena com sucesso!</p>
-      <button onclick="closeSuccessModal()" style="background: var(--win); color:#000; border:none; padding:12px 30px; border-radius:30px; font-family:'Orbitron'; font-weight:900; cursor:pointer; text-transform:uppercase;">Continuar Treino</button>
-    </div>
-  </div>
-
-  <!-- MODAL DE ZOOM DA VÍTIMA -->
-  <div class="modal-overlay" id="victimModal">
-    <div class="victim-zoom-box">
-      <h3 style="color: var(--loss); font-family:'Orbitron'; margin:0; text-transform:uppercase;">🦆 Vítima em Destaque</h3>
-      <img id="zoomVictimImg" class="victim-zoom-img" src="" alt="Vítima">
-      <div id="zoomVictimName" style="font-family:'Orbitron'; font-size: 18px; font-weight: bold; color: #fff;"></div>
-      <p id="zoomVictimQuote" style="font-size: 13px; font-style: italic; color: #ffd700; margin-top: 8px; font-weight: bold; line-height: 1.3; min-height: 36px; display: flex; align-items: center; justify-content: center;"></p>
-      <button onclick="closeVictimModal()" style="background: var(--loss); color:#fff; border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:10px;">Fechar Zoeira</button>
-    </div>
-  </div>
-
-  <!-- PAINEL DE ADMIN -->
-  <div class="admin-panel" id="adminPanel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-      <h3 style="margin:0; color: var(--accent-neon);" id="admin-form-title">⚙️ Painel do Administrador</h3>
-      <button onclick="logoutAdmin()" style="background: var(--loss); border:none; color:#fff; padding:6px 14px; border-radius:30px; font-size:12px; cursor:pointer; font-weight:bold;">Sair do Admin</button>
-    </div>
+  <main class="container">
+    <button class="btn-cadastrar-flutuante" onclick="abrirModalCadastro()">+ CADASTRAR JOGADOR</button>
     
-    <input type="hidden" id="adm-edit-id" value="">
-    
-    <div class="form-group">
-      <input type="text" id="adm-name" placeholder="Nome do Jogador">
+    <h2 class="section-title">DESAFIANTES NA ARENA</h2>
+    <div class="grid-players" id="gridPlayers">
+      <!-- Jogadores serão renderizados aqui via JS -->
     </div>
-    
-    <div class="form-group">
-      <label>Foto Normal (WebP Animado / GIF / JPG):</label>
-      <input type="file" id="adm-foto-normal" accept="image/*" onchange="handleFileSelect(event, 'normal')">
-    </div>
+  </main>
 
-    <div class="form-group">
-      <label>Foto KO (Cara Machucada):</label>
-      <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleFileSelect(event, 'ko')">
-    </div>
-
-    <!-- CROPPER ESTILO WHATSAPP -->
-    <div class="preview-container">
+  <!-- MODAL: CADASTRO COM CROPPER (Estilo WhatsApp) -->
+  <div id="modalCadastro" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h2 style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif;">NOVO LUTADOR</h2>
+      <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">*Apenas 1 registro permitido por aparelho.</p>
       
-      <!-- NORMAL CROPPER -->
-      <div class="preview-box">
-        <label style="font-size:10px; color:var(--accent-neon); font-weight:bold;">AJUSTAR NORMAL (Zoom & Arraste)</label>
-        <div class="wa-crop-frame" id="frame-normal" onmousedown="startDrag(event, 'normal')" ontouchstart="startDrag(event, 'normal')">
-          <img id="crop-img-normal" class="wa-crop-img" src="https://i.pravatar.cc/150?img=11">
-        </div>
-        <div class="wa-controls">
-          <label>Zoom</label>
-          <input type="range" id="zoom-normal" min="50" max="300" value="100" oninput="updateCropTransform('normal')">
+      <div class="modal-inputs">
+        <input type="text" id="inputNome" placeholder="Digite seu Nome ou Nick">
+        <input type="file" id="inputFoto" accept="image/*">
+        
+        <div class="cropper-container-wrapper" id="cropperWrapper">
+          <img id="imageToCrop" src="" style="max-width: 100%;">
         </div>
       </div>
 
-      <!-- KO CROPPER -->
-      <div class="preview-box">
-        <label style="font-size:10px; color:var(--loss); font-weight:bold;">AJUSTAR KO (Zoom & Arraste)</label>
-        <div class="wa-crop-frame" id="frame-ko" onmousedown="startDrag(event, 'ko')" ontouchstart="startDrag(event, 'ko')">
-          <img id="crop-img-ko" class="wa-crop-img" src="https://i.pravatar.cc/150?img=33">
-        </div>
-        <div class="wa-controls">
-          <label>Zoom</label>
-          <input type="range" id="zoom-ko" min="50" max="300" value="100" oninput="updateCropTransform('ko')">
-        </div>
+      <div class="modal-actions">
+        <button onclick="salvarJogador()" class="btn-confirmar">REGISTRAR</button>
+        <button onclick="fecharModal('modalCadastro')" class="btn-cancelar">CANCELAR</button>
       </div>
-
     </div>
-    
-    <div style="display: flex; gap: 8px;">
-      <button id="btn-save-player" onclick="savePlayerAdm()" style="flex:1; background: var(--win); border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#000;">+ Salvar / Cadastrar Jogador</button>
-      <button id="btn-cancel-edit" onclick="cancelEdit()" style="display:none; background: #555; border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#fff;">Cancelar</button>
-    </div>
-
-    <hr style="border-color: var(--border); margin: 20px 0;">
-    
-    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciar Jogadores e Aparelhos:</h4>
-    <div id="admin-players-list"></div>
-
-    <hr style="border-color: var(--border); margin: 20px 0;">
-    <button onclick="resetTournament()" style="background: var(--loss); border:none; color:#fff; padding:10px 18px; border-radius:30px; cursor:pointer; font-weight:bold;">⚠️ Zerar Campeonato</button>
   </div>
 
-  <!-- PAINEL DE DESTAQUES -->
-  <div class="blink-infamy">Hall da Infâmia</div>
-  <div class="podium-panel">
-    <div class="podium-grid">
+  <!-- MODAL: EXPLOSÃO K.O. (Confirmação de Vitória) -->
+  <div id="modalKO" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="background: transparent; border: none; box-shadow: none;">
+      <div id="animacaoKO" class="explosao-ko">K.O. !</div>
+      <p id="fraseEpica" class="frase-epica">...</p>
+      <button onclick="fecharModal('modalKO')" class="btn-confirmar" style="margin-top: 30px; width: 200px;">Continuar</button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN (Liberação de Aparelho) -->
+  <div id="modalAdmin" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h2 style="color: var(--neon-gold); font-family: 'Orbitron', sans-serif;">PAINEL ADMIN</h2>
+      <p style="font-size: 0.85rem; margin-bottom: 15px;">Gerenciar bloqueio de aparelhos</p>
       
-      <!-- 1º LUGAR -->
-      <div class="podium-slot slot-1">
-        <div class="podium-badge-title" style="color: var(--gold);">🥇 1º LUGAR</div>
-        <div class="podium-subtitle">"Kakarotto Verme Miserável"</div>
-        <div id="podium-1">---</div>
+      <div class="admin-list" id="listaAparelhos">
+        <!-- Lista de aparelhos bloqueados carregará aqui -->
       </div>
 
-      <!-- 2º LUGAR -->
-      <div class="podium-slot slot-2">
-        <div class="podium-badge-title" style="color: var(--silver);">🥈 2º LUGAR</div>
-        <div class="podium-subtitle">"Vegeta Príncipe do Saia daí"</div>
-        <div id="podium-2">---</div>
+      <div class="modal-actions">
+        <!-- Simulação de destravamento geral para o protótipo -->
+        <button onclick="liberarMeuAparelho()" class="btn-confirmar" style="background: var(--neon-pink); color: #fff;">Liberar MEU Aparelho</button>
+        <button onclick="fecharModal('modalAdmin')" class="btn-cancelar">FECHAR</button>
       </div>
-
-      <!-- 3º LUGAR -->
-      <div class="podium-slot slot-3">
-        <div class="podium-badge-title" style="color: var(--bronze);">🥉 3º LUGAR</div>
-        <div class="podium-subtitle">"Gohan Desperdício de Potencial Premium Plus"</div>
-        <div id="podium-3">---</div>
-      </div>
-
-      <!-- PATO -->
-      <div class="podium-slot slot-duck">
-        <div class="podium-badge-title" style="color: var(--loss);">🦆 PATO DA TEMPORADA (QUAC!)</div>
-        <div class="podium-subtitle">"Por que você matou o Kuririn?"</div>
-        <div id="podium-duck">---</div>
-      </div>
-
     </div>
   </div>
 
-  <!-- IDENTIFICAÇÃO DO APARELHO (SEM BOTÃO DE TROCA PRA EVITAR BURLA) -->
-  <div class="identity-bar" id="deviceBar" style="display: none;">
-    <div>
-      <span style="font-size:11px; color:#a8a8b3; text-transform:uppercase;">🎮 Jogador Identificado no Aparelho:</span><br>
-      <b id="deviceNameDisplay" style="color: var(--accent-neon); font-family:'Orbitron'; font-size:15px;">---</b>
-    </div>
-    <div style="font-size:10px; color:#ffd700; text-align:right;">Aparelho Vinculado com Sucesso</div>
-  </div>
+  <footer>
+    <p>Fight Nerd Mauá &copy; Arena Arcade</p>
+    <button class="btn-admin-link" onclick="acessarAdmin()">Acesso Restrito (Admin)</button>
+  </footer>
 
-  <!-- CARDS DOS JOGADORES -->
-  <h2>Registrar Vitória</h2>
-  <div class="grid" id="players-grid"></div>
-
-  <!-- TABELA DE CLASSIFICAÇÃO -->
-  <div style="margin-top: 40px;">
-    <h2>Classificação Geral</h2>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Pos.</th>
-            <th style="text-align:left;">Lutador</th>
-            <th>Vitórias 🏆</th>
-            <th>Derrotas 🦆</th>
-            <th>Saldo ⚖️</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard"></tbody>
-      </table>
-    </div>
-  </div>
+  <!-- Bibliotecas de JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <!-- Firebase SDKs (v9 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCQ2sZ6do1PKMbGmGQj0dprbvUUrC4lINg",
-      authDomain: "fight-nerd-maua.firebaseapp.com",
-      databaseURL: "https://fight-nerd-maua-default-rtdb.firebaseio.com",
-      projectId: "fight-nerd-maua",
-      storageBucket: "fight-nerd-maua.firebasestorage.app",
-      messagingSenderId: "606341642412",
-      appId: "1:606341642412:web:b1f84bada3181610ee8709",
-      measurementId: "G-67DZHFJXPX"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let adminPassword = "86675";
-    let isAdminLoggedIn = false;
-    let jogadores = [];
-
-    let newNormalBase64 = null;
-    let newKoBase64 = null;
-
-    let cropState = {
-      normal: { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 },
-      ko: { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 }
-    };
-
-    let activeDrag = null;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let initialX = 0;
-    let initialY = 0;
-
-    let deviceId = localStorage.getItem('fnm_device_id');
-    if (!deviceId) {
-      deviceId = 'dev_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-      localStorage.setItem('fnm_device_id', deviceId);
-    }
-
-    let myPlayerId = localStorage.getItem('fnm_player_id') || null;
-
-    const frasesZoeiraMaster = [
-      "Vamos tesouro, não se misture com essa gentalha...",
-      "Gentalha! Gentalha!",
-      "Volta o cão arrependido com suas orelhas tão fartas...",
-      "Mamãe!",
-      "Deixa acontecer, naturally...",
-      "Maionese, ele me bate, bate feito maionese...",
-      "Não estou suportando mais...",
-      "Não posso mais suportar... Esses seus abuuusos...",
-      "Índio quer apito se não der, pau vai comer!",
-      "Anotaram a placa do caminhão?", "Vem, vem tranquilo!", "É só uma picadinha!", "Cacete de agulha!",
-      "Que horas passa o amarelinho?", "E só não te dou outra porque...", "Tá bom, mas não se irrite!",
-      "Seu Madruga, sua vózinha sabe jogar melhor que você?", "Rapaaaaz!", "É pau, é pedra, é o fim do caminho!",
-      "Ratinho-o-o-o!", "Maravilha, Alberto!", "Xaropinho: QUE NOJO!", "Que deselegante!",
-      "Tapa na cara de quem tá no chão.", "Isto é uma desgraça, tá me ouvindo? Uma desgraça!", "Eu sou ricaaa!",
-      "Sabe de nada, inocente!", "Errou! Ô loco, meu!", "É uma cilada, Bino!", "Já acabou, Jéssica?",
-      "Aai, Pai! Páara...", "Receba! Graças a Deus, pai!", "Na cara não, pra não estragar o velório!",
-      "Tinha que ser o Chaves mesmo!", "E lá vamos nós!", "Que coisa feia, que coisa ridícula!",
-      "Que falta de decoro!", "Já pode pedir música no Fantástico pela surra!", "Foi de F no chat!",
-      "Apanhou tanto que a mãe achou que era foto de ultrassom!", "Apanhou tanto que o RG mudou de nome sozinho pra 'Presunto'!",
-      "Apanhou tanto que a cara virou mapa topográfico de relevo!", "Apanhou tanto que o relógio inteligente marcou corrida de maratona!",
-      "Apanhou tanto que se chacoalhar faz barulho de chocalho por dentro!", "Apanhou tanto que o sensor de colisão do carro disparou do lado de fora!",
-      "Apanhou tanto que até o Wi-Fi desconectou de desgosto!", "Apanhou tanto que o Google Fotos identificou o rosto como obra do Picasso!",
-      "Apanhou tanto que a sombra se recusou a acompanhar no caminho de volta!", "Apanhou tanto que virou estampa de camiseta de liquidação!",
-      "Apanhou tanto que o app do banco bloqueou o acesso por biometria facial!", "Apanhou tanto que se soprar forte cai o que sobrou da dignidade!",
-      "Apanhou tanto que se virar de ponta-cabeça sai moeda da orelha!", "Apanhou tanto que até o anjo da guarda pediu demissão sem aviso prévio!",
-      "Apanhou tanto que virou ponto de referência pra mapa de impacto!", "Apanhou tanto que a cara ficou parecendo amassado de funilaria!",
-      "Apanhou tanto que o GPS recalculou a rota direto pro Pronto-Socorro!", "Apanhou tanto que o sangue virou molho de pimenta pra temperar a derrota!",
-      "Apanhou tanto que nem o corretor do celular consegue consertar essa cara!", "Apanhou tanto que até o Juiz do combate pediu desculpa por ter deixado acontecer!",
-      "Por que você matou o Kuririn?!", "Sobra nada pro Betinha...", "Ficou no cheirinho!", "No céu tem pão?... E morreu!",
-      "SABOOOR de perdedor!", "Nem usei 30% do meu poder...", "Venham na maciota!", "Você é fraco... lhe falta ódio.",
-      "Foi nada, segue o jogo!", "Você é um estorvo, garoto!", "Tô na área, se me derrubar é pênalti!",
-      "Não conheço o mundo sem você pra eu chutar a bunda!", "Apanhou mais que saco de pancada em dia de treino.",
-      "Ah, poxa vida... levou uma surra pra aprender!", "Caiu mais rápido que o Yamcha!", "Nem precisou transformar em Super Saiyajin...",
-      "Onde foi parar todo aquele orgulho Sayajin?", "Meteoro de Pégaso? Tá mais pra garoa de Pégaso!",
-      "Um mesmo golpe não funciona duas vezes... mas esse funcionou!", "Nem a deusa Atena salva uma surra dessa.",
-      "Patético. Nem me fez gastar 1% do meu Ki.", "Volte para a academia de ninjas, garoto.", "FLAWLESS VICTORY!",
-      "BRUTALITY!", "BABALITY!", "TOASTY!", "Get over here... pra tomar mais uma!", "Tomou um Uppercut que foi parar no teto!",
-      "K.O. - PERFECT!", "Volta pro lobby que essa doeu!", "GAME OVER! Insert Coin to Cry.", "Tá jogando de controle desligado?",
-      "POW! BAM! CRASH! ZAP!", "Foi tanto tapa que a cara virou do avesso!", "Pediu pra sair!", "Aperta o START pra reiniciar a vida.",
-      "Sobra nada! Passou o trator por cima!", "Desliga o controle que o humilhado tá tonto!", "Fui tapeado!",
-      "Fui jantado com farofa na arena!", "Quac! Apanhei até de quem não jogava...", "O entregador de vitórias da rodada.",
-      "Voou pena pra tudo quanto é lado!", "Veio só pra marcar presença e tomar tático.", "Falta de kit médico ou falta de braço?",
-      "Tomou um tático tão pesado que mudou de fuso horário!", "Apanhou de pau mole pra aprender a ter respeito!",
-      "Nem a mãe reconhece se virar o rosto pro lado!", "Foi humilhado em 4K 60FPS sem direito a replay!",
-      "Parece que jogaram uma granada de fezes no seu jogo!", "Tomou um Combobreaker na alma!", "Entregou o controle pro irmão mais novo jogar?",
-      "Apertou todos os botões, rezou um Pai Nosso e mesmo assim caiu!", "Passou o campeonato inteiro no menu de opções!",
-      "Se liga o Wi-Fi melhora, porque a desculpa do lag tá feia!", "Gaguejou no controle!", "Esqueceu de ativar o tutorial?",
-      "Pediu pause pra chorar no banheiro!", "Caiu mais fácil que o Freeza fatiado pelo Trunks!", "O Buggy O Palhaço apanharia menos que você nessa!",
-      "Sinta o gostinho da Expansão de Domínio do K.O.!", "Nem com Akuma no Mi despertada você arrumava algo aqui.",
-      "Isso porque eu tava jogando com uma mão só...", "Respire fundo... e aceite o Game Over!", "Veio só pra pagar a conta do evento!",
-      "Sua participação foi meramente ilustrativa!", "Tá servindo só de saco de pancada e escada pro pódio!", "Pede pra sair, 01!",
-      "Passaram o cerol sem dó!", "Perdeu o rumo de casa no primeiro golpe!", "Alguém chama o Samu que o presunto tá quente!",
-      "Nem o Procon resolve esse calote de gameplay!", "Vai chorar na cama que é lugar quente!", "Essa doeu até no meu RG!",
-      "Entrou mudo e saiu calado de tanta pisa!", "Foi atropelado no acostamento!", "Bateu fofo e apanhou pesado!", "Tomou um sacode que soltou as parafusas!"
+    // ==========================================
+    // 1. O ARSENAL COMPLETO DE FRASES (Zoeira + Animes + Anti-heróis)
+    // ==========================================
+    const frasesKO = [
+      // Cavaleiros e Shounen (Sua lista)
+      "Vamos! Levante-se Seiya!", "Coragem Seiya!", "Força, Seiya!", "Lute, Seiya!", 
+      "Não morra Seiya!", "Não cuspa os dentes, Seiya!", "Não perca litros de sangue, Seiya!", 
+      "Não tenha traumatismos, Seiya!", "Saoori!", "Por Athena!", "Eu não desisto Nunca!", 
+      "Preciso de milagre!", "Esse é o meu jeito Ninja!", "Queime Cosmo!", "Alcance o sétimo sentido!", 
+      "Não perca as esperanças, Seiya!", "Não perca os sentidos, Seiya!", "Não quebre as pernas, Seiya!", 
+      "Pela Deusa!", "Me dê sua força Pegasus!", "Vamos ao encontro do mais forte!", "Nem doeu!", 
+      "Insolente!", "Miserável é um gênio!", "Kaioken aumentado 100 vezes!", "Morra Seiya!", 
+      "Levante as mãos para a Genki Dama", "O Naruto é duro às vezes...", "Booora!", "UP!UP!", 
+      "A flor tem que ser de cerejeira", "Mais de 8 mil!",
+      // Pesos Pesados / Anti-heróis
+      "O seu poder de luta é de um verme insolente!", "Chamas Negras Mortais!", 
+      "Você é fraco. Por que é fraco? Porque lhe falta ódio.", "Ave Fênix! Volto das cinzas para te derrotar!", 
+      "Chaos Control! Muito lento...",
+      // Zoeira e Hall da Infâmia
+      "Perdeu a alma!", "Vamos tesouro, não se misture com essa gentalha...", "Sabe de nada, inocente!", 
+      "Errou o combo até no vento!", "Apanhou tanto que o controle desconectou!", "Levou o Perfect e nem viu de onde veio!", 
+      "Resetou o controle pra ver se melhorava!", "Passou vergonha no crédito e no débito!", "Chama o VAR que deu ruim!"
     ];
 
-    let filaFrases = [];
+    // ==========================================
+    // 2. VARIÁVEIS GLOBAIS E CROPPER
+    // ==========================================
+    let cropper;
+    const dbMock = [
+      { id: 1, nome: "Ryu", foto: "https://via.placeholder.com/150/000000/FFFFFF?text=RYU" },
+      { id: 2, nome: "Ken", foto: "https://via.placeholder.com/150/000000/FFFFFF?text=KEN" }
+    ]; // Simulação de banco de dados para o visual rodar sem Firebase configurado.
 
-    function pegarProximaFraseSemRepetir() {
-      if (filaFrases.length === 0) {
-        filaFrases = [...frasesZoeiraMaster].sort(() => Math.random() - 0.5);
+    // Configurar leitor de imagem para o Cropper
+    const inputFoto = document.getElementById('inputFoto');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const cropperWrapper = document.getElementById('cropperWrapper');
+
+    inputFoto.addEventListener('change', function (e) {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        const url = URL.createObjectURL(file);
+        imageToCrop.src = url;
+        cropperWrapper.style.display = 'block';
+
+        if (cropper) { cropper.destroy(); }
+        
+        // Ativa o corte circular/quadrado estilo WhatsApp
+        cropper = new Cropper(imageToCrop, {
+          aspectRatio: 1, // Quadrado perfeito (para ficar redondo no CSS)
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 1,
+          restore: false,
+          guides: false,
+          center: false,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+        });
       }
-      return filaFrases.pop();
-    }
-
-    db.ref('jogadores').on('value', (snapshot) => {
-      const data = snapshot.val();
-      jogadores = data ? Object.values(data) : [];
-      checkDeviceRegistration();
-      recalcularPontosEAtualizar();
     });
 
-    function checkDeviceRegistration() {
-      const modal = document.getElementById('deviceModal');
-      const bar = document.getElementById('deviceBar');
-      const nameDisplay = document.getElementById('deviceNameDisplay');
-
-      if (!myPlayerId) {
-        modal.style.display = 'flex';
-        bar.style.display = 'none';
-      } else {
-        const p = jogadores.find(item => String(item.id) === String(myPlayerId));
-        if (p) {
-          modal.style.display = 'none';
-          bar.style.display = 'flex';
-          nameDisplay.innerText = p.nome;
-        } else {
-          // Se o administrador apagou o lutador ou invalidou o aparelho, força nova identificação
-          localStorage.removeItem('fnm_player_id');
-          myPlayerId = null;
-          modal.style.display = 'flex';
-          bar.style.display = 'none';
-        }
-      }
-    }
-
-    function registerDevice() {
-      const typedName = document.getElementById('deviceInputName').value.trim().toLowerCase();
-      if (!typedName) return alert("Digite um nome!");
-
-      const found = jogadores.find(item => item.nome.trim().toLowerCase() === typedName);
-      if (!found) {
-        alert("⚠️ Nome não encontrado no cadastro do torneio! Verifique com o Administrador.");
-        return;
-      }
-
-      myPlayerId = found.id;
-      localStorage.setItem('fnm_player_id', myPlayerId);
-      checkDeviceRegistration();
-      updateUI();
-    }
-
-    // Função exclusiva do Admin para liberar o aparelho de um jogador
-    function resetDeviceForPlayer(playerId) {
-      if (!isAdminLoggedIn) return;
-      if (confirm("Deseja liberar o aparelho deste lutador para que ele possa se cadastrar novamente?")) {
-        db.ref('jogadores/' + String(playerId) + '/linkedDevice').remove();
-        alert("✅ Aparelho liberado! Quando ele abrir a página, poderá escolher o nome de novo.");
-      }
-    }
-
-    function recalcularPontosEAtualizar() {
-      jogadores.forEach(p => {
-        p.vitoriasCalculadas = 0;
-        p.derrotasCalculadas = 0;
-      });
-
-      jogadores.forEach(vencedor => {
-        let vitimasObj = vencedor.vitimas || {};
-        let vitimasList = Object.values(vitimasObj);
-
-        vencedor.vitoriasCalculadas = vitimasList.length;
-
-        vitimasList.forEach(voto => {
-          let perdedor = jogadores.find(p => String(p.id) === String(voto.perdedorId));
-          if (perdedor) {
-            perdedor.derrotasCalculadas = (perdedor.derrotasCalculadas || 0) + 1;
-          }
-        });
-      });
-
-      updateUI();
-    }
-
-    function ordenarJogadores() {
-      return [...jogadores].sort((a, b) => {
-        if (b.vitoriasCalculadas !== a.vitoriasCalculadas) {
-          return b.vitoriasCalculadas - a.vitoriasCalculadas;
-        }
-
-        let aVenceuB = Object.values(a.vitimas || {}).some(v => String(v.perdedorId) === String(b.id));
-        let bVenceuA = Object.values(b.vitimas || {}).some(v => String(v.perdedorId) === String(a.id));
-
-        if (aVenceuB && !bVenceuA) return -1;
-        if (bVenceuA && !aVenceuB) return 1;
-
-        if (a.derrotasCalculadas !== b.derrotasCalculadas) {
-          return a.derrotasCalculadas - b.derrotasCalculadas;
-        }
-
-        let saldoA = a.vitoriasCalculadas - a.derrotasCalculadas;
-        let saldoB = b.vitoriasCalculadas - b.derrotasCalculadas;
-        if (saldoB !== saldoA) {
-          return saldoB - saldoA;
-        }
-
-        return a.nome.localeCompare(b.nome);
-      });
-    }
-
-    function openLoginModal() {
-      if (isAdminLoggedIn) {
-        document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
-      } else {
-        document.getElementById('loginModal').style.display = 'flex';
-        document.getElementById('modalPassInput').value = '';
-        document.getElementById('modalPassInput').focus();
-      }
-    }
-
-    function closeLoginModal() {
-      document.getElementById('loginModal').style.display = 'none';
-    }
-
-    function showSuccessModal() {
-      document.getElementById('successModal').style.display = 'flex';
-    }
-
-    function closeSuccessModal() {
-      document.getElementById('successModal').style.display = 'none';
-    }
-
-    function showVictimZoom(nome, fotoKO, cropDataStr) {
-      const fraseSemRepetir = pegarProximaFraseSemRepetir();
-      const img = document.getElementById('zoomVictimImg');
-      document.getElementById('zoomVictimName').innerText = nome;
-      img.src = fotoKO;
+    // ==========================================
+    // 3. LÓGICA DE INTERFACE
+    // ==========================================
+    function renderizarJogadores() {
+      const grid = document.getElementById('gridPlayers');
+      grid.innerHTML = '';
       
-      applyCropStylesToImg(img, cropDataStr, 180);
-
-      document.getElementById('zoomVictimQuote').innerText = `"${fraseSemRepetir}"`;
-      document.getElementById('victimModal').style.display = 'flex';
-    }
-
-    function closeVictimModal() {
-      document.getElementById('victimModal').style.display = 'none';
-    }
-
-    function checkPassword() {
-      const pass = document.getElementById('modalPassInput').value;
-      if (pass === adminPassword) {
-        isAdminLoggedIn = true;
-        closeLoginModal();
-        document.getElementById('adminPanel').style.display = 'block';
-        document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
-        updateUI();
-      } else {
-        alert("⚠️ Senha incorreta!");
-      }
-    }
-
-    function logoutAdmin() {
-      isAdminLoggedIn = false;
-      document.getElementById('adminPanel').style.display = 'none';
-      updateUI();
-    }
-
-    function handleFileSelect(event, type) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target.result;
-        if (type === 'normal') {
-          newNormalBase64 = base64;
-        } else {
-          newKoBase64 = base64;
-        }
-
-        const imgObj = new Image();
-        imgObj.onload = function() {
-          cropState[type].natW = imgObj.naturalWidth;
-          cropState[type].natH = imgObj.naturalHeight;
-          cropState[type].zoom = 100;
-          cropState[type].x = 0;
-          cropState[type].y = 0;
-
-          document.getElementById(`zoom-${type}`).value = 100;
-
-          const cropImgEl = document.getElementById(`crop-img-${type}`);
-          cropImgEl.src = base64;
-          updateCropTransform(type);
-        };
-        imgObj.src = base64;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function updateCropTransform(type) {
-      const zoomVal = parseInt(document.getElementById(`zoom-${type}`).value);
-      cropState[type].zoom = zoomVal;
-
-      const natW = cropState[type].natW || 100;
-      const natH = cropState[type].natH || 100;
-
-      let baseScale = Math.max(100 / natW, 100 / natH);
-      let finalW = natW * baseScale * (zoomVal / 100);
-      let finalH = natH * baseScale * (zoomVal / 100);
-
-      const imgEl = document.getElementById(`crop-img-${type}`);
-      imgEl.style.width = finalW + 'px';
-      imgEl.style.height = finalH + 'px';
-      imgEl.style.left = cropState[type].x + 'px';
-      imgEl.style.top = cropState[type].y + 'px';
-    }
-
-    function startDrag(e, type) {
-      activeDrag = type;
-      dragStartX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-      dragStartY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-      initialX = cropState[type].x;
-      initialY = cropState[type].y;
-
-      document.addEventListener('mousemove', onDragMove);
-      document.addEventListener('mouseup', stopDrag);
-      document.addEventListener('touchmove', onDragMove);
-      document.addEventListener('touchend', stopDrag);
-      e.preventDefault();
-    }
-
-    function onDragMove(e) {
-      if (!activeDrag) return;
-      let type = activeDrag;
-      let currentX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-      let currentY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-
-      let dx = currentX - dragStartX;
-      let dy = currentY - dragStartY;
-
-      cropState[type].x = initialX + dx;
-      cropState[type].y = initialY + dy;
-
-      updateCropTransform(type);
-    }
-
-    function stopDrag() {
-      activeDrag = null;
-      document.removeEventListener('mousemove', onDragMove);
-      document.removeEventListener('mouseup', stopDrag);
-      document.removeEventListener('touchmove', onDragMove);
-      document.removeEventListener('touchend', stopDrag);
-    }
-
-    function applyCropStylesToImg(imgEl, cropDataStr, targetSize) {
-      if (!cropDataStr) {
-        imgEl.style.width = targetSize + 'px';
-        imgEl.style.height = targetSize + 'px';
-        imgEl.style.left = '0px';
-        imgEl.style.top = '0px';
-        return;
-      }
-
-      try {
-        let data = JSON.parse(cropDataStr);
-        let natW = data.natW || 100;
-        let natH = data.natH || 100;
-        let zoom = data.zoom || 100;
-
-        let baseScale = Math.max(targetSize / natW, targetSize / natH);
-        let finalW = natW * baseScale * (zoom / 100);
-        let finalH = natH * baseScale * (zoom / 100);
-
-        let scaleFactor = targetSize / 100;
-        let finalX = (data.x || 0) * scaleFactor;
-        let finalY = (data.y || 0) * scaleFactor;
-
-        imgEl.style.width = finalW + 'px';
-        imgEl.style.height = finalH + 'px';
-        imgEl.style.left = finalX + 'px';
-        imgEl.style.top = finalY + 'px';
-      } catch (err) {
-        imgEl.style.width = targetSize + 'px';
-        imgEl.style.height = targetSize + 'px';
-        imgEl.style.left = '0px';
-        imgEl.style.top = '0px';
-      }
-    }
-
-    async function savePlayerAdm() {
-      if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
-
-      const editId = String(document.getElementById('adm-edit-id').value);
-      const nome = document.getElementById('adm-name').value.trim();
-
-      if (!nome) return alert("Digite o nome do jogador!");
-
-      let id = editId ? editId : 'p_' + Date.now();
-      let existingPlayer = jogadores.find(p => String(p.id) === String(id));
-
-      let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
-      let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
-
-      const playerData = {
-        id: String(id),
-        nome: nome,
-        fotoNormal: fotoNormal,
-        fotoKO: fotoKO,
-        cropNormal: JSON.stringify(cropState.normal),
-        cropKO: JSON.stringify(cropState.ko)
-      };
-
-      db.ref('jogadores/' + id).update(playerData);
-      alert("✅ Jogador salvo!");
-      cancelEdit();
-    }
-
-    function editPlayer(id) {
-      const p = jogadores.find(item => String(item.id) === String(id));
-      if (!p) return;
-
-      document.getElementById('adm-edit-id').value = String(p.id);
-      document.getElementById('adm-name').value = p.nome;
-      
-      const imgN = document.getElementById('crop-img-normal');
-      imgN.src = p.fotoNormal;
-      if (p.cropNormal) {
-        cropState.normal = JSON.parse(p.cropNormal);
-      } else {
-        cropState.normal = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
-      }
-      document.getElementById('zoom-normal').value = cropState.normal.zoom || 100;
-
-      const imgK = document.getElementById('crop-img-ko');
-      imgK.src = p.fotoKO;
-      if (p.cropKO) {
-        cropState.ko = JSON.parse(p.cropKO);
-      } else {
-        cropState.ko = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
-      }
-      document.getElementById('zoom-ko').value = cropState.ko.zoom || 100;
-
-      let tempImgN = new Image();
-      tempImgN.onload = function() { cropState.normal.natW = tempImgN.naturalWidth; cropState.normal.natH = tempImgN.naturalHeight; updateCropTransform('normal'); };
-      tempImgN.src = p.fotoNormal;
-
-      let tempImgK = new Image();
-      tempImgK.onload = function() { cropState.ko.natW = tempImgK.naturalWidth; cropState.ko.natH = tempImgK.naturalHeight; updateCropTransform('ko'); };
-      tempImgK.src = p.fotoKO;
-
-      newNormalBase64 = null;
-      newKoBase64 = null;
-
-      document.getElementById('admin-form-title').innerText = "✏️ Editar Jogador: " + p.nome;
-      document.getElementById('btn-save-player').innerText = "Salvar Alterações";
-      document.getElementById('btn-cancel-edit').style.display = "block";
-    }
-
-    function deletePlayer(id) {
-      if (!isAdminLoggedIn) return;
-      if (confirm("Deseja realmente remover este jogador do campeonato?")) {
-        db.ref('jogadores/' + String(id)).remove();
-      }
-    }
-
-    function cancelEdit() {
-      document.getElementById('adm-edit-id').value = "";
-      document.getElementById('adm-name').value = "";
-      document.getElementById('adm-foto-normal').value = "";
-      document.getElementById('adm-foto-ko').value = "";
-      
-      const defaultAvatar1 = "https://i.pravatar.cc/150?img=11";
-      const defaultAvatar2 = "https://i.pravatar.cc/150?img=33";
-      
-      document.getElementById('crop-img-normal').src = defaultAvatar1;
-      document.getElementById('crop-img-ko').src = defaultAvatar2;
-      document.getElementById('zoom-normal').value = 100;
-      document.getElementById('zoom-ko').value = 100;
-
-      cropState.normal = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
-      cropState.ko = { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 };
-      updateCropTransform('normal');
-      updateCropTransform('ko');
-      
-      newNormalBase64 = null;
-      newKoBase64 = null;
-
-      document.getElementById('admin-form-title').innerText = "⚙️ Painel do Administrador";
-      document.getElementById('btn-save-player').innerText = "+ Salvar / Cadastrar Jogador";
-      document.getElementById('btn-cancel-edit').style.display = "none";
-    }
-
-    function renderAdminList() {
-      const listEl = document.getElementById('admin-players-list');
-      if (!listEl) return;
-      listEl.innerHTML = "";
-
-      const jogadoresOrdenadosAdmin = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
-
-      jogadoresOrdenadosAdmin.forEach(p => {
-        listEl.innerHTML += `
-          <div class="admin-player-item">
-            <span><b>${p.nome}</b> (${p.vitoriasCalculadas || 0}V / ${p.derrotasCalculadas || 0}D)</span>
-            <div style="display:flex; gap:6px;">
-              <button onclick="editPlayer('${p.id}')" style="background:var(--accent); border:none; color:#fff; padding:5px 10px; border-radius:20px; cursor:pointer; font-size:11px;">Editar</button>
-              <button onclick="resetDeviceForPlayer('${p.id}')" style="background:#ffd700; border:none; color:#000; padding:5px 10px; border-radius:20px; cursor:pointer; font-size:11px; font-weight:bold;" title="Liberar aparelho deste jogador">Liberar Aparelho</button>
-              <button onclick="deletePlayer('${p.id}')" style="background:var(--loss); border:none; color:#fff; padding:5px 10px; border-radius:20px; cursor:pointer; font-size:11px;">Remover</button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    function votar(vencedorId) {
-      let perdedorId = myPlayerId;
-
-      if (isAdminLoggedIn) {
-        let nomePerdedorManual = prompt("⚙️ [PAINEL ADMIN] Digite o nome exato do lutador que sofreu a derrota (perdedor):");
-        if (!nomePerdedorManual) return;
-        
-        let foundPerdedor = jogadores.find(item => item.nome.trim().toLowerCase() === nomePerdedorManual.trim().toLowerCase());
-        if (!foundPerdedor) {
-          alert("⚠️ Lutador perdedor não encontrado!");
-          return;
-        }
-        perdedorId = foundPerdedor.id;
-      }
-
-      if (!perdedorId) {
-        alert("⚠️ Aparelho não vinculado! Reinicie ou identifique-se.");
-        return;
-      }
-
-      if (String(perdedorId) === String(vencedorId)) {
-        alert("⚠️ TRAPAÇA DETECTADA! Você não pode registrar derrota em si mesmo.");
-        return;
-      }
-
-      const perdedor = jogadores.find(p => String(p.id) === String(perdedorId));
-      const vencedor = jogadores.find(p => String(p.id) === String(vencedorId));
-
-      if (!perdedor || !vencedor) return;
-
-      const idVota = 'v_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-      const dataHoraAtual = new Date().toLocaleString('pt-BR');
-      const modoRegistro = isAdminLoggedIn ? "Admin (Manual)" : `Dispositivo (${perdedor.nome})`;
-
-      db.ref(`jogadores/${vencedor.id}/vitimas/${idVota}`).set({
-        idVota: idVota,
-        perdedorId: String(perdedor.id),
-        auditData: dataHoraAtual,
-        auditDevice: deviceId,
-        auditModo: modoRegistro
-      });
-
-      // Exibe o Pop-up animado de Confirmação (Estilo Impacto K.O.)
-      showSuccessModal();
-    }
-
-    function removeVote(vencedorId, idVota, e) {
-      if (e) e.stopPropagation();
-      if (!isAdminLoggedIn) {
-        alert("Apenas o Administrador pode remover votos!");
-        return;
-      }
-
-      if (!confirm("Deseja anular este voto especificamente e ajustar a pontuação?")) return;
-
-      db.ref(`jogadores/${vencedorId}/vitimas/${idVota}`).remove();
-    }
-
-    function updateUI() {
-      const grid = document.getElementById('players-grid');
-      grid.innerHTML = "";
-
-      const jogadoresOrdenadosCards = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
-
-      jogadoresOrdenadosCards.forEach(player => {
-        let vitimasObj = player.vitimas || {};
-        let vitimasList = Object.values(vitimasObj);
-
-        let votersHtml = vitimasList.map(v => {
-          let perdedor = jogadores.find(p => String(p.id) === String(v.perdedorId));
-          if (!perdedor) return '';
-          let fotoKOAtual = perdedor.fotoKO;
-          let nomeAtual = perdedor.nome;
-          let cropKOStr = perdedor.cropKO;
-
-          let auditHtml = "";
-          if (isAdminLoggedIn) {
-            auditHtml = `<div class="audit-info">🕒 ${v.auditData || 'N/D'} | 📱 ${v.auditModo || 'App'}</div>`;
-          }
-
-          let tempImgId = 'badge_img_' + Math.random().toString(36).substring(2);
-
-          setTimeout(() => {
-            let el = document.getElementById(tempImgId);
-            if (el) applyCropStylesToImg(el, cropKOStr, 18);
-          }, 50);
-
-          return `
-            <div style="display:inline-block; margin:2px; vertical-align:top;">
-              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', '${encodeURIComponent(cropKOStr || '')}')" title="Clique para dar zoom em ${nomeAtual}">
-                <span style="display:inline-block; width:18px; height:18px; border-radius:50%; overflow:hidden; position:relative; vertical-align:middle; background:#000;">
-                  <img id="${tempImgId}" src="${fotoKOAtual}" style="position:absolute;">
-                </span> ${nomeAtual}
-                ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
-              </span>
-              ${auditHtml}
-            </div>
-          `;
-        }).join('');
-
-        let isKOClass = (player.derrotasCalculadas || 0) > 0 ? "ko" : "";
-        
-        let cardAvatarId = 'card_avatar_' + player.id;
-        setTimeout(() => {
-          let el = document.getElementById(cardAvatarId);
-          if (el) applyCropStylesToImg(el, player.cropNormal, 110);
-        }, 50);
-
+      dbMock.forEach(jogador => {
         grid.innerHTML += `
-          <div class="card ${isKOClass}">
-            <div class="avatar-wrapper">
-              <img id="${cardAvatarId}" class="card-avatar-img" src="${player.fotoNormal}" alt="${player.nome}">
-            </div>
-            <div class="name">${player.nome}</div>
-            <div class="stats">
-              <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
-            </div>
-            
-            <div class="vote-instruction-box">
-              <div class="vote-hint-text">Tomou coro desse mano?</div>
-              <button class="btn-vote" onclick="votar('${player.id}')">
-                Registrar Derrota p/ ${player.nome}
-              </button>
-            </div>
-
-            <div class="voters-container">
-              <div style="font-size:10px; color:#a8a8b3; text-transform:uppercase; font-weight:bold;">Vítimas (Clique p/ Zoom):</div>
-              <div style="margin-top:4px;">${votersHtml || '<span style="font-size:10px; color:#555">Nenhuma ainda</span>'}</div>
-            </div>
+          <div class="player-card">
+            <img src="${jogador.foto}" alt="${jogador.nome}" class="player-avatar">
+            <h3 class="player-name">${jogador.nome}</h3>
+            <!-- Botão com texto específico solicitado -->
+            <button class="btn-votar" onclick="registrarVitoria(${jogador.id}, '${jogador.nome}')">
+               Clique aqui para registrar o resultado 👇🏼
+            </button>
           </div>
         `;
       });
-
-      if (isAdminLoggedIn) renderAdminList();
-      updatePodiumAndTable();
     }
 
-    function renderCircleSlot(player, isDuck = false) {
-      if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-      const foto = isDuck ? player.fotoKO : player.fotoNormal;
-      const cropData = isDuck ? player.cropKO : player.cropNormal;
-      const statText = isDuck 
-        ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>`
-        : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
-
-      let podiumAvatarId = 'podium_avatar_' + (isDuck ? 'duck_' : '') + player.id;
-      setTimeout(() => {
-        let el = document.getElementById(podiumAvatarId);
-        if (el) applyCropStylesToImg(el, cropData, 90);
-      }, 50);
-
-      return `
-        <div class="podium-circle-wrapper">
-          <img id="${podiumAvatarId}" class="podium-avatar-img" src="${foto}" alt="${player.nome}">
-        </div>
-        <div style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff;">${player.nome}</div>
-        <div>${statText}</div>
-      `;
+    // ==========================================
+    // 4. LÓGICA DE APARELHO E CADASTRO
+    // ==========================================
+    function checarBloqueioAparelho() {
+      return localStorage.getItem('fightNerdDeviceLock') === 'true';
     }
 
-    function updatePodiumAndTable() {
-      if(jogadores.length === 0) return;
-
-      const ranking = ordenarJogadores();
-
-      document.getElementById('podium-1').innerHTML = (ranking[0] && ranking[0].vitoriasCalculadas > 0) 
-        ? renderCircleSlot(ranking[0]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-
-      document.getElementById('podium-2').innerHTML = (ranking[1] && ranking[1].vitoriasCalculadas > 0) 
-        ? renderCircleSlot(ranking[1]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-
-      document.getElementById('podium-3').innerHTML = (ranking[2] && ranking[2].vitoriasCalculadas > 0) 
-        ? renderCircleSlot(ranking[2]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-
-      const worstPlayer = [...jogadores].sort((a,b) => b.derrotasCalculadas - a.derrotasCalculadas)[0];
-      document.getElementById('podium-duck').innerHTML = (worstPlayer && worstPlayer.derrotasCalculadas > 0) 
-        ? renderCircleSlot(worstPlayer, true) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-
-      const leaderboard = document.getElementById('leaderboard');
-      leaderboard.innerHTML = "";
-      ranking.forEach((p, idx) => {
-        let saldo = p.vitoriasCalculadas - p.derrotasCalculadas;
-        let saldoFormatted = saldo > 0 ? `+${saldo}` : saldo;
-
-        leaderboard.innerHTML += `
-          <tr>
-            <td><b>${idx + 1}º</b></td>
-            <td style="text-align:left;"><b>${p.nome}</b></td>
-            <td style="color: var(--win); font-weight:bold;">${p.vitoriasCalculadas || 0}</td>
-            <td style="color: var(--loss); font-weight:bold;">${p.derrotasCalculadas || 0}</td>
-            <td style="font-weight:bold;">${saldoFormatted}</td>
-          </tr>
-        `;
-      });
+    function abrirModalCadastro() {
+      if (checarBloqueioAparelho()) {
+        alert("Este aparelho já possui um guerreiro cadastrado! Apenas o Administrador pode liberar para um novo cadastro.");
+        return;
+      }
+      document.getElementById('modalCadastro').style.display = 'flex';
+      document.getElementById('inputNome').value = '';
+      inputFoto.value = '';
+      cropperWrapper.style.display = 'none';
+      if (cropper) { cropper.destroy(); cropper = null; }
     }
 
-    function resetTournament() {
-      if (!isAdminLoggedIn) return;
-      if (confirm("Deseja ZERAR todas as vitórias e derrotas do campeonato?")) {
-        jogadores.forEach(p => {
-          db.ref('jogadores/' + String(p.id) + '/vitimas').remove();
-        });
+    function salvarJogador() {
+      const nome = document.getElementById('inputNome').value;
+      if (!nome) return alert("Digite um nome!");
+      if (!cropper) return alert("Selecione e ajuste uma foto!");
+
+      // Pega o corte final em Base64
+      const canvas = cropper.getCroppedCanvas({ width: 250, height: 250 });
+      const fotoBase64 = canvas.toDataURL("image/webp");
+
+      // Adiciona ao banco simulado (Aqui entraria o push do Firebase)
+      dbMock.push({ id: Date.now(), nome: nome, foto: fotoBase64 });
+      
+      // TRAVA O APARELHO APÓS CADASTRAR
+      localStorage.setItem('fightNerdDeviceLock', 'true');
+      
+      renderizarJogadores();
+      fecharModal('modalCadastro');
+    }
+
+    // ==========================================
+    // 5. O EFEITO K.O. EXPLOSIVO
+    // ==========================================
+    function registrarVitoria(id, nome) {
+      // Abre o Modal Transparente
+      document.getElementById('modalKO').style.display = 'flex';
+      
+      // Reinicia a animação CSS (truque de reflow)
+      const elementoAnimacao = document.getElementById('animacaoKO');
+      elementoAnimacao.style.animation = 'none';
+      elementoAnimacao.offsetHeight; /* trigger reflow */
+      elementoAnimacao.style.animation = null; 
+
+      // Sorteia uma frase épica
+      const fraseSorteada = frasesKO[Math.floor(Math.random() * frasesKO.length)];
+      document.getElementById('fraseEpica').innerText = `"${fraseSorteada}"`;
+      
+      // OBS: Aqui iria sua lógica do Firebase de adicionar +1 ponto pro jogador.
+    }
+
+    // ==========================================
+    // 6. PAINEL ADMIN (LIBERAÇÃO)
+    // ==========================================
+    function acessarAdmin() {
+      const senha = prompt("Digite a senha do Mestre (Admin):");
+      if (senha === "1234") { // Mude a senha depois!
+        document.getElementById('modalAdmin').style.display = 'flex';
+      } else if (senha !== null) {
+        alert("Senha Incorreta! Treine mais.");
       }
     }
+
+    // Como o localStorage é local do celular da pessoa, em produção o Admin
+    // precisaria deletar uma 'flag' do Firebase atrelada ao UID do celular dela.
+    // Para esse protótipo de 1 arquivo, fiz um botão para o próprio jogador/admin
+    // limpar o localStorage do navegador atual.
+    function liberarMeuAparelho() {
+      localStorage.removeItem('fightNerdDeviceLock');
+      alert("Aparelho liberado! Agora você pode cadastrar outro nome.");
+      fecharModal('modalAdmin');
+    }
+
+    // ==========================================
+    // 7. UTILITÁRIOS
+    // ==========================================
+    function fecharModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // Inicializa a tela com os jogadores de teste
+    renderizarJogadores();
   </script>
 </body>
 </html>
