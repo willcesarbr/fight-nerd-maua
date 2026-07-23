@@ -53,6 +53,9 @@
     .btn-venceu { background: linear-gradient(135deg, #7e22ce, #581c87); color: white; border: 1px solid #a855f7; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 0.82rem; cursor: pointer; width: 100%; transition: transform 0.1s; }
     .btn-venceu:active { transform: scale(0.96); }
 
+    /* Toast de Feedback de Voto */
+    .toast-vote { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; padding: 12px 20px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid #4ade80; z-index: 200; transition: opacity 0.3s; }
+
     /* Modais */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
     .modal-hidden { display: none !important; }
@@ -112,7 +115,12 @@
 
   </div>
 
-  <!-- MODAL DE CONFIRMAÇÃO K.O. -->
+  <!-- TOAST DE CONFIRMAÇÃO DE VOTO -->
+  <div id="vote-toast" class="toast-vote modal-hidden">
+    <span id="vote-toast-msg">Voto confirmado!</span>
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO K.O. (ZOEIRA DA DERROTA) -->
   <div id="ko-modal" class="modal-overlay modal-hidden">
     <div class="modal-card">
       <div class="ko-header">💥 K.O.! 💥</div>
@@ -188,8 +196,8 @@
     }
     const db = firebase.database();
 
-    // --- FRASÔMETRO ---
-    const MEME_PHRASES = [
+    // --- LISTA 1: ZOANÇA DE DERROTA (POP-UP DO REGISTRO DAS VÍTIMAS) ---
+    const DEFEAT_PHRASES = [
       "Vamos! Levante-se, Seiya!",
       "Coragem, Seiya! Lute, Seiya!",
       "Não cuspa os dentes, Seiya!",
@@ -203,17 +211,24 @@
       "Morra, Seiya!",
       "Levante as mãos para a Genki Dama!",
       "O Naruto é duro às vezes...",
-      "Bora! UP! UP!",
-      "Mais de 8 mil!",
       "Sobra nada pro Betinha!",
       "Ficou no cheirinho...",
       "Apanhou tanto que esqueceu a senha do Wi-Fi!",
       "Anotaram a placa do caminhão?",
-      "Vem, vem tranquilo!",
       "No céu tem pão? E aqui só tem surra!"
     ];
 
-    let lastPhraseIndex = -1;
+    // --- LISTA 2: CONFIRMAÇÃO DO ATO DA VOTAÇÃO (FEEDBACK DO VOTO) ---
+    const VOTE_CONFIRMATIONS = [
+      "⚡ Voto computado no placar com sucesso!",
+      "🔥 Golpe limpo! Placar atualizado!",
+      "🎯 Golpes contabilizados na arena!",
+      "🥊 Vitória registrada na súmula!",
+      "📊 Mais um ponto cravado na tabela!"
+    ];
+
+    let lastDefeatIndex = -1;
+    let lastVoteIndex = -1;
     let playersData = {};
     let activeEditingPlayerId = null;
 
@@ -321,7 +336,7 @@
       `).join("");
     }
 
-    // --- REGISTRAR DERROTA / K.O. ---
+    // --- REGISTRAR DERROTA / VOTAÇÃO ---
     function registerLoss(winnerId) {
       const winner = playersData[winnerId];
       if (!winner) return;
@@ -329,19 +344,42 @@
       const newWins = (winner.wins || 0) + 1;
       db.ref(`players/${winnerId}/wins`).set(newWins);
 
+      // Exibe a frase de confirmação de voto (Lista 2)
+      showVoteToast();
+
+      // Exibe o Pop-up de zoeira K.O. (Lista 1)
       showKoModal(winner.name);
     }
 
+    // LISTA 2: Exibe o toast de votação cravada
+    function showVoteToast() {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * VOTE_CONFIRMATIONS.length);
+      } while (randomIndex === lastVoteIndex && VOTE_CONFIRMATIONS.length > 1);
+
+      lastVoteIndex = randomIndex;
+
+      const toast = document.getElementById("vote-toast");
+      document.getElementById("vote-toast-msg").innerText = VOTE_CONFIRMATIONS[randomIndex];
+      
+      toast.classList.remove("modal-hidden");
+      setTimeout(() => {
+        toast.classList.add("modal-hidden");
+      }, 3000);
+    }
+
+    // LISTA 1: Exibe a zombaria da derrota no Pop-up
     function showKoModal(winnerName) {
       let randomIndex;
       do {
-        randomIndex = Math.floor(Math.random() * MEME_PHRASES.length);
-      } while (randomIndex === lastPhraseIndex && MEME_PHRASES.length > 1);
+        randomIndex = Math.floor(Math.random() * DEFEAT_PHRASES.length);
+      } while (randomIndex === lastDefeatIndex && DEFEAT_PHRASES.length > 1);
 
-      lastPhraseIndex = randomIndex;
+      lastDefeatIndex = randomIndex;
 
       document.getElementById("ko-player-name").innerText = `Vitória Computada para ${winnerName}!`;
-      document.getElementById("ko-phrase").innerText = `"${MEME_PHRASES[randomIndex]}"`;
+      document.getElementById("ko-phrase").innerText = `"${DEFEAT_PHRASES[randomIndex]}"`;
 
       document.getElementById("ko-modal").classList.remove("modal-hidden");
     }
