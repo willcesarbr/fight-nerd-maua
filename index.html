@@ -1,692 +1,548 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fight Nerd Mauá - Arcade Arena</title>
-  
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fight Nerd Mauá - Arcade Arena</title>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
 
-  <!-- Cropper.js CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-  <!-- Cropper.js JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+:root {
+    --bg: #0a0a10;
+    --card: rgba(20, 20, 32, 0.85);
+    --accent: #9d4edd;
+    --accent-neon: #00f0ff;
+    --gold: #ffd700;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+    --text: #f1f1f6;
+    --win: #00ff87;
+    --loss: #ff0055;
+    --border: rgba(255, 255, 255, 0.15);
+}
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.18) 0%, transparent 50%), 
+                      radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.15) 0%, transparent 40%), 
+                      linear-gradient(rgba(10, 10, 16, 0.9), rgba(10, 10, 16, 0.95)), 
+                      url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    color: var(--text);
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 16px;
+}
 
-    :root {
-      --bg: #0a0a10;
-      --card: rgba(20, 20, 32, 0.85);
-      --accent: #9d4edd;
-      --accent-neon: #00f0ff;
-      --gold: #ffd700;
-      --silver: #c0c0c0;
-      --bronze: #cd7f32;
-      --text: #f1f1f6;
-      --win: #00ff87;
-      --loss: #ff0055;
-      --border: rgba(255, 255, 255, 0.15);
-    }
+h1.main-title {
+    font-family: 'Bangers', cursive;
+    font-size: 3.8rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0;
+    text-align: center;
+    background: linear-gradient(180deg, #fff 20%, var(--accent-neon) 60%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.6));
+    transform: skewX(-4deg);
+}
 
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background: var(--bg);
-      background-image: 
-        radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
-        linear-gradient(rgba(10, 10, 16, 0.9), rgba(10, 10, 16, 0.95)),
-        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop');
-      background-size: cover;
-      background-attachment: fixed;
-      background-position: center;
-      color: var(--text);
-      max-width: 950px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-neon);
+    margin-bottom: 15px;
+    text-align: center;
+}
 
-    h1.main-title {
-      font-family: 'Bangers', cursive;
-      font-size: 3.8rem;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      margin: 0;
-      text-align: center;
-      background: linear-gradient(180deg, #fff 20%, var(--accent-neon) 60%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.6));
-      transform: skewX(-4deg);
-    }
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-    h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--accent-neon);
-      margin-bottom: 15px;
-      text-align: center;
-    }
+.btn-admin-toggle {
+    background: rgba(31, 31, 46, 0.8);
+    color: var(--accent-neon);
+    border: 1px solid var(--accent-neon);
+    padding: 6px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
 
-    .blink-infamy {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.6rem;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: var(--loss);
-      text-align: center;
-      margin-bottom: 15px;
-      text-shadow: 0 0 10px rgba(255, 0, 85, 0.9), 0 0 20px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.4);
-      animation: neonBlink 1.2s infinite alternate;
-    }
+.btn-admin-toggle:hover {
+    background: var(--accent-neon);
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+}
 
-    @keyframes neonBlink {
-      0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 0, 85, 0.9), 0 0 20px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.4); }
-      50% { opacity: 0.3; text-shadow: none; }
-    }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+}
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+.modal-box {
+    background: #12121a;
+    border: 2px solid var(--accent-neon);
+    padding: 25px;
+    border-radius: 30px;
+    text-align: center;
+    width: 90%;
+    max-width: 380px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
 
-    .btn-admin-toggle {
-      background: rgba(31, 31, 46, 0.8);
-      color: var(--accent-neon);
-      border: 1px solid var(--accent-neon);
-      padding: 6px 16px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
-    .btn-admin-toggle:hover {
-      background: var(--accent-neon);
-      color: #000;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
-    }
+/* MODAL DE ZOOM DA VÍTIMA */
+.victim-zoom-box {
+    background: rgba(20, 20, 32, 0.95);
+    border: 3px solid var(--loss);
+    border-radius: 35px;
+    padding: 25px;
+    text-align: center;
+    max-width: 340px;
+    box-shadow: 0 0 40px rgba(255, 0, 85, 0.6);
+    animation: popIn 0.3s ease-out;
+}
 
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-    }
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
-    .modal-box {
-      background: #12121a;
-      border: 2px solid var(--accent-neon);
-      padding: 25px;
-      border-radius: 30px;
-      text-align: center;
-      width: 90%;
-      max-width: 380px;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
-    }
+.victim-zoom-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--loss);
+    box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+    margin: 15px 0 10px 0;
+}
 
-    .victim-zoom-box {
-      background: rgba(20, 20, 32, 0.95);
-      border: 3px solid var(--loss);
-      border-radius: 35px;
-      padding: 25px;
-      text-align: center;
-      max-width: 340px;
-      box-shadow: 0 0 40px rgba(255, 0, 85, 0.6);
-      animation: popIn 0.3s ease-out;
-    }
+.admin-panel {
+    display: none;
+    background: rgba(18, 18, 28, 0.95);
+    border: 2px solid var(--accent-neon);
+    padding: 22px;
+    border-radius: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+    backdrop-filter: blur(12px);
+}
 
-    @keyframes popIn {
-      0% { transform: scale(0.7); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+    text-align: left;
+}
 
-    .victim-zoom-img {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 5px solid var(--loss);
-      box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
-      margin: 15px 0 10px 0;
-    }
+.form-group label {
+    font-size: 11px;
+    color: var(--accent-neon);
+    font-weight: bold;
+    text-transform: uppercase;
+}
 
-    /* TELA DE EXPLOSÃO K.O. */
-    .ko-explosion-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(5, 5, 8, 0.94);
-      backdrop-filter: blur(12px);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      animation: screenShock 0.4s ease-out;
-    }
+/* PREVIEW E CONTROLES DE POSIÇÃO DA FOTO */
+.preview-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
 
-    @keyframes screenShock {
-      0% { transform: translate(-8px, 6px) scale(0.95); filter: hue-rotate(90deg) brightness(1.8); }
-      20% { transform: translate(8px, -6px) scale(1.05); filter: hue-rotate(-90deg) brightness(2); }
-      40% { transform: translate(-5px, -5px) scale(0.98); }
-      60% { transform: translate(5px, 5px) scale(1.02); }
-      80% { transform: translate(-2px, 2px) scale(1); }
-      100% { transform: translate(0, 0) scale(1); filter: none; }
-    }
+.preview-box {
+    flex: 1;
+    text-align: center;
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
 
-    .ko-blast-container {
-      position: relative;
-      text-align: center;
-      padding: 30px;
-      max-width: 480px;
-      width: 90%;
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, rgba(157, 78, 221, 0.2) 60%, transparent 100%);
-      border: 4px solid var(--accent-neon);
-      border-radius: 40px;
-      box-shadow: 0 0 60px rgba(0, 240, 255, 0.7), inset 0 0 30px rgba(0, 240, 255, 0.5);
-      animation: blastPulse 0.8s infinite alternate ease-in-out;
-    }
+.preview-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-neon);
+    margin: 5px 0;
+    background: #000;
+}
 
-    @keyframes blastPulse {
-      0% { box-shadow: 0 0 40px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.3); transform: scale(1); }
-      100% { box-shadow: 0 0 70px rgba(0, 240, 255, 0.9), inset 0 0 40px rgba(0, 240, 255, 0.7); transform: scale(1.03); }
-    }
+.podium-panel {
+    background: rgba(15, 15, 25, 0.9);
+    border: 2px solid var(--accent);
+    border-radius: 35px;
+    padding: 20px 10px;
+    margin-bottom: 35px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 25px rgba(157, 78, 221, 0.25);
+}
 
-    .ko-big-title {
-      font-family: 'Bangers', cursive;
-      font-size: 5rem;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 5px;
-      margin: 0;
-      line-height: 1;
-      text-shadow: 3px 3px 0px var(--accent-neon), -3px -3px 0px var(--accent), 0 0 30px #00f0ff;
-      animation: titleShake 0.2s infinite alternate;
-    }
+.podium-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    align-items: center;
+}
 
-    @keyframes titleShake {
-      0% { transform: rotate(-2deg) scale(1); }
-      100% { transform: rotate(2deg) scale(1.06); }
-    }
-
-    .ko-quote-box {
-      font-family: 'Bangers', cursive;
-      font-size: 2.2rem;
-      letter-spacing: 2px;
-      color: var(--gold);
-      background: rgba(0, 0, 0, 0.75);
-      border: 3px solid var(--gold);
-      padding: 20px;
-      border-radius: 25px;
-      margin: 20px 0 25px 0;
-      box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
-      line-height: 1.2;
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-shadow: 2px 2px 0px #000;
-      animation: textGlow 1.5s infinite alternate;
-    }
-
-    @keyframes textGlow {
-      0% { text-shadow: 2px 2px 0px #000, 0 0 10px rgba(255, 215, 0, 0.5); }
-      100% { text-shadow: 2px 2px 0px #000, 0 0 25px rgba(255, 215, 0, 0.9); }
-    }
-
-    .btn-close-blast {
-      background: linear-gradient(135deg, var(--accent-neon), var(--accent));
-      color: #000;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      cursor: pointer;
-      box-shadow: 0 5px 20px rgba(0, 240, 255, 0.6);
-      transition: all 0.2s;
-    }
-    .btn-close-blast:hover {
-      background: linear-gradient(135deg, #33f3ff, #b065ff);
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(0, 240, 255, 0.9);
-    }
-
-    .admin-panel {
-      display: none;
-      background: rgba(18, 18, 28, 0.95);
-      border: 2px solid var(--accent-neon);
-      padding: 22px;
-      border-radius: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
-      backdrop-filter: blur(12px);
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-      text-align: left;
-    }
-    .form-group label {
-      font-size: 11px;
-      color: var(--accent-neon);
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .preview-container {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    .preview-box {
-      flex: 1;
-      text-align: center;
-      background: rgba(0,0,0,0.3);
-      padding: 10px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-    }
-    .preview-thumb {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--accent-neon);
-      margin: 5px 0;
-      background: #000;
-    }
-
-    .podium-panel {
-      background: rgba(15, 15, 25, 0.9);
-      border: 2px solid var(--accent);
-      border-radius: 35px;
-      padding: 20px 10px;
-      margin-bottom: 35px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 25px rgba(157, 78, 221, 0.25);
-    }
-
+@media (max-width: 650px) {
     .podium-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      align-items: center;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px 10px;
     }
-    @media (max-width: 650px) {
-      .podium-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 10px; }
-    }
+}
 
-    .podium-slot {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      padding: 0 5px;
-    }
+.podium-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 0 5px;
+}
+
+.podium-slot:not(:last-child) {
+    border-right: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 650px) {
     .podium-slot:not(:last-child) {
-      border-right: 1px dashed rgba(255, 255, 255, 0.12);
+        border-right: none;
     }
-    @media (max-width: 650px) {
-      .podium-slot:not(:last-child) { border-right: none; }
-    }
+}
 
-    .podium-badge-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-    }
-    .podium-subtitle {
-      font-size: 10px;
-      font-weight: bold;
-      color: #a8a8b3;
-      margin-bottom: 12px;
-      min-height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.2;
-    }
+.podium-badge-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
 
-    .podium-circle-wrapper { position: relative; margin-bottom: 10px; }
-    .podium-circle-avatar {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--border);
-      background: #12121a;
-      transition: transform 0.3s ease;
-    }
-    .podium-circle-avatar:hover { transform: scale(1.08); }
+.podium-subtitle {
+    font-size: 10px;
+    font-weight: bold;
+    color: #a8a8b3;
+    margin-bottom: 12px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
 
-    .slot-1 .podium-circle-avatar { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-    .slot-2 .podium-circle-avatar { border-color: var(--silver); box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); }
-    .slot-3 .podium-circle-avatar { border-color: var(--bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
-    .slot-duck .podium-circle-avatar { border-color: var(--loss); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+.podium-circle-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
 
-    .identity-bar {
-      background: var(--card);
-      border: 2px solid var(--accent);
-      padding: 14px 20px;
-      border-radius: 50px;
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
-    }
+.podium-circle-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--border);
+    background: #12121a;
+    transition: transform 0.3s ease;
+}
 
-    input[type="text"], input[type="password"] {
-      background: #12121a;
-      color: #fff;
-      border: 1px solid var(--border);
-      padding: 10px 16px;
-      border-radius: 30px;
-      font-size: 14px;
-    }
+.podium-circle-avatar:hover {
+    transform: scale(1.08);
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 18px;
-    }
+.slot-1 .podium-circle-avatar { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+.slot-2 .podium-circle-avatar { border-color: var(--silver); box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); }
+.slot-3 .podium-circle-avatar { border-color: var(--bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
+.slot-duck .podium-circle-avatar { border-color: var(--loss); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
 
-    .card {
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 35px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      backdrop-filter: blur(10px);
-      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: var(--accent-neon);
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-    }
+.identity-bar {
+    background: var(--card);
+    border: 2px solid var(--accent);
+    padding: 14px 20px;
+    border-radius: 50px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
+}
 
-    .avatar {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--accent);
-      margin-bottom: 10px;
-      box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
-    }
-    .card.ko .avatar {
-      border-color: var(--loss);
-      box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
-      filter: grayscale(20%);
-    }
+select, input[type="text"], input[type="password"] {
+    background: #12121a;
+    color: #fff;
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 30px;
+    font-size: 14px;
+}
 
-    .name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px; }
-    .stats { font-size: 13px; margin: 6px 0; color: #a8a8b3; }
-    .stats b.win { color: var(--win); }
-    .stats b.loss { color: var(--loss); }
+select { flex: 1; }
 
-    .voto-container-card {
-      width: 100%;
-      margin-top: 10px;
-      text-align: center;
-    }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+}
 
-    .instrucao-clique {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent-neon);
-      margin-bottom: 6px;
-      letter-spacing: -0.2px;
-    }
+.card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 35px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
 
-    .btn-vote {
-      display: block;
-      width: 100%;
-      background: linear-gradient(135deg, var(--accent), #5a00d2);
-      border: none;
-      color: #fff;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: bold;
-      padding: 12px 14px;
-      border-radius: 50px;
-      cursor: pointer;
-      text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
-      transition: all 0.2s ease-in-out;
-    }
-    .btn-vote:hover {
-      background: linear-gradient(135deg, #b065ff, #6b00f7);
-      box-shadow: 0 6px 18px rgba(157, 78, 221, 0.6);
-      transform: translateY(-2px);
-    }
-    .btn-vote:active { 
-      transform: translateY(1px);
-      box-shadow: 0 2px 6px rgba(157, 78, 221, 0.4);
-    }
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-neon);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
 
-    .voters-container {
-      width: 100%;
-      margin-top: 12px;
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
-      text-align: center;
-    }
+.avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--accent);
+    margin-bottom: 10px;
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+}
 
-    .voter-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(255, 0, 85, 0.15);
-      border: 1px solid var(--loss);
-      padding: 3px 8px;
-      border-radius: 50px;
-      font-size: 10px;
-      margin: 2px;
-      color: #ff4d7d;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .voter-badge:hover {
-      transform: scale(1.1);
-      background: rgba(255, 0, 85, 0.35);
-    }
-    .voter-badge img {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+.card.ko .avatar {
+    border-color: var(--loss);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+    filter: grayscale(20%);
+}
 
-    .btn-remove-vote {
-      background: transparent;
-      border: none;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      margin-left: 3px;
-      font-size: 12px;
-    }
-    .btn-remove-vote:hover { color: var(--loss); }
+.name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+}
 
-    .audit-info {
-      font-size: 9px;
-      color: var(--accent-neon);
-      margin-top: 2px;
-      text-align: center;
-      background: rgba(0, 240, 255, 0.08);
-      padding: 2px 6px;
-      border-radius: 10px;
-      border: 1px dashed rgba(0, 240, 255, 0.3);
-    }
+.stats {
+    font-size: 13px;
+    margin: 6px 0;
+    color: #a8a8b3;
+}
 
-    .admin-player-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.05);
-      padding: 10px 16px;
-      border-radius: 30px;
-      margin-bottom: 8px;
-    }
+.stats b.win { color: var(--win); }
+.stats b.loss { color: var(--loss); }
 
-    .table-wrapper {
-      background: var(--card);
-      border-radius: 25px;
-      padding: 15px;
-      border: 1px solid var(--border);
-      backdrop-filter: blur(10px);
-    }
+.btn-vote {
+    background: linear-gradient(135deg, var(--accent), #5a00d2);
+    border: none;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 50px;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 8px;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+    transition: all 0.2s;
+}
 
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; }
-    th { background: rgba(0,0,0,0.4); color: var(--accent-neon); font-family: 'Orbitron', sans-serif; font-size: 11px; }
+.btn-vote:active { transform: scale(0.95); }
 
-    .crop-container {
-      max-height: 350px;
-      width: 100%;
-      margin-bottom: 15px;
-      background: #000;
-      border-radius: 15px;
-      overflow: hidden;
-    }
-    .crop-container img {
-      max-width: 100%;
-      display: block;
-    }
-  </style>
+.voters-container {
+    width: 100%;
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    text-align: center;
+}
+
+.voter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 0, 85, 0.15);
+    border: 1px solid var(--loss);
+    padding: 3px 8px;
+    border-radius: 50px;
+    font-size: 10px;
+    margin: 2px;
+    color: #ff4d7d;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.voter-badge:hover {
+    transform: scale(1.1);
+    background: rgba(255, 0, 85, 0.35);
+}
+
+.voter-badge img {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.btn-remove-vote {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 3px;
+    font-size: 12px;
+}
+
+.btn-remove-vote:hover { color: var(--loss); }
+
+.admin-player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    padding: 10px 16px;
+    border-radius: 30px;
+    margin-bottom: 8px;
+}
+
+.table-wrapper {
+    background: var(--card);
+    border-radius: 25px;
+    padding: 15px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+th {
+    background: rgba(0,0,0,0.4);
+    color: var(--accent-neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+}
+</style>
 </head>
 <body>
 
-  <div class="top-bar">
+<div class="top-bar">
     <div style="flex: 1;"></div>
     <h1 class="main-title" style="flex: 2;">Fight Nerd Mauá</h1>
     <div style="flex: 1; text-align: right;">
-      <button class="btn-admin-toggle" onclick="openLoginModal()">⚙️ Admin</button>
+        <button class="btn-admin-toggle" onclick="openLoginModal()">⚙️ Admin</button>
     </div>
-  </div>
+</div>
 
-  <!-- MODAL DE SENHA -->
-  <div class="modal-overlay" id="loginModal">
+<!-- MODAL DE SENHA -->
+<div class="modal-overlay" id="loginModal">
     <div class="modal-box">
-      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🔒 Acesso Restrito</h3>
-      <p style="font-size: 13px; color: #a8a8b3;">Digite a senha de administrador:</p>
-      <input type="password" id="modalPassInput" placeholder="•••••" style="text-align: center; width: 180px; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') checkPassword()">
-      <div style="display: flex; gap: 10px; justify-content: center;">
-        <button onclick="checkPassword()" style="background: var(--win); border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Entrar</button>
-        <button onclick="closeLoginModal()" style="background: #444; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
-      </div>
+        <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🔒 Acesso Restrito</h3>
+        <p style="font-size: 13px; color: #a8a8b3;">Digite a senha de administrador:</p>
+        <input type="password" id="modalPassInput" placeholder="•••••" style="text-align: center; width: 180px; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') checkPassword()">
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button onclick="checkPassword()" style="background: var(--win); border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Entrar</button>
+            <button onclick="closeLoginModal()" style="background: #444; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
+        </div>
     </div>
-  </div>
+</div>
 
-  <!-- MODAL DE IDENTIFICAÇÃO DO APARELHO -->
-  <div class="modal-overlay" id="deviceModal" style="display: flex;">
-    <div class="modal-box" style="max-width: 320px;">
-      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🎮 Identifique-se</h3>
-      <p style="font-size: 12px; color: #a8a8b3; line-height: 1.4;">Digite exatamente o seu <b>nome de lutador</b> cadastrado para vincular este aparelho:</p>
-      <input type="text" id="deviceInputName" placeholder="Seu nome no torneio..." style="width: 80%; text-align: center; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') registerDevice()">
-      <button onclick="registerDevice()" style="background: var(--win); border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">Salvar Aparelho</button>
-    </div>
-  </div>
-
-  <!-- MODAL DE ZOOM DA VÍTIMA -->
-  <div class="modal-overlay" id="victimModal">
+<!-- MODAL DE ZOOM DA VÍTIMA -->
+<div class="modal-overlay" id="victimModal">
     <div class="victim-zoom-box">
-      <h3 style="color: var(--loss); font-family:'Orbitron'; margin:0; text-transform:uppercase;">🦆 Vítima em Destaque</h3>
-      <img id="zoomVictimImg" class="victim-zoom-img" src="" alt="Vítima">
-      <div id="zoomVictimName" style="font-family:'Orbitron'; font-size: 18px; font-weight: bold; color: #fff;"></div>
-      <p id="zoomVictimQuote" style="font-size: 13px; font-style: italic; color: #ffd700; margin-top: 8px; font-weight: bold; line-height: 1.3; min-height: 36px; display: flex; align-items: center; justify-content: center;"></p>
-      <button onclick="closeVictimModal()" style="background: var(--loss); color:#fff; border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:10px;">Fechar Zoeira</button>
+        <h3 style="color: var(--loss); font-family:'Orbitron'; margin:0; text-transform:uppercase;">🦆 Vítima em Destaque</h3>
+        <img id="zoomVictimImg" class="victim-zoom-img" src="" alt="Vítima">
+        <div id="zoomVictimName" style="font-family:'Orbitron'; font-size: 18px; font-weight: bold; color: #fff;"></div>
+        <p id="zoomVictimQuote" style="font-size: 13px; font-style: italic; color: #ffd700; margin-top: 8px; font-weight: bold; line-height: 1.3; min-height: 36px; display: flex; align-items: center; justify-content: center;"></p>
+        <button onclick="closeVictimModal()" style="background: var(--loss); color:#fff; border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:10px;">Fechar Zoeira</button>
     </div>
-  </div>
+</div>
 
-  <!-- TELA DE EXPLOSÃO K.O. -->
-  <div class="ko-explosion-overlay" id="koExplosionModal">
-    <div class="ko-blast-container">
-      <div class="ko-big-title">K.O.!</div>
-      <p id="blastRandomQuote" class="ko-quote-box"></p>
-      <button class="btn-close-blast" onclick="closeKoExplosionModal()">Continuar Carnificina 🔥</button>
-    </div>
-  </div>
-
-  <!-- MODAL DE CROP DE IMAGEM -->
-  <div class="modal-overlay" id="cropModal">
-    <div class="modal-box" style="max-width: 420px;">
-      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">✂️ Ajustar e Recortar Foto</h3>
-      <p style="font-size: 11px; color: #a8a8b3; margin-bottom: 10px;">Enquadre perfeitamente no formato circular/quadrado:</p>
-      <div class="crop-container">
-        <img id="imageToCrop" src="" alt="Cortar">
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: center;">
-        <button onclick="applyCrop()" style="background: var(--win); border:none; padding:10px 22px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">✓ Recortar e Usar</button>
-        <button onclick="closeCropModal()" style="background: #444; color:#fff; border:none; padding:10px 22px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAINEL DE ADMIN -->
-  <div class="admin-panel" id="adminPanel">
+<!-- PAINEL DE ADMIN -->
+<div class="admin-panel" id="adminPanel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-      <h3 style="margin:0; color: var(--accent-neon);" id="admin-form-title">⚙️ Painel do Administrador</h3>
-      <button onclick="logoutAdmin()" style="background: var(--loss); border:none; color:#fff; padding:6px 14px; border-radius:30px; font-size:12px; cursor:pointer; font-weight:bold;">Sair do Admin</button>
-    </div>
-    
-    <input type="hidden" id="adm-edit-id" value="">
-    <div class="form-group">
-      <input type="text" id="adm-name" placeholder="Nome do Jogador">
-    </div>
-    <div class="form-group">
-      <label>Foto Normal (WebP Animado / GIF / JPG):</label>
-      <input type="file" id="adm-foto-normal" accept="image/*" onchange="initCrop(event, 'normal')">
-    </div>
-    <div class="form-group">
-      <label>Foto KO (Cara Machucada Animada):</label>
-      <input type="file" id="adm-foto-ko" accept="image/*" onchange="initCrop(event, 'ko')">
+        <h3 style="margin:0; color: var(--accent-neon);" id="admin-form-title">⚙️ Painel do Administrador</h3>
+        <button onclick="logoutAdmin()" style="background: var(--loss); border:none; color:#fff; padding:6px 14px; border-radius:30px; font-size:12px; cursor:pointer; font-weight:bold;">Sair do Admin</button>
     </div>
 
+    <input type="hidden" id="adm-edit-id" value="">
+    
+    <div class="form-group">
+        <input type="text" id="adm-name" placeholder="Nome do Jogador">
+    </div>
+
+    <div class="form-group">
+        <label>Foto Normal (WebP Animado / GIF / JPG):</label>
+        <input type="file" id="adm-foto-normal" accept="image/*" onchange="handleFileSelect(event, 'normal')">
+    </div>
+
+    <div class="form-group">
+        <label>Foto KO (Cara Machucada Animada/Estatica):</label>
+        <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleFileSelect(event, 'ko')">
+    </div>
+
+    <!-- PREVIEWS COM SLIDER DE POSIÇÃO VERTICAL -->
     <div class="preview-container">
-      <div class="preview-box">
-        <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
-        <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
-      </div>
-      <div class="preview-box">
-        <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
-        <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
-      </div>
+        <div class="preview-box">
+            <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
+            <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
+            <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
+            <input type="range" id="posY-normal" min="0" max="100" value="50" oninput="updatePosPreview('normal')">
+        </div>
+        <div class="preview-box">
+            <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
+            <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
+            <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
+            <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updatePosPreview('ko')">
+        </div>
     </div>
 
     <div style="display: flex; gap: 8px;">
-      <button id="btn-save-player" onclick="savePlayerAdm()" style="flex:1; background: var(--win); border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#000;">+ Salvar / Cadastrar Jogador</button>
-      <button id="btn-cancel-edit" onclick="cancelEdit()" style="display:none; background: #555; border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#fff;">Cancelar</button>
+        <button id="btn-save-player" onclick="savePlayerAdm()" style="flex:1; background: var(--win); border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#000;">+ Salvar / Cadastrar Jogador</button>
+        <button id="btn-cancel-edit" onclick="cancelEdit()" style="display:none; background: #555; border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#fff;">Cancelar</button>
     </div>
 
     <hr style="border-color: var(--border); margin: 20px 0;">
@@ -695,227 +551,272 @@
 
     <hr style="border-color: var(--border); margin: 20px 0;">
     <button onclick="resetTournament()" style="background: var(--loss); border:none; color:#fff; padding:10px 18px; border-radius:30px; cursor:pointer; font-weight:bold;">⚠️ Zerar Campeonato</button>
-  </div>
+</div>
 
-  <!-- PAINEL DE DESTAQUES -->
-  <div class="blink-infamy">Hall da Infâmia</div>
-  <div class="podium-panel">
+<!-- PAINEL DE DESTAQUES -->
+<h2>Hall da Fama & Infâmia</h2>
+<div class="podium-panel">
     <div class="podium-grid">
-      <!-- 1º LUGAR -->
-      <div class="podium-slot slot-1">
-        <div class="podium-badge-title" style="color: var(--gold);">🥇 1º LUGAR</div>
-        <div class="podium-subtitle">"Rei da Arena"</div>
-        <div id="podium-1">---</div>
-      </div>
-      <!-- 2º LUGAR -->
-      <div class="podium-slot slot-2">
-        <div class="podium-badge-title" style="color: var(--silver);">🥈 2º LUGAR</div>
-        <div class="podium-subtitle">"Príncipe do Combate"</div>
-        <div id="podium-2">---</div>
-      </div>
-      <!-- 3º LUGAR -->
-      <div class="podium-slot slot-3">
-        <div class="podium-badge-title" style="color: var(--bronze);">🥉 3º LUGAR</div>
-        <div class="podium-subtitle">"Guerreiro de Ferro"</div>
-        <div id="podium-3">---</div>
-      </div>
-      <!-- PATO -->
-      <div class="podium-slot slot-duck">
-        <div class="podium-badge-title" style="color: var(--loss);">🦆 PATO DA TEMPORADA</div>
-        <div class="podium-subtitle">"Saco de Pancada Oficial"</div>
-        <div id="podium-duck">---</div>
-      </div>
+        <!-- 1º LUGAR -->
+        <div class="podium-slot slot-1">
+            <div class="podium-badge-title" style="color: var(--gold);">🥇 1º LUGAR</div>
+            <div class="podium-subtitle">"Kakarotto Verme Miserável"</div>
+            <div id="podium-1">---</div>
+        </div>
+        <!-- 2º LUGAR -->
+        <div class="podium-slot slot-2">
+            <div class="podium-badge-title" style="color: var(--silver);">🥈 2º LUGAR</div>
+            <div class="podium-subtitle">"Vegeta Príncipe do Saia daí"</div>
+            <div id="podium-2">---</div>
+        </div>
+        <!-- 3º LUGAR -->
+        <div class="podium-slot slot-3">
+            <div class="podium-badge-title" style="color: var(--bronze);">🥉 3º LUGAR</div>
+            <div class="podium-subtitle">"Gohan Desperdício de Potencial Premium Plus"</div>
+            <div id="podium-3">---</div>
+        </div>
+        <!-- PATO -->
+        <div class="podium-slot slot-duck">
+            <div class="podium-badge-title" style="color: var(--loss);">🦆 PATO DA TEMPORADA (QUAC!)</div>
+            <div class="podium-subtitle">"Por que você matou o Kuririn?"</div>
+            <div id="podium-duck">---</div>
+        </div>
     </div>
-  </div>
+</div>
 
-  <!-- IDENTIFICAÇÃO FIXA DO APARELHO -->
-  <div class="identity-bar" id="deviceBar" style="display: none;">
-    <div>
-      <span style="font-size:11px; color:#a8a8b3; text-transform:uppercase;">Aparelho Vinculado:</span><br>
-      <b id="deviceNameDisplay" style="color: var(--accent-neon); font-family:'Orbitron'; font-size:15px;">---</b>
-    </div>
-    <button onclick="resetDevice()" style="background:transparent; border:1px solid var(--loss); color:var(--loss); padding:4px 12px; border-radius:20px; font-size:10px; cursor:pointer; font-weight:bold;">Trocar Aparelho / Sair</button>
-  </div>
+<!-- IDENTIFICAÇÃO -->
+<div class="identity-bar">
+    <label for="currentUser"><b style="color: var(--accent-neon);">QUEM É VOCÊ NESSA BAGAÇA?</b></label>
+    <select id="currentUser">
+        <option value="">-- Selecione seu nome --</option>
+    </select>
+</div>
 
-  <!-- CARDS DOS JOGADORES -->
-  <h2>Registrar Vitória</h2>
-  <div class="grid" id="players-grid"></div>
+<!-- CARDS DOS JOGADORES -->
+<h2>Registrar Vitória</h2>
+<div class="grid" id="players-grid"></div>
 
-  <!-- TABELA DE CLASSIFICAÇÃO -->
-  <div style="margin-top: 40px;">
+<!-- TABELA DE CLASSIFICAÇÃO -->
+<div style="margin-top: 40px;">
     <h2>Classificação Geral</h2>
     <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Pos.</th>
-            <th style="text-align:left;">Lutador</th>
-            <th>Vitórias 🏆</th>
-            <th>Derrotas 🦆</th>
-            <th>Saldo ⚖️</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard"></tbody>
-      </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pos.</th>
+                    <th style="text-align:left;">Lutador</th>
+                    <th>Vitórias 🏆</th>
+                    <th>Derrotas 🦆</th>
+                    <th>Saldo ⚖️</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard"></tbody>
+        </table>
     </div>
-  </div>
+</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCQ2sZ6do1PKMbGmGQj0dprbvUUrC4lINg",
-      authDomain: "fight-nerd-maua.firebaseapp.com",
-      databaseURL: "https://fight-nerd-maua-default-rtdb.firebaseio.com",
-      projectId: "fight-nerd-maua",
-      storageBucket: "fight-nerd-maua.firebasestorage.app",
-      messagingSenderId: "606341642412",
-      appId: "1:606341642412:web:b1f84bada3181610ee8709",
-      measurementId: "G-67DZHFJXPX"
-    };
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyCQ2sZ6do1PKMbGmGQj0dprbvUUrC4lINg",
+    authDomain: "fight-nerd-maua.firebaseapp.com",
+    databaseURL: "https://fight-nerd-maua-default-rtdb.firebaseio.com",
+    projectId: "fight-nerd-maua",
+    storageBucket: "fight-nerd-maua.firebasestorage.app",
+    messagingSenderId: "606341642412",
+    appId: "1:606341642412:web:b1f84bada3181610ee8709",
+    measurementId: "G-67DZHFJXPX"
+};
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    let adminPassword = "86675";
-    let isAdminLoggedIn = false;
-    let jogadores = [];
-    let newNormalBase64 = null;
-    let newKoBase64 = null;
-    let cropper = null;
-    let currentCropType = null;
+let adminPassword = "86675";
+let isAdminLoggedIn = false;
+let jogadores = [];
+let newNormalBase64 = null;
+let newKoBase64 = null;
 
-    let deviceId = localStorage.getItem('fnm_device_id');
-    if (!deviceId) {
-      deviceId = 'dev_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-      localStorage.setItem('fnm_device_id', deviceId);
+const frasesZoeiraMaster = [
+    "Vamos tesouro, não se misture com essa gentalha...",
+    "Gentalha! Gentalha!",
+    "Volta o cão arrependido com suas orelhas tão fartas...",
+    "Mamãe!",
+    "Deixa acontecer, naturalmente...",
+    "Maionese, ele me bate, bate feito maionese...",
+    "Não estou suportando mais...",
+    "Não posso mais suportar... Esses seus abuuusos...",
+    "Índio quer apito se não der, pau vai comer!",
+    "Anotaram a placa do caminhão?",
+    "Vem, vem tranquilo!",
+    "É só uma picadinha!",
+    "Cacete de agulha!",
+    "Que horas passa o amarelinho?",
+    "E só não te dou outra porque...",
+    "Tá bom, mas não se irrite!",
+    "Seu Madruga, sua vózinha sabe jogar melhor que você?",
+    "Rapaaaaz!",
+    "É pau, é pedra, é o fim do caminho!",
+    "Ratinho-o-o-o!",
+    "Maravilha, Alberto!",
+    "Xaropinho: QUE NOJO!",
+    "Que deselegante!",
+    "Tapa na cara de quem tá no chão.",
+    "Isto é uma desgraça, tá me ouvindo? Uma desgraça!",
+    "Eu sou ricaaa!",
+    "Sabe de nada, inocente!",
+    "Errou! Ô loco, meu!",
+    "É uma cilada, Bino!",
+    "Já acabou, Jéssica?",
+    "Aai, Pai! Páara...",
+    "Receba! Graças a Deus, pai!",
+    "Na cara não, pra não estragar o velório!",
+    "Tinha que ser o Chaves mesmo!",
+    "E lá vamos nós!",
+    "Que coisa feia, que coisa ridícula!",
+    "Que falta de decoro!",
+    "Já pode pedir música no Fantástico pela surra!",
+    "Foi de F no chat!",
+    "Apanhou tanto que a mãe achou que era foto de ultrassom!",
+    "Apanhou tanto que o RG mudou de nome sozinho pra 'Presunto'!",
+    "Apanhou tanto que a cara virou mapa topográfico de relevo!",
+    "Apanhou tanto que o relógio inteligente marcou corrida de maratona!",
+    "Apanhou tanto que se chacoalhar faz barulho de chocalho por dentro!",
+    "Apanhou tanto que o sensor de colisão do carro disparou do lado de fora!",
+    "Apanhou tanto que até o Wi-Fi desconectou de desgosto!",
+    "Apanhou tanto que o Google Fotos identificou o rosto como obra do Picasso!",
+    "Apanhou tanto que a sombra se recusou a acompanhar no caminho de volta!",
+    "Apanhou tanto que virou estampa de camiseta de liquidação!",
+    "Apanhou tanto que o app do banco bloqueou o acesso por biometria facial!",
+    "Apanhou tanto que se soprar forte cai o que sobrou da dignidade!",
+    "Apanhou tanto que se virar de ponta-cabeça sai moeda da orelha!",
+    "Apanhou tanto que até o anjo da guarda pediu demissão sem aviso prévio!",
+    "Apanhou tanto que virou ponto de referência pra mapa de impacto!",
+    "Apanhou tanto que a cara ficou parecendo amassado de funilaria!",
+    "Apanhou tanto que o GPS recalculou a rota direto pro Pronto-Socorro!",
+    "Apanhou tanto que o sangue virou molho de pimenta pra temperar a derrota!",
+    "Apanhou tanto que nem o corretor do celular consegue consertar essa cara!",
+    "Apanhou tanto que até o Juiz do combate pediu desculpa por ter deixado acontecer!",
+    "Por que você matou o Kuririn?!",
+    "Sobra nada pro Betinha...",
+    "Ficou no cheirinho!",
+    "No céu tem pão?... E morreu!",
+    "SABOOOR de perdedor!",
+    "Nem usei 30% do meu poder...",
+    "Venham na maciota!",
+    "Você é fraco... lhe falta ódio.",
+    "Foi nada, segue o jogo!",
+    "Você é um estorvo, garoto!",
+    "Tô na área, se me derrubar é pênalti!",
+    "Não conheço o mundo sem você pra eu chutar a bunda!",
+    "Apanhou mais que saco de pancada em dia de treino.",
+    "Ah, poxa vida... levou uma surra pra aprender!",
+    "Caiu mais rápido que o Yamcha!",
+    "Nem precisou transformar em Super Saiyajin...",
+    "Onde foi parar todo aquele orgulho Sayajin?",
+    "Meteoro de Pégaso? Tá mais pra garoa de Pégaso!",
+    "Um mesmo golpe não funciona duas vezes... mas esse funcionou!",
+    "Nem a deusa Atena salva uma surra dessa.",
+    "Patético. Nem me fez gastar 1% do meu Ki.",
+    "Volte para a academia de ninjas, garoto.",
+    "FLAWLESS VICTORY!",
+    "BRUTALITY!",
+    "BABALITY!",
+    "TOASTY!",
+    "Get over here... pra tomar mais uma!",
+    "Tomou um Uppercut que foi parar no teto!",
+    "K.O. - PERFECT!",
+    "Volta pro lobby que essa doeu!",
+    "GAME OVER! Insert Coin to Cry.",
+    "Tá jogando de controle desligado?",
+    "POW! BAM! CRASH! ZAP!",
+    "Foi tanto tapa que a cara virou do avesso!",
+    "Pediu pra sair!",
+    "Aperta o START pra reiniciar a vida.",
+    "Sobra nada! Passou o trator por cima!",
+    "Desliga o controle que o humilhado tá tonto!",
+    "Fui tapeado!",
+    "Fui jantado com farofa na arena!",
+    "Quac! Apanhei até de quem não jogava...",
+    "O entregador de vitórias da rodada.",
+    "Voou pena pra tudo quanto é lado!",
+    "Veio só pra marcar presença e tomar tático.",
+    "Falta de kit médico ou falta de braço?",
+    "Tomou um tático tão pesado que mudou de fuso horário!",
+    "Apanhou de pau mole pra aprender a ter respeito!",
+    "Nem a mãe reconhece se virar o rosto pro lado!",
+    "Foi humilhado em 4K 60FPS sem direito a replay!",
+    "Parece que jogaram uma granada de fezes no seu jogo!",
+    "Tomou um Combobreaker na alma!",
+    "Entregou o controle pro irmão mais novo jogar?",
+    "Apertou todos os botões, rezou um Pai Nosso e mesmo assim caiu!",
+    "Passou o campeonato inteiro no menu de opções!",
+    "Se liga o Wi-Fi melhora, porque a desculpa do lag tá feia!",
+    "Gaguejou no controle!",
+    "Esqueceu de ativar o tutorial?",
+    "Pediu pause pra chorar no banheiro!",
+    "Caiu mais fácil que o Freeza fatiado pelo Trunks!",
+    "O Buggy O Palhaço apanharia menos que você nessa!",
+    "Sinta o gostinho da Expansão de Domínio do K.O.!",
+    "Nem com Akuma no Mi despertada você arrumava algo aqui.",
+    "Isso porque eu tava jogando com uma mão só...",
+    "Respire fundo... e aceite o Game Over!",
+    "Veio só pra pagar a conta do evento!",
+    "Sua participação foi meramente ilustrativa!",
+    "Tá servindo só de saco de pancada e escada pro pódio!",
+    "Pede pra sair, 01!",
+    "Passaram o cerol sem dó!",
+    "Perdeu o rumo de casa no primeiro golpe!",
+    "Alguém chama o Samu que o presunto tá quente!",
+    "Nem o Procon resolve esse calote de gameplay!",
+    "Vai chorar na cama que é lugar quente!",
+    "Essa doeu até no meu RG!",
+    "Entrou mudo e saiu calado de tanta pisa!",
+    "Foi atropelado no acostamento!",
+    "Bateu fofo e apanhou pesado!",
+    "Tomou um sacode que soltou as parafusas!"
+];
+
+let filaFrases = [];
+
+function pegarProximaFraseSemRepetir() {
+    if (filaFrases.length === 0) {
+        filaFrases = [...frasesZoeiraMaster].sort(() => Math.random() - 0.5);
     }
+    return filaFrases.pop();
+}
 
-    let myPlayerId = localStorage.getItem('fnm_player_id') || null;
+db.ref('jogadores').on('value', (snapshot) => {
+    const data = snapshot.val();
+    jogadores = data ? Object.values(data) : [];
+    recalcularPontosEAtualizar();
+});
 
-    const frasesExplosaoMaster = [
-      "Vamos! Levante-se Seiya!", "Coragem Seiya!", "Força, Seiya!", "Lute, Seiya!",
-      "Não morra Seiya!", "Por Athena!", "Eu não desisto nunca!", "Preciso de um milagre!",
-      "Esse é o meu jeito ninja!", "Queime Cosmo!", "Alcance o sétimo sentido!",
-      "Kaioken aumentado 100 vezes!", "Morra Seiya!", "Bora pra cima!", "Mais de 8 mil!"
-    ];
-
-    let filaFrasesExplosao = [];
-    function pegarProximaFraseExplosao() {
-      if (filaFrasesExplosao.length === 0) {
-        filaFrasesExplosao = [...frasesExplosaoMaster].sort(() => Math.random() - 0.5);
-      }
-      return filaFrasesExplosao.pop();
-    }
-
-    const frasesZoeiraMaster = [
-      "Vamos tesouro, não se misture com essa gentalha...",
-      "Volta o cão arrependido...",
-      "Anotaram a placa do caminhão?",
-      "Vem, vem tranquilo!",
-      "Tá bom, mas não se irrite!",
-      "Rapaaaaz!",
-      "Já acabou, Jéssica?",
-      "Receba! Graças a Deus, pai!",
-      "Na cara não, pra não estragar o velório!",
-      "Foi de F no chat!",
-      "Apanhou tanto que pediu música no Fantástico!",
-      "No céu tem pão?... E morreu!",
-      "Nem usei 30% do meu poder...",
-      "Você é fraco... lhe falta ódio.",
-      "FLAWLESS VICTORY!",
-      "K.O. - PERFECT!",
-      "Volta pro lobby que essa doeu!",
-      "Game Over! Insert Coin to Cry."
-    ];
-
-    let filaFrasesZoeira = [];
-    function pegarProximaFraseZoeira() {
-      if (filaFrasesZoeira.length === 0) {
-        filaFrasesZoeira = [...frasesZoeiraMaster].sort(() => Math.random() - 0.5);
-      }
-      return filaFrasesZoeira.pop();
-    }
-
-    db.ref('jogadores').on('value', (snapshot) => {
-      const data = snapshot.val();
-      jogadores = data ? Object.values(data) : [];
-      checkDeviceRegistration();
-      recalcularPontosEAtualizar();
-    });
-
-    function checkDeviceRegistration() {
-      const modal = document.getElementById('deviceModal');
-      const bar = document.getElementById('deviceBar');
-      const nameDisplay = document.getElementById('deviceNameDisplay');
-
-      if (!myPlayerId) {
-        modal.style.display = 'flex';
-        bar.style.display = 'none';
-      } else {
-        const p = jogadores.find(item => String(item.id) === String(myPlayerId));
-        if (p) {
-          modal.style.display = 'none';
-          bar.style.display = 'flex';
-          nameDisplay.innerText = p.nome;
-        } else {
-          localStorage.removeItem('fnm_player_id');
-          myPlayerId = null;
-          modal.style.display = 'flex';
-          bar.style.display = 'none';
-        }
-      }
-    }
-
-    function registerDevice() {
-      const typedName = document.getElementById('deviceInputName').value.trim().toLowerCase();
-      if (!typedName) return alert("Digite um nome!");
-
-      const found = jogadores.find(item => item.nome.trim().toLowerCase() === typedName);
-      if (!found) {
-        alert("⚠️ Nome não encontrado no cadastro do torneio! Verifique com o Administrador.");
-        return;
-      }
-
-      myPlayerId = found.id;
-      localStorage.setItem('fnm_player_id', myPlayerId);
-      checkDeviceRegistration();
-      updateUI();
-    }
-
-    function resetDevice() {
-      if (confirm("Deseja desvincular este aparelho e entrar com outro nome?")) {
-        localStorage.removeItem('fnm_player_id');
-        myPlayerId = null;
-        checkDeviceRegistration();
-        updateUI();
-      }
-    }
-
-    function recalcularPontosEAtualizar() {
-      jogadores.forEach(p => {
+function recalcularPontosEAtualizar() {
+    jogadores.forEach(p => {
         p.vitoriasCalculadas = 0;
         p.derrotasCalculadas = 0;
-      });
+    });
 
-      jogadores.forEach(vencedor => {
+    jogadores.forEach(vencedor => {
         let vitimasObj = vencedor.vitimas || {};
         let vitimasList = Object.values(vitimasObj);
         vencedor.vitoriasCalculadas = vitimasList.length;
 
         vitimasList.forEach(voto => {
-          let perdedor = jogadores.find(p => String(p.id) === String(voto.perdedorId));
-          if (perdedor) {
-            perdedor.derrotasCalculadas = (perdedor.derrotasCalculadas || 0) + 1;
-          }
+            let perdedor = jogadores.find(p => String(p.id) === String(voto.perdedorId));
+            if (perdedor) {
+                perdedor.derrotasCalculadas = (perdedor.derrotasCalculadas || 0) + 1;
+            }
         });
-      });
+    });
 
-      updateUI();
-    }
+    updateUI();
+}
 
-    function ordenarJogadores() {
-      return [...jogadores].sort((a, b) => {
+function ordenarJogadores() {
+    return [...jogadores].sort((a, b) => {
         if (b.vitoriasCalculadas !== a.vitoriasCalculadas) {
-          return b.vitoriasCalculadas - a.vitoriasCalculadas;
+            return b.vitoriasCalculadas - a.vitoriasCalculadas;
         }
         let aVenceuB = Object.values(a.vitimas || {}).some(v => String(v.perdedorId) === String(b.id));
         let bVenceuA = Object.values(b.vitimas || {}).some(v => String(v.perdedorId) === String(a.id));
@@ -923,398 +824,329 @@
         if (bVenceuA && !aVenceuB) return 1;
 
         if (a.derrotasCalculadas !== b.derrotasCalculadas) {
-          return a.derrotasCalculadas - b.derrotasCalculadas;
+            return a.derrotasCalculadas - b.derrotasCalculadas;
         }
 
         let saldoA = a.vitoriasCalculadas - a.derrotasCalculadas;
         let saldoB = b.vitoriasCalculadas - b.derrotasCalculadas;
         if (saldoB !== saldoA) {
-          return saldoB - saldoA;
+            return saldoB - saldoA;
         }
 
         return a.nome.localeCompare(b.nome);
-      });
-    }
+    });
+}
 
-    function openLoginModal() {
-      if (isAdminLoggedIn) {
+function openLoginModal() {
+    if (isAdminLoggedIn) {
         document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
-      } else {
+    } else {
         document.getElementById('loginModal').style.display = 'flex';
         document.getElementById('modalPassInput').value = '';
         document.getElementById('modalPassInput').focus();
-      }
     }
+}
 
-    function closeLoginModal() {
-      document.getElementById('loginModal').style.display = 'none';
-    }
+function closeLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+}
 
-    function showVictimZoom(nome, fotoKO, posY) {
-      const fraseZoeira = pegarProximaFraseZoeira();
-      const img = document.getElementById('zoomVictimImg');
-      document.getElementById('zoomVictimName').innerText = nome;
-      img.src = fotoKO;
-      img.style.objectPosition = `center ${posY || 50}%`;
-      document.getElementById('zoomVictimQuote').innerText = `"${fraseZoeira}"`;
-      document.getElementById('victimModal').style.display = 'flex';
-    }
+function showVictimZoom(nome, fotoKO, posY) {
+    const fraseSemRepetir = pegarProximaFraseSemRepetir();
+    const img = document.getElementById('zoomVictimImg');
+    document.getElementById('zoomVictimName').innerText = nome;
+    img.src = fotoKO;
+    img.style.objectPosition = `center ${posY || 50}%`;
+    document.getElementById('zoomVictimQuote').innerText = `"${fraseSemRepetir}"`;
+    document.getElementById('victimModal').style.display = 'flex';
+}
 
-    function closeVictimModal() {
-      document.getElementById('victimModal').style.display = 'none';
-    }
+function closeVictimModal() {
+    document.getElementById('victimModal').style.display = 'none';
+}
 
-    function showKoExplosionModal() {
-      const fraseExplosao = pegarProximaFraseExplosao();
-      document.getElementById('blastRandomQuote').innerText = `"${fraseExplosao}"`;
-      document.getElementById('koExplosionModal').style.display = 'flex';
-    }
-
-    function closeKoExplosionModal() {
-      document.getElementById('koExplosionModal').style.display = 'none';
-    }
-
-    function checkPassword() {
-      const pass = document.getElementById('modalPassInput').value;
-      if (pass === adminPassword) {
+function checkPassword() {
+    const pass = document.getElementById('modalPassInput').value;
+    if (pass === adminPassword) {
         isAdminLoggedIn = true;
         closeLoginModal();
         document.getElementById('adminPanel').style.display = 'block';
         document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
         updateUI();
-      } else {
+    } else {
         alert("⚠️ Senha incorreta!");
-      }
     }
+}
 
-    function logoutAdmin() {
-      isAdminLoggedIn = false;
-      document.getElementById('adminPanel').style.display = 'none';
-      updateUI();
-    }
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    document.getElementById('adminPanel').style.display = 'none';
+    updateUI();
+}
 
-    function initCrop(event, type) {
-      const file = event.target.files[0];
-      if (!file) return;
-      currentCropType = type;
+function handleFileSelect(event, type) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageElement = document.getElementById('imageToCrop');
-        imageElement.src = e.target.result;
-        document.getElementById('cropModal').style.display = 'flex';
-
-        if (cropper) {
-          cropper.destroy();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (type === 'normal') {
+            newNormalBase64 = e.target.result;
+            const img = document.getElementById('preview-normal');
+            img.src = e.target.result;
+        } else {
+            newKoBase64 = e.target.result;
+            const img = document.getElementById('preview-ko');
+            img.src = e.target.result;
         }
+    };
+    reader.readAsDataURL(file);
+}
 
-        cropper = new Cropper(imageElement, {
-          aspectRatio: 1,
-          viewMode: 1,
-          dragMode: 'move',
-          autoCropArea: 0.9,
-          restore: false,
-          guides: true,
-          center: true,
-          highlight: false,
-          cropBoxMovable: true,
-          cropBoxResizable: true,
-          toggleDragModeOnDblclick: false,
-        });
-      };
-      reader.readAsDataURL(file);
-      event.target.value = '';
-    }
+function updatePosPreview(type) {
+    const val = document.getElementById(`posY-${type}`).value;
+    const img = document.getElementById(`preview-${type}`);
+    img.style.objectPosition = `center ${val}%`;
+}
 
-    function closeCropModal() {
-      document.getElementById('cropModal').style.display = 'none';
-      if (cropper) {
-        cropper.destroy();
-        cropper = null;
-      }
-    }
+async function savePlayerAdm() {
+    if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
 
-    function applyCrop() {
-      if (!cropper) return;
+    const editId = String(document.getElementById('adm-edit-id').value);
+    const nome = document.getElementById('adm-name').value.trim();
 
-      const canvas = cropper.getCroppedCanvas({
-        width: 300,
-        height: 300,
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
-      });
+    if (!nome) return alert("Digite o nome do jogador!");
 
-      const croppedDataBase64 = canvas.toDataURL('image/jpeg', 0.9);
+    let id = editId ? editId : 'p_' + Date.now();
+    let existingPlayer = jogadores.find(p => String(p.id) === String(id));
 
-      if (currentCropType === 'normal') {
-        newNormalBase64 = croppedDataBase64;
-        document.getElementById('preview-normal').src = croppedDataBase64;
-      } else if (currentCropType === 'ko') {
-        newKoBase64 = croppedDataBase64;
-        document.getElementById('preview-ko').src = croppedDataBase64;
-      }
+    let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
+    let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
 
-      closeCropModal();
-    }
+    let posYNormal = document.getElementById('posY-normal').value;
+    let posYKO = document.getElementById('posY-ko').value;
 
-    async function savePlayerAdm() {
-      if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
-
-      const editId = String(document.getElementById('adm-edit-id').value);
-      const nome = document.getElementById('adm-name').value.trim();
-      if (!nome) return alert("Digite o nome do jogador!");
-
-      let id = editId ? editId : 'p_' + Date.now();
-      let existingPlayer = jogadores.find(p => String(p.id) === String(id));
-
-      let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
-      let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
-
-      const playerData = {
+    const playerData = {
         id: String(id),
         nome: nome,
         fotoNormal: fotoNormal,
         fotoKO: fotoKO,
-        posYNormal: 50,
-        posYKO: 50
-      };
+        posYNormal: posYNormal,
+        posYKO: posYKO
+    };
 
-      db.ref('jogadores/' + id).update(playerData);
-      alert("✅ Jogador salvo!");
-      cancelEdit();
-    }
+    db.ref('jogadores/' + id).update(playerData);
+    alert("✅ Jogador salvo com animação preservada!");
+    cancelEdit();
+}
 
-    function editPlayer(id) {
-      const p = jogadores.find(item => String(item.id) === String(id));
-      if (!p) return;
+function editPlayer(id) {
+    const p = jogadores.find(item => String(item.id) === String(id));
+    if (!p) return;
 
-      document.getElementById('adm-edit-id').value = String(p.id);
-      document.getElementById('adm-name').value = p.nome;
+    document.getElementById('adm-edit-id').value = String(p.id);
+    document.getElementById('adm-name').value = p.nome;
 
-      document.getElementById('preview-normal').src = p.fotoNormal;
-      document.getElementById('preview-ko').src = p.fotoKO;
+    const imgN = document.getElementById('preview-normal');
+    imgN.src = p.fotoNormal;
+    document.getElementById('posY-normal').value = p.posYNormal || 50;
+    imgN.style.objectPosition = `center ${p.posYNormal || 50}%`;
 
-      newNormalBase64 = null;
-      newKoBase64 = null;
+    const imgK = document.getElementById('preview-ko');
+    imgK.src = p.fotoKO;
+    document.getElementById('posY-ko').value = p.posYKO || 50;
+    imgK.style.objectPosition = `center ${p.posYKO || 50}%`;
 
-      document.getElementById('admin-form-title').innerText = "✏️ Editar Jogador: " + p.nome;
-      document.getElementById('btn-save-player').innerText = "Salvar Alterações";
-      document.getElementById('btn-cancel-edit').style.display = "block";
-    }
+    newNormalBase64 = null;
+    newKoBase64 = null;
 
-    function deletePlayer(id) {
-      if (!isAdminLoggedIn) return;
-      if (confirm("Deseja realmente remover este jogador do campeonato?")) {
+    document.getElementById('admin-form-title').innerText = "✏️ Editar Jogador: " + p.nome;
+    document.getElementById('btn-save-player').innerText = "Salvar Alterações";
+    document.getElementById('btn-cancel-edit').style.display = "block";
+}
+
+function deletePlayer(id) {
+    if (!isAdminLoggedIn) return;
+    if (confirm("Deseja realmente remover este jogador do campeonato?")) {
         db.ref('jogadores/' + String(id)).remove();
-      }
     }
+}
 
-    function cancelEdit() {
-      document.getElementById('adm-edit-id').value = "";
-      document.getElementById('adm-name').value = "";
-      document.getElementById('adm-foto-normal').value = "";
-      document.getElementById('adm-foto-ko').value = "";
-      document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
-      document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
-      newNormalBase64 = null;
-      newKoBase64 = null;
-      document.getElementById('admin-form-title').innerText = "⚙️ Painel do Administrador";
-      document.getElementById('btn-save-player').innerText = "+ Salvar / Cadastrar Jogador";
-      document.getElementById('btn-cancel-edit').style.display = "none";
-    }
+function cancelEdit() {
+    document.getElementById('adm-edit-id').value = "";
+    document.getElementById('adm-name').value = "";
+    document.getElementById('adm-foto-normal').value = "";
+    document.getElementById('adm-foto-ko').value = "";
+    document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
+    document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
+    document.getElementById('posY-normal').value = 50;
+    document.getElementById('posY-ko').value = 50;
+    newNormalBase64 = null;
+    newKoBase64 = null;
+    document.getElementById('admin-form-title').innerText = "⚙️ Painel do Administrador";
+    document.getElementById('btn-save-player').innerText = "+ Salvar / Cadastrar Jogador";
+    document.getElementById('btn-cancel-edit').style.display = "none";
+}
 
-    function renderAdminList() {
-      const listEl = document.getElementById('admin-players-list');
-      if (!listEl) return;
-      listEl.innerHTML = "";
+function renderAdminList() {
+    const listEl = document.getElementById('admin-players-list');
+    if (!listEl) return;
+    listEl.innerHTML = "";
 
-      const jogadoresOrdenadosAdmin = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
-
-      jogadoresOrdenadosAdmin.forEach(p => {
+    jogadores.forEach(p => {
         listEl.innerHTML += `
-          <div class="admin-player-item">
-            <span><b>${p.nome}</b> (${p.vitoriasCalculadas || 0}V / ${p.derrotasCalculadas || 0}D)</span>
-            <div>
-              <button onclick="editPlayer('${p.id}')" style="background:var(--accent); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Editar</button>
-              <button onclick="deletePlayer('${p.id}')" style="background:var(--loss); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Remover</button>
+            <div class="admin-player-item">
+                <span><b>${p.nome}</b> (${p.vitoriasCalculadas || 0}V / ${p.derrotasCalculadas || 0}D)</span>
+                <div>
+                    <button onclick="editPlayer('${p.id}')" style="background:var(--accent); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Editar</button>
+                    <button onclick="deletePlayer('${p.id}')" style="background:var(--loss); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Remover</button>
+                </div>
             </div>
-          </div>
         `;
-      });
+    });
+}
+
+function votar(vencedorId) {
+    const perdedorId = String(document.getElementById('currentUser').value);
+    if (perdedorId === "") {
+        alert("⚠️ Selecione SEU NOME no topo antes de votar!");
+        return;
+    }
+    if (String(perdedorId) === String(vencedorId)) {
+        alert("⚠️ TRAPAÇA DETECTADA! Você não pode votar em si mesmo.");
+        return;
     }
 
-    function votar(vencedorId) {
-      let perdedorId = myPlayerId;
+    const perdedor = jogadores.find(p => String(p.id) === String(perdedorId));
+    const vencedor = jogadores.find(p => String(p.id) === String(vencedorId));
+    if (!perdedor || !vencedor) return;
 
-      if (isAdminLoggedIn) {
-        let nomePerdedorManual = prompt("⚙️ [PAINEL ADMIN] Digite o nome exato do lutador que sofreu a derrota (perdedor):");
-        if (!nomePerdedorManual) return;
-
-        let foundPerdedor = jogadores.find(item => item.nome.trim().toLowerCase() === nomePerdedorManual.trim().toLowerCase());
-        if (!foundPerdedor) {
-          alert("⚠️ Lutador perdedor não encontrado!");
-          return;
-        }
-        perdedorId = foundPerdedor.id;
-      }
-
-      if (!perdedorId) {
-        alert("⚠️ Aparelho não vinculado! Reinicie ou identifique-se.");
-        return;
-      }
-
-      if (String(perdedorId) === String(vencedorId)) {
-        alert("⚠️ TRAPAÇA DETECTADA! Você não pode registrar derrota em si mesmo.");
-        return;
-      }
-
-      const perdedor = jogadores.find(p => String(p.id) === String(perdedorId));
-      const vencedor = jogadores.find(p => String(p.id) === String(vencedorId));
-
-      if (!perdedor || !vencedor) return;
-
-      const idVota = 'v_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-      const dataHoraAtual = new Date().toLocaleString('pt-BR');
-      const modoRegistro = isAdminLoggedIn ? "Admin (Manual)" : `Dispositivo (${perdedor.nome})`;
-
-      db.ref(`jogadores/${vencedor.id}/vitimas/${idVota}`).set({
+    const idVota = 'v_' + Date.now();
+    db.ref(`jogadores/${vencedor.id}/vitimas/${idVota}`).set({
         idVota: idVota,
-        perdedorId: String(perdedor.id),
-        auditData: dataHoraAtual,
-        auditDevice: deviceId,
-        auditModo: modoRegistro
-      });
+        perdedorId: String(perdedor.id)
+    });
+}
 
-      showKoExplosionModal();
-    }
-
-    function removeVote(vencedorId, idVota, e) {
-      if (e) e.stopPropagation();
-      if (!isAdminLoggedIn) {
+function removeVote(vencedorId, idVota, e) {
+    if (e) e.stopPropagation();
+    if (!isAdminLoggedIn) {
         alert("Apenas o Administrador pode remover votos!");
         return;
-      }
-      if (!confirm("Deseja anular este voto especificamente e ajustar a pontuação?")) return;
-
-      db.ref(`jogadores/${vencedorId}/vitimas/${idVota}`).remove();
     }
+    if (!confirm("Deseja anular este voto especificamente e ajustar a pontuação?")) return;
 
-    function updateUI() {
-      const grid = document.getElementById('players-grid');
-      grid.innerHTML = "";
+    db.ref(`jogadores/${vencedorId}/vitimas/${idVota}`).remove();
+}
 
-      const jogadoresOrdenadosCards = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
+function updateUI() {
+    const select = document.getElementById('currentUser');
+    const selectedVal = select.value;
+    select.innerHTML = '<option value="">-- Selecione seu nome --</option>';
+    jogadores.forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+    });
+    select.value = selectedVal;
 
-      jogadoresOrdenadosCards.forEach(player => {
+    const grid = document.getElementById('players-grid');
+    grid.innerHTML = "";
+
+    jogadores.forEach(player => {
         let vitimasObj = player.vitimas || {};
         let vitimasList = Object.values(vitimasObj);
 
         let votersHtml = vitimasList.map(v => {
-          let perdedor = jogadores.find(p => String(p.id) === String(v.perdedorId));
-          if (!perdedor) return '';
+            let perdedor = jogadores.find(p => String(p.id) === String(v.perdedorId));
+            if (!perdedor) return '';
+            let fotoKOAtual = perdedor.fotoKO;
+            let nomeAtual = perdedor.nome;
+            let posY = perdedor.posYKO || 50;
 
-          let fotoKOAtual = perdedor.fotoKO;
-          let nomeAtual = perdedor.nome;
-          let posY = perdedor.posYKO || 50;
-
-          let auditHtml = "";
-          if (isAdminLoggedIn) {
-            auditHtml = `<div class="audit-info">🕒 ${v.auditData || 'N/D'} | 📱 ${v.auditModo || 'App'}</div>`;
-          }
-
-          return `
-            <div style="display:inline-block; margin:2px; vertical-align:top;">
-              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
-                <img src="${fotoKOAtual}" style="object-position: center ${posY}%"> ${nomeAtual}
-                ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
-              </span>
-              ${auditHtml}
-            </div>
-          `;
+            return `
+                <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
+                    <img src="${fotoKOAtual}" style="object-position: center ${posY}%"> ${nomeAtual}
+                    ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
+                </span>
+            `;
         }).join('');
 
         let isKOClass = (player.derrotasCalculadas || 0) > 0 ? "ko" : "";
         let posN = player.posYNormal || 50;
 
         grid.innerHTML += `
-          <div class="card ${isKOClass}">
-            <img class="avatar" src="${player.fotoNormal}" style="object-position: center ${posN}%" alt="${player.nome}">
-            <div class="name">${player.nome}</div>
-            <div class="stats">
-              <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
+            <div class="card ${isKOClass}">
+                <img class="avatar" src="${player.fotoNormal}" style="object-position: center ${posN}%" alt="${player.nome}">
+                <div class="name">${player.nome}</div>
+                <div class="stats">
+                    <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
+                </div>
+                <button class="btn-vote" onclick="votar('${player.id}')">
+                    ${player.nome} me venceu
+                </button>
+                <div class="voters-container">
+                    <div style="font-size:10px; color:#a8a8b3; text-transform:uppercase; font-weight:bold;">Vítimas (Clique p/ Zoom):</div>
+                    <div>${votersHtml || '<span style="font-size:10px; color:#555">Nenhuma ainda</span>'}</div>
+                </div>
             </div>
-            <div class="voto-container-card">
-              <p class="instrucao-clique">Clique aqui 👇🏼 para registrar resultado</p>
-              <button class="btn-vote" onclick="votar('${player.id}')">
-                ${player.nome} me venceu
-              </button>
-            </div>
-            <div class="voters-container">
-              <div style="font-size:10px; color:#a8a8b3; text-transform:uppercase; font-weight:bold;">Vítimas (Clique p/ Zoom):</div>
-              <div style="margin-top:4px;">${votersHtml || '<span style="font-size:10px; color:#555">Nenhuma ainda</span>'}</div>
-            </div>
-          </div>
         `;
-      });
+    });
 
-      if (isAdminLoggedIn) renderAdminList();
-      updatePodiumAndTable();
-    }
+    if (isAdminLoggedIn) renderAdminList();
+    updatePodiumAndTable();
+}
 
-    function renderCircleSlot(player, isDuck = false) {
-      if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-      const foto = isDuck ? player.fotoKO : player.fotoNormal;
-      const posY = isDuck ? (player.posYKO || 50) : (player.posYNormal || 50);
-      const statText = isDuck ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>` : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
+function renderCircleSlot(player, isDuck = false) {
+    if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+    const foto = isDuck ? player.fotoKO : player.fotoNormal;
+    const posY = isDuck ? (player.posYKO || 50) : (player.posYNormal || 50);
+    const statText = isDuck ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>` : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
 
-      return `
+    return `
         <div class="podium-circle-wrapper">
-          <img class="podium-circle-avatar" src="${foto}" style="object-position: center ${posY}%" alt="${player.nome}">
+            <img class="podium-circle-avatar" src="${foto}" style="object-position: center ${posY}%" alt="${player.nome}">
         </div>
         <div style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff;">${player.nome}</div>
         <div>${statText}</div>
-      `;
-    }
+    `;
+}
 
-    function updatePodiumAndTable() {
-      if(jogadores.length === 0) return;
+function updatePodiumAndTable() {
+    if(jogadores.length === 0) return;
+    const ranking = ordenarJogadores();
 
-      const ranking = ordenarJogadores();
+    document.getElementById('podium-1').innerHTML = (ranking[0] && ranking[0].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[0]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+    document.getElementById('podium-2').innerHTML = (ranking[1] && ranking[1].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[1]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+    document.getElementById('podium-3').innerHTML = (ranking[2] && ranking[2].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[2]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
 
-      document.getElementById('podium-1').innerHTML = (ranking[0] && ranking[0].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[0]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-      document.getElementById('podium-2').innerHTML = (ranking[1] && ranking[1].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[1]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-      document.getElementById('podium-3').innerHTML = (ranking[2] && ranking[2].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[2]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+    const worstPlayer = [...jogadores].sort((a,b) => b.derrotasCalculadas - a.derrotasCalculadas)[0];
+    document.getElementById('podium-duck').innerHTML = (worstPlayer && worstPlayer.derrotasCalculadas > 0) ? renderCircleSlot(worstPlayer, true) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
 
-      const worstPlayer = [...jogadores].sort((a,b) => b.derrotasCalculadas - a.derrotasCalculadas)[0];
-      document.getElementById('podium-duck').innerHTML = (worstPlayer && worstPlayer.derrotasCalculadas > 0) ? renderCircleSlot(worstPlayer, true) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+    const leaderboard = document.getElementById('leaderboard');
+    leaderboard.innerHTML = "";
 
-      const leaderboard = document.getElementById('leaderboard');
-      leaderboard.innerHTML = "";
-
-      ranking.forEach((p, idx) => {
+    ranking.forEach((p, idx) => {
         let saldo = p.vitoriasCalculadas - p.derrotasCalculadas;
         let saldoFormatted = saldo > 0 ? `+${saldo}` : saldo;
-
         leaderboard.innerHTML += `
-          <tr>
-            <td><b>${idx + 1}º</b></td>
-            <td style="text-align:left;"><b>${p.nome}</b></td>
-            <td style="color: var(--win); font-weight:bold;">${p.vitoriasCalculadas || 0}</td>
-            <td style="color: var(--loss); font-weight:bold;">${p.derrotasCalculadas || 0}</td>
-            <td style="font-weight:bold;">${saldoFormatted}</td>
-          </tr>
+            <tr>
+                <td><b>${idx + 1}º</b></td>
+                <td style="text-align:left;"><b>${p.nome}</b></td>
+                <td style="color: var(--win); font-weight:bold;">${p.vitoriasCalculadas || 0}</td>
+                <td style="color: var(--loss); font-weight:bold;">${p.derrotasCalculadas || 0}</td>
+                <td style="font-weight:bold;">${saldoFormatted}</td>
+            </tr>
         `;
-      });
-    }
+    });
+}
 
-    function resetTournament() {
-      if (!isAdminLoggedIn) return;
-      if (confirm("Deseja ZERAR todas as vitórias e derrotas do campeonato?")) {
+function resetTournament() {
+    if (!isAdminLoggedIn) return;
+    if (confirm("Deseja ZERAR todas as vitórias e derrotas do campeonato?")) {
         jogadores.forEach(p => {
-          db.ref('jogadores/' + String(p.id) + '/vitimas').remove();
+            db.ref('jogadores/' + String(p.id) + '/vitimas').remove();
         });
-      }
     }
-  </script>
+}
+</script>
 </body>
 </html>
