@@ -10,16 +10,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   
-  <!-- Cropper.js CSS (Para cortar foto estilo WhatsApp) -->
+  <!-- Cropper.js CSS (Corte de foto estilo WhatsApp) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
   <style>
     :root {
       --bg-dark: #0a0a0f;
-      --card-bg: rgba(20, 20, 35, 0.75);
+      --card-bg: rgba(20, 20, 35, 0.85);
       --neon-cyan: #00e5ff;
       --neon-pink: #ff0055;
       --neon-gold: #ffd700;
+      --neon-purple: #8a2be2;
       --text-color: #f0f0f5;
     }
 
@@ -33,134 +34,191 @@
       background-image: 
         radial-gradient(circle at 15% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 85% 80%, rgba(0, 229, 255, 0.15) 0%, transparent 40%);
-      padding-bottom: 50px;
+      padding-bottom: 60px;
       overflow-x: hidden;
     }
 
-    /* Header */
+    /* Header Arcade */
     header {
       text-align: center;
-      padding: 30px 15px;
-      background: rgba(10, 10, 15, 0.8);
+      padding: 25px 15px;
+      background: rgba(10, 10, 15, 0.9);
       backdrop-filter: blur(10px);
       border-bottom: 2px solid var(--neon-pink);
-      box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
-      margin-bottom: 30px;
+      box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+      margin-bottom: 25px;
     }
 
     header h1 {
       font-family: 'Bangers', cursive;
-      font-size: 3rem;
+      font-size: 3.2rem;
       letter-spacing: 2px;
       color: var(--neon-gold);
-      text-shadow: 3px 3px 0px var(--neon-pink), 0 0 10px rgba(255, 215, 0, 0.5);
+      text-shadow: 3px 3px 0px var(--neon-pink), 0 0 12px rgba(255, 215, 0, 0.6);
     }
 
     header p {
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--neon-cyan);
-      margin-top: 5px;
+      margin-top: 4px;
+      letter-spacing: 1px;
     }
 
-    .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+    .container { max-width: 1050px; margin: 0 auto; padding: 0 15px; }
 
-    /* Botão Flutuante de Cadastro */
+    /* Botão Cadastro Flutuante */
     .btn-cadastrar-flutuante {
-      background: var(--neon-cyan);
+      background: linear-gradient(45deg, var(--neon-cyan), #00a2ff);
       color: #000;
       font-family: 'Orbitron', sans-serif;
-      font-weight: 800;
+      font-weight: 900;
       border: none;
-      padding: 15px 30px;
-      font-size: 1.1rem;
+      padding: 14px 28px;
+      font-size: 1rem;
       border-radius: 8px;
       cursor: pointer;
       display: block;
       margin: 0 auto 30px auto;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-      transition: transform 0.2s;
+      box-shadow: 0 0 18px rgba(0, 229, 255, 0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .btn-cadastrar-flutuante:hover { transform: scale(1.05); }
+    .btn-cadastrar-flutuante:hover { 
+      transform: scale(1.04);
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.8);
+    }
 
+    /* Títulos de Seção */
     .section-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--neon-cyan);
-      margin: 30px 0 15px 0;
+      margin: 35px 0 18px 0;
       text-transform: uppercase;
       border-left: 4px solid var(--neon-pink);
-      padding-left: 10px;
+      padding-left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    /* Grid de Jogadores */
+    /* Grid dos Desafiantes */
     .grid-players {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
     }
 
     .player-card {
       background: var(--card-bg);
-      border: 2px solid rgba(0, 229, 255, 0.3);
-      border-radius: 12px;
+      border: 2px solid rgba(0, 229, 255, 0.25);
+      border-radius: 14px;
       padding: 20px;
       text-align: center;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+    }
+
+    .player-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
     }
 
     .player-avatar {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       object-fit: cover;
-      border: 4px solid var(--neon-gold);
-      margin-bottom: 15px;
+      border: 3px solid var(--neon-gold);
+      margin-bottom: 12px;
       background: #000;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
     }
 
     .player-name {
       font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 1.3rem;
-      margin-bottom: 15px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
       color: #fff;
     }
 
-    /* O Botão Roxo Melhorado para Registro de Resultado */
+    .player-score {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+    .player-score span {
+      color: var(--neon-gold);
+      font-weight: bold;
+    }
+
+    /* Botão Roxo de Resultado */
     .btn-votar {
       background: linear-gradient(180deg, #8a2be2, #4b0082);
       color: #fff;
       border: 2px solid #a855f7;
-      padding: 12px 15px;
+      padding: 12px 14px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 800;
       border-radius: 8px;
       cursor: pointer;
       width: 100%;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
-      box-shadow: 0 4px 15px rgba(138, 43, 226, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 15px rgba(138, 43, 226, 0.5);
       transition: all 0.2s;
     }
-
     .btn-votar:hover {
       background: linear-gradient(180deg, #9f3cf3, #5c00a3);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(138, 43, 226, 0.8), inset 0 2px 5px rgba(255, 255, 255, 0.4);
-    }
-    
-    .btn-votar:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 5px rgba(138, 43, 226, 0.8);
+      box-shadow: 0 6px 20px rgba(138, 43, 226, 0.8);
     }
 
-    /* Modais */
+    /* HALL DA INFÂMIA / VÍTIMAS DO K.O. */
+    .hall-infamia-container {
+      background: rgba(255, 0, 85, 0.08);
+      border: 2px dashed var(--neon-pink);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 15px;
+    }
+
+    .grid-vitimas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .vitima-card {
+      background: rgba(10, 10, 15, 0.8);
+      border: 1px solid var(--neon-pink);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .vitima-card:hover { transform: scale(1.03); }
+
+    .vitima-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--neon-pink);
+      filter: grayscale(30%) contrast(110%);
+      margin-bottom: 8px;
+    }
+
+    /* MODAIS */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
       display: flex; justify-content: center; align-items: center;
       z-index: 999; padding: 15px;
     }
@@ -170,7 +228,7 @@
       border: 2px solid var(--neon-cyan);
       border-radius: 16px;
       padding: 25px;
-      max-width: 450px;
+      max-width: 440px;
       width: 100%;
       text-align: center;
       box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
@@ -205,37 +263,40 @@
       100% { transform: translate(0, 0); }
     }
 
-    .frase-epica {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-      font-size: 1.3rem;
-      color: var(--text-color);
-      margin-top: 20px;
-      font-style: italic;
-      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    .frase-seiya-epica {
+      font-family: 'Bangers', cursive;
+      font-size: 1.6rem;
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px rgba(255, 0, 85, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+      margin: 15px 0;
+      line-height: 1.2;
     }
 
-    /* Editor de Imagem (Cropper) */
-    .cropper-container-wrapper {
+    .frase-zoeira-roast {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--neon-cyan);
+      margin: 15px 0;
+      font-style: italic;
+    }
+
+    /* Cropper e Form Inputs */
+    .cropper-wrapper {
       width: 100%;
-      height: 300px;
+      height: 260px;
       background: #000;
       margin: 15px 0;
-      display: none; /* Só mostra quando seleciona foto */
+      display: none;
     }
 
     .modal-inputs {
-      display: flex; flex-direction: column; gap: 15px; margin: 20px 0;
+      display: flex; flex-direction: column; gap: 12px; margin: 15px 0;
     }
-    
     .modal-inputs input[type="text"] {
-      padding: 12px; font-family: 'Orbitron', sans-serif; font-size: 1rem;
+      padding: 12px; font-family: 'Orbitron', sans-serif; font-size: 0.95rem;
       border: 1px solid var(--neon-cyan); border-radius: 6px;
-      background: rgba(0,0,0,0.5); color: #fff;
-    }
-    
-    .modal-inputs input[type="file"] {
-      color: var(--neon-cyan); font-family: 'Montserrat', sans-serif;
+      background: rgba(0,0,0,0.6); color: #fff;
     }
 
     .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
@@ -245,27 +306,13 @@
       font-family: 'Orbitron', sans-serif; border: none; padding: 12px;
       border-radius: 6px; cursor: pointer; text-transform: uppercase;
     }
-    
     .btn-cancelar {
       flex: 1; background: transparent; color: #aaa; border: 1px solid #555;
       font-family: 'Orbitron', sans-serif; padding: 12px; border-radius: 6px; cursor: pointer;
     }
 
-    /* Admin Panel */
-    .admin-list {
-      text-align: left; max-height: 250px; overflow-y: auto; margin: 15px 0;
-    }
-    .admin-item {
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin-bottom: 8px;
-    }
-    .btn-liberar {
-      background: var(--neon-pink); color: #fff; border: none; padding: 5px 10px;
-      border-radius: 4px; cursor: pointer; font-weight: bold;
-    }
-
-    footer { text-align: center; margin-top: 50px; color: #666; font-size: 0.8rem; }
-    .btn-admin-link { background: none; border: none; color: #555; cursor: pointer; text-decoration: underline; margin-top: 15px; }
+    footer { text-align: center; margin-top: 50px; color: #555; font-size: 0.8rem; }
+    .btn-admin-link { background: none; border: none; color: #555; cursor: pointer; text-decoration: underline; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -278,23 +325,28 @@
   <main class="container">
     <button class="btn-cadastrar-flutuante" onclick="abrirModalCadastro()">+ CADASTRAR JOGADOR</button>
     
-    <h2 class="section-title">DESAFIANTES NA ARENA</h2>
-    <div class="grid-players" id="gridPlayers">
-      <!-- Jogadores serão renderizados aqui via JS -->
+    <!-- DESAFIANTES -->
+    <h2 class="section-title">⚔️ DESAFIANTES NA ARENA</h2>
+    <div class="grid-players" id="gridPlayers"></div>
+
+    <!-- HALL DA INFÂMIA / VÍTIMAS -->
+    <h2 class="section-title" style="color: var(--neon-pink); border-color: var(--neon-gold);">💀 HALL DA INFÂMIA (VÍTIMAS)</h2>
+    <div class="hall-infamia-container">
+      <div class="grid-vitimas" id="gridVitimas"></div>
     </div>
   </main>
 
-  <!-- MODAL: CADASTRO COM CROPPER (Estilo WhatsApp) -->
+  <!-- MODAL 1: CADASTRO COM CROPPER -->
   <div id="modalCadastro" class="modal-overlay" style="display: none;">
     <div class="modal-card">
       <h2 style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif;">NOVO LUTADOR</h2>
-      <p style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">*Apenas 1 registro permitido por aparelho.</p>
+      <p style="font-size: 0.8rem; color: #aaa; margin-top: 4px;">*Apenas 1 registro por aparelho.</p>
       
       <div class="modal-inputs">
-        <input type="text" id="inputNome" placeholder="Digite seu Nome ou Nick">
+        <input type="text" id="inputNome" placeholder="Seu Nome ou Nick">
         <input type="file" id="inputFoto" accept="image/*">
         
-        <div class="cropper-container-wrapper" id="cropperWrapper">
+        <div class="cropper-wrapper" id="cropperWrapper">
           <img id="imageToCrop" src="" style="max-width: 100%;">
         </div>
       </div>
@@ -306,28 +358,46 @@
     </div>
   </div>
 
-  <!-- MODAL: EXPLOSÃO K.O. (Confirmação de Vitória) -->
-  <div id="modalKO" class="modal-overlay" style="display: none;">
-    <div class="modal-card" style="background: transparent; border: none; box-shadow: none;">
+  <!-- MODAL 2: CONFIRMAÇÃO DE VITÓRIA / EXPLOSÃO K.O. (SEIYA) -->
+  <div id="modalConfirmacaoKO" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="border-color: var(--neon-pink); box-shadow: 0 0 35px var(--neon-pink);">
       <div id="animacaoKO" class="explosao-ko">K.O. !</div>
-      <p id="fraseEpica" class="frase-epica">...</p>
-      <button onclick="fecharModal('modalKO')" class="btn-confirmar" style="margin-top: 30px; width: 200px;">Continuar</button>
+      <p style="font-size: 0.9rem;">Confirmar vitória para <strong id="nomeVencedorAlvo" style="color: var(--neon-gold);">...</strong>?</p>
+      
+      <!-- Frase Motivacional do Seiya -->
+      <p id="textoSeiyaMotivacional" class="frase-seiya-epica">"Por Athena!"</p>
+
+      <div class="modal-actions">
+        <button onclick="confirmarVitoriaEfetiva()" class="btn-confirmar" style="background: var(--neon-pink); color: #fff;">CONFIRMAR K.O.</button>
+        <button onclick="fecharModal('modalConfirmacaoKO')" class="btn-cancelar">CANCELAR</button>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL: ADMIN (Liberação de Aparelho) -->
-  <div id="modalAdmin" class="modal-overlay" style="display: none;">
+  <!-- MODAL 3: VÍTIMA DO K.O. (HALL DA INFÂMIA - ZOEIRA) -->
+  <div id="modalVitimaInfo" class="modal-overlay" style="display: none;">
     <div class="modal-card">
-      <h2 style="color: var(--neon-gold); font-family: 'Orbitron', sans-serif;">PAINEL ADMIN</h2>
-      <p style="font-size: 0.85rem; margin-bottom: 15px;">Gerenciar bloqueio de aparelhos</p>
+      <h2 style="color: var(--neon-pink); font-family: 'Bangers', cursive; font-size: 2.2rem;">PATO DA RODADA!</h2>
+      <img id="imgVitimaInfo" src="" class="player-avatar" style="border-color: var(--neon-pink); width: 130px; height: 130px;">
+      <h3 id="nomeVitimaInfo" style="font-family: 'Orbitron', sans-serif;">...</h3>
       
-      <div class="admin-list" id="listaAparelhos">
-        <!-- Lista de aparelhos bloqueados carregará aqui -->
-      </div>
+      <!-- Frase de Zoeira -->
+      <p id="textoZoeiraVitima" class="frase-zoeira-roast">"Errou o combo até no vento!"</p>
 
       <div class="modal-actions">
-        <!-- Simulação de destravamento geral para o protótipo -->
-        <button onclick="liberarMeuAparelho()" class="btn-confirmar" style="background: var(--neon-pink); color: #fff;">Liberar MEU Aparelho</button>
+        <button onclick="fecharModal('modalVitimaInfo')" class="btn-confirmar">FECHAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ADMIN -->
+  <div id="modalAdmin" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h2 style="color: var(--neon-gold); font-family: 'Orbitron', sans-serif;">ADMINISTRADOR</h2>
+      <p style="font-size: 0.85rem; margin: 10px 0;">Controle de acesso e reset da arena</p>
+      
+      <div class="modal-actions" style="flex-direction: column;">
+        <button onclick="liberarAparelhoLocal()" class="btn-confirmar" style="background: var(--neon-pink); color: #fff;">LIBERAR ESTE APARELHO</button>
         <button onclick="fecharModal('modalAdmin')" class="btn-cancelar">FECHAR</button>
       </div>
     </div>
@@ -338,47 +408,99 @@
     <button class="btn-admin-link" onclick="acessarAdmin()">Acesso Restrito (Admin)</button>
   </footer>
 
-  <!-- Bibliotecas de JavaScript -->
+  <!-- Scripts: Cropper.js & Firebase -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-  <!-- Firebase SDKs (v9 Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
     // ==========================================
-    // 1. O ARSENAL COMPLETO DE FRASES (Zoeira + Animes + Anti-heróis)
+    // 1. LISTA DE FRASES SEPARADAS
     // ==========================================
-    const frasesKO = [
-      // Cavaleiros e Shounen (Sua lista)
-      "Vamos! Levante-se Seiya!", "Coragem Seiya!", "Força, Seiya!", "Lute, Seiya!", 
+    
+    // Frases para TELA DE CONFIRMAÇÃO DE VITÓRIA (Seiya & Shounen)
+    const frasesSeiya = [
+      "Ya!", "Coragem Seiya!", "Força, Seiya!", "Lute, Seiya!", 
       "Não morra Seiya!", "Não cuspa os dentes, Seiya!", "Não perca litros de sangue, Seiya!", 
       "Não tenha traumatismos, Seiya!", "Saoori!", "Por Athena!", "Eu não desisto Nunca!", 
       "Preciso de milagre!", "Esse é o meu jeito Ninja!", "Queime Cosmo!", "Alcance o sétimo sentido!", 
-      "Não perca as esperanças, Seiya!", "Não perca os sentidos, Seiya!", "Não quebre as pernas, Seiya!", 
-      "Pela Deusa!", "Me dê sua força Pegasus!", "Vamos ao encontro do mais forte!", "Nem doeu!", 
-      "Insolente!", "Miserável é um gênio!", "Kaioken aumentado 100 vezes!", "Morra Seiya!", 
-      "Levante as mãos para a Genki Dama", "O Naruto é duro às vezes...", "Booora!", "UP!UP!", 
-      "A flor tem que ser de cerejeira", "Mais de 8 mil!",
-      // Pesos Pesados / Anti-heróis
-      "O seu poder de luta é de um verme insolente!", "Chamas Negras Mortais!", 
-      "Você é fraco. Por que é fraco? Porque lhe falta ódio.", "Ave Fênix! Volto das cinzas para te derrotar!", 
-      "Chaos Control! Muito lento...",
-      // Zoeira e Hall da Infâmia
-      "Perdeu a alma!", "Vamos tesouro, não se misture com essa gentalha...", "Sabe de nada, inocente!", 
-      "Errou o combo até no vento!", "Apanhou tanto que o controle desconectou!", "Levou o Perfect e nem viu de onde veio!", 
-      "Resetou o controle pra ver se melhorava!", "Passou vergonha no crédito e no débito!", "Chama o VAR que deu ruim!"
+      "Não perca as esperanças, Seiya!", "Pela Deusa!", "Me dê sua força Pegasus!", 
+      "Vamos ao encontro do mais forte!", "Kaioken aumentado 100 vezes!", "Levante as mãos para a Genki Dama", 
+      "Mais de 8 mil!", "O seu poder de luta é de um verme insolente!", "Chamas Negras Mortais!", 
+      "Você é fraco. Porque lhe falta ódio.", "Ave Fênix!", "Chaos Control!"
+    ];
+
+    // Frases para O HALL DA INFÂMIA / VÍTIMAS (Zoeira Puro Suco)
+    const frasesZoeira = [
+      "Errou o combo até no vento!",
+      "Apanhou mais que saco de pancada!",
+      "Apanhou tanto que o controle desconectou!",
+      "Levou o Perfect e nem viu de onde veio!",
+      "Resetou o controle pra ver se melhorava!",
+      "Passou vergonha no crédito e no débito!",
+      "Chama o VAR que deu ruim!",
+      "Perdeu a alma no round!",
+      "Sabe de nada, inocente!",
+      "Pediu descanso no meio da luta!",
+      "Foi dormir mais cedo na arena!"
     ];
 
     // ==========================================
-    // 2. VARIÁVEIS GLOBAIS E CROPPER
+    // 2. BANCO DE DADOS (LOCAL / FIREBASE)
     // ==========================================
-    let cropper;
-    const dbMock = [
-      { id: 1, nome: "Ryu", foto: "https://via.placeholder.com/150/000000/FFFFFF?text=RYU" },
-      { id: 2, nome: "Ken", foto: "https://via.placeholder.com/150/000000/FFFFFF?text=KEN" }
-    ]; // Simulação de banco de dados para o visual rodar sem Firebase configurado.
+    let jogadores = [
+      { id: 1, nome: "Ryu Mauá", foto: "https://via.placeholder.com/150/000000/00e5ff?text=RYU", vitorias: 3 },
+      { id: 2, nome: "Ken Mauá", foto: "https://via.placeholder.com/150/000000/ff0055?text=KEN", vitorias: 1 }
+    ];
 
-    // Configurar leitor de imagem para o Cropper
+    let vitimas = [
+      { id: 2, nome: "Ken Mauá", foto: "https://via.placeholder.com/150/000000/ff0055?text=KEN" }
+    ];
+
+    let jogadorAlvoId = null;
+    let cropper = null;
+
+    // ==========================================
+    // 3. RENDERIZAÇÃO DA ARENA
+    // ==========================================
+    function renderizarArena() {
+      // Desafiantes
+      const gridP = document.getElementById('gridPlayers');
+      gridP.innerHTML = '';
+      jogadores.forEach(j => {
+        gridP.innerHTML += `
+          <div class="player-card">
+            <img src="${j.foto}" alt="${j.nome}" class="player-avatar">
+            <div class="player-name">${j.nome}</div>
+            <div class="player-score">Vitórias: <span>${j.vitorias}</span></div>
+            <button class="btn-votar" onclick="iniciarVoto(${j.id}, '${j.nome}')">
+              Clique aqui para registrar o resultado 👇🏼
+            </button>
+          </div>
+        `;
+      });
+
+      // Hall da Infâmia
+      const gridV = document.getElementById('gridVitimas');
+      gridV.innerHTML = '';
+      if(vitimas.length === 0) {
+        gridV.innerHTML = '<p style="color:#777; font-size:0.85rem; grid-column:1/-1;">Nenhuma vítima registrada ainda nesta rodada...</p>';
+      } else {
+        vitimas.forEach(v => {
+          gridV.innerHTML += `
+            <div class="vitima-card" onclick="abrirModalVitima('${v.nome}', '${v.foto}')">
+              <img src="${v.foto}" alt="${v.nome}" class="vitima-avatar">
+              <div style="font-family:'Orbitron'; font-size:0.85rem; font-weight:700;">${v.nome}</div>
+              <span style="font-size:0.7rem; color:var(--neon-pink);">[Ver Zoeira]</span>
+            </div>
+          `;
+        });
+      }
+    }
+
+    // ==========================================
+    // 4. EDITOR DE FOTO (CROPPER STILO WHATSAPP)
+    // ==========================================
     const inputFoto = document.getElementById('inputFoto');
     const imageToCrop = document.getElementById('imageToCrop');
     const cropperWrapper = document.getElementById('cropperWrapper');
@@ -391,56 +513,26 @@
         imageToCrop.src = url;
         cropperWrapper.style.display = 'block';
 
-        if (cropper) { cropper.destroy(); }
+        if (cropper) cropper.destroy();
         
-        // Ativa o corte circular/quadrado estilo WhatsApp
         cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1, // Quadrado perfeito (para ficar redondo no CSS)
+          aspectRatio: 1,
           viewMode: 1,
           dragMode: 'move',
           autoCropArea: 1,
-          restore: false,
           guides: false,
-          center: false,
-          highlight: false,
           cropBoxMovable: true,
           cropBoxResizable: true,
-          toggleDragModeOnDblclick: false,
         });
       }
     });
 
     // ==========================================
-    // 3. LÓGICA DE INTERFACE
+    // 5. LÓGICA DE MODAIS E VOTAÇÃO
     // ==========================================
-    function renderizarJogadores() {
-      const grid = document.getElementById('gridPlayers');
-      grid.innerHTML = '';
-      
-      dbMock.forEach(jogador => {
-        grid.innerHTML += `
-          <div class="player-card">
-            <img src="${jogador.foto}" alt="${jogador.nome}" class="player-avatar">
-            <h3 class="player-name">${jogador.nome}</h3>
-            <!-- Botão com texto específico solicitado -->
-            <button class="btn-votar" onclick="registrarVitoria(${jogador.id}, '${jogador.nome}')">
-               Clique aqui para registrar o resultado 👇🏼
-            </button>
-          </div>
-        `;
-      });
-    }
-
-    // ==========================================
-    // 4. LÓGICA DE APARELHO E CADASTRO
-    // ==========================================
-    function checarBloqueioAparelho() {
-      return localStorage.getItem('fightNerdDeviceLock') === 'true';
-    }
-
     function abrirModalCadastro() {
-      if (checarBloqueioAparelho()) {
-        alert("Este aparelho já possui um guerreiro cadastrado! Apenas o Administrador pode liberar para um novo cadastro.");
+      if (localStorage.getItem('fnm_device_locked') === 'true') {
+        alert("Aparelho bloqueado! Este dispositivo já cadastrou um lutador. Peça liberação ao Admin.");
         return;
       }
       document.getElementById('modalCadastro').style.display = 'flex';
@@ -451,75 +543,88 @@
     }
 
     function salvarJogador() {
-      const nome = document.getElementById('inputNome').value;
-      if (!nome) return alert("Digite um nome!");
-      if (!cropper) return alert("Selecione e ajuste uma foto!");
+      const nome = document.getElementById('inputNome').value.trim();
+      if (!nome) return alert("Digite seu nome ou nick!");
+      if (!cropper) return alert("Selecione e ajuste sua foto!");
 
-      // Pega o corte final em Base64
-      const canvas = cropper.getCroppedCanvas({ width: 250, height: 250 });
+      const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
       const fotoBase64 = canvas.toDataURL("image/webp");
 
-      // Adiciona ao banco simulado (Aqui entraria o push do Firebase)
-      dbMock.push({ id: Date.now(), nome: nome, foto: fotoBase64 });
-      
-      // TRAVA O APARELHO APÓS CADASTRAR
-      localStorage.setItem('fightNerdDeviceLock', 'true');
-      
-      renderizarJogadores();
+      jogadores.push({
+        id: Date.now(),
+        nome: nome,
+        foto: fotoBase64,
+        vitorias: 0
+      });
+
+      // Trava o aparelho
+      localStorage.setItem('fnm_device_locked', 'true');
+
+      renderizarArena();
       fecharModal('modalCadastro');
     }
 
-    // ==========================================
-    // 5. O EFEITO K.O. EXPLOSIVO
-    // ==========================================
-    function registrarVitoria(id, nome) {
-      // Abre o Modal Transparente
-      document.getElementById('modalKO').style.display = 'flex';
-      
-      // Reinicia a animação CSS (truque de reflow)
-      const elementoAnimacao = document.getElementById('animacaoKO');
-      elementoAnimacao.style.animation = 'none';
-      elementoAnimacao.offsetHeight; /* trigger reflow */
-      elementoAnimacao.style.animation = null; 
+    function iniciarVoto(id, nome) {
+      jogadorAlvoId = id;
+      document.getElementById('nomeVencedorAlvo').innerText = nome;
 
-      // Sorteia uma frase épica
-      const fraseSorteada = frasesKO[Math.floor(Math.random() * frasesKO.length)];
-      document.getElementById('fraseEpica').innerText = `"${fraseSorteada}"`;
-      
-      // OBS: Aqui iria sua lógica do Firebase de adicionar +1 ponto pro jogador.
+      // Sorteia frase do Seiya
+      const indexSeiya = Math.floor(Math.random() * frasesSeiya.length);
+      document.getElementById('textoSeiyaMotivacional').innerText = `"${frasesSeiya[indexSeiya]}"`;
+
+      // Dispara Animação Explosiva K.O.
+      const anim = document.getElementById('animacaoKO');
+      anim.style.animation = 'none';
+      anim.offsetHeight; /* trigger reflow */
+      anim.style.animation = null;
+
+      document.getElementById('modalConfirmacaoKO').style.display = 'flex';
     }
 
-    // ==========================================
-    // 6. PAINEL ADMIN (LIBERAÇÃO)
-    // ==========================================
-    function acessarAdmin() {
-      const senha = prompt("Digite a senha do Mestre (Admin):");
-      if (senha === "1234") { // Mude a senha depois!
-        document.getElementById('modalAdmin').style.display = 'flex';
-      } else if (senha !== null) {
-        alert("Senha Incorreta! Treine mais.");
+    function confirmarVitoriaEfetiva() {
+      const jogador = jogadores.find(j => j.id === jogadorAlvoId);
+      if (jogador) {
+        jogador.vitorias += 1;
       }
+      renderizarArena();
+      fecharModal('modalConfirmacaoKO');
     }
 
-    // Como o localStorage é local do celular da pessoa, em produção o Admin
-    // precisaria deletar uma 'flag' do Firebase atrelada ao UID do celular dela.
-    // Para esse protótipo de 1 arquivo, fiz um botão para o próprio jogador/admin
-    // limpar o localStorage do navegador atual.
-    function liberarMeuAparelho() {
-      localStorage.removeItem('fightNerdDeviceLock');
-      alert("Aparelho liberado! Agora você pode cadastrar outro nome.");
-      fecharModal('modalAdmin');
+    function abrirModalVitima(nome, foto) {
+      document.getElementById('nomeVitimaInfo').innerText = nome;
+      document.getElementById('imgVitimaInfo').src = foto;
+
+      // Sorteia frase de Zoeira
+      const indexZoeira = Math.floor(Math.random() * frasesZoeira.length);
+      document.getElementById('textoZoeiraVitima').innerText = `"${frasesZoeira[indexZoeira]}"`;
+
+      document.getElementById('modalVitimaInfo').style.display = 'flex';
     }
 
-    // ==========================================
-    // 7. UTILITÁRIOS
-    // ==========================================
     function fecharModal(id) {
       document.getElementById(id).style.display = 'none';
     }
 
-    // Inicializa a tela com os jogadores de teste
-    renderizarJogadores();
+    // ==========================================
+    // 6. ADMIN
+    // ==========================================
+    function acessarAdmin() {
+      const senha = prompt("Digite a senha do Mestre (Admin):");
+      if (senha === "86675") {
+        document.getElementById('modalAdmin').style.display = 'flex';
+      } else if (senha !== null) {
+        alert("Senha Incorreta!");
+      }
+    }
+
+    function liberarAparelhoLocal() {
+      localStorage.removeItem('fnm_device_locked');
+      alert("Este aparelho foi liberado para um novo cadastro!");
+      fecharModal('modalAdmin');
+    }
+
+    // Inicialização
+    renderizarArena();
   </script>
 </body>
 </html>
