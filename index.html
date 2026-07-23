@@ -10,45 +10,63 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
   <style>
-    /* Estilo Visual Anterior (Limpo, Rápido e Direto) */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #121214; color: #e1e1e6; padding: 16px; }
-    
-    .container { max-width: 480px; margin: 0 auto; }
-    
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #29292e; padding-bottom: 12px; }
-    h1 { font-size: 1.25rem; color: #00b37e; font-weight: bold; }
-    
-    .btn-admin { background: #29292e; color: #c4c4cc; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --accent: #58a6ff;
+      --green: #238636;
+      --green-hover: #2ea043;
+      --red: #da3633;
+    }
 
-    /* Cards de Jogadores (Layout Anterior) */
-    .player-card { background: #202024; border: 1px solid #29292e; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; }
+
+    .container { width: 100%; max-width: 480px; }
+
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    h1 { font-size: 1.15rem; color: var(--text-bright); font-weight: 700; display: flex; align-items: center; gap: 8px; }
     
-    .player-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #121214; flex-shrink: 0; }
-    .player-details h3 { font-size: 0.95rem; color: #fba94c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-    .player-details p { font-size: 0.75rem; color: #9999ab; margin-top: 2px; }
+    .btn-admin { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
+    .btn-admin:hover { border-color: var(--accent); color: var(--accent); }
 
-    .btn-venceu { background: #00b37e; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
-    .btn-venceu:hover { background: #00875f; }
-    .btn-venceu:active { transform: scale(0.96); }
+    /* Cards */
+    .player-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    
+    .player-info { display: flex; align-items: center; gap: 10px; overflow: hidden; cursor: pointer; flex-grow: 1; }
+    .player-info:hover .player-details h3 { color: var(--accent); }
 
-    /* Toast de Feedback de Voto */
-    .toast-vote { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #00b37e; color: white; padding: 10px 16px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 200; transition: opacity 0.3s; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #000; flex-shrink: 0; border: 1px solid var(--border); }
+    .player-details h3 { font-size: 0.95rem; color: var(--text-bright); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+    .player-details p { font-size: 0.75rem; color: #8b949e; margin-top: 2px; }
+
+    .btn-venceu { background: var(--green); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
+    .btn-venceu:hover { background: var(--green-hover); }
+    .btn-venceu:active { transform: scale(0.97); }
+
+    /* Toast de Votação (Lista 2) */
+    .toast-vote { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; padding: 10px 16px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 200; border: 1px solid #3fb950; transition: opacity 0.3s; }
 
     /* Modais */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(1,4,9,0.85); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
     .modal-hidden { display: none !important; }
-    .modal-card { background: #202024; border: 1px solid #29292e; border-radius: 12px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
-    .modal-card h3 { color: #fba94c; margin-bottom: 12px; font-size: 1rem; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); max-height: 85vh; overflow-y: auto; }
+    .modal-card h3 { color: var(--text-bright); margin-bottom: 12px; font-size: 1rem; }
 
-    /* Modal K.O. */
-    .ko-header { font-size: 2rem; font-weight: 900; color: #fba94c; text-shadow: 0 0 8px #f75a68; }
-    .ko-quote { background: #121214; border: 1px solid #29292e; padding: 10px; border-radius: 6px; font-style: italic; color: #e1e1e6; margin: 10px 0; font-size: 0.85rem; }
-    .btn-ko-continue { background: #fba94c; color: #121214; font-weight: bold; width: 100%; padding: 8px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; }
+    /* Modal K.O. / Zoeira (Lista 1) */
+    .ko-header { font-size: 1.8rem; font-weight: 800; color: #f85149; }
+    .ko-quote { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 6px; font-style: italic; color: var(--text-bright); margin: 12px 0; font-size: 0.85rem; }
+    .btn-ko-continue { background: var(--accent); color: #0d1117; font-weight: 600; width: 100%; padding: 8px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; }
+    .btn-ko-continue:hover { opacity: 0.9; }
+
+    /* Lista de Vítimas no Modal */
+    .victim-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; border: 1px solid var(--border); font-size: 0.8rem; text-align: left; }
 
     /* Admin Inputs */
-    .admin-input { width: 100%; padding: 8px; background: #121214; border: 1px solid #29292e; border-radius: 6px; color: #fff; font-size: 0.8rem; margin-bottom: 8px; }
+    .admin-input { width: 100%; padding: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-bright); font-size: 0.8rem; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -61,7 +79,7 @@
 
     <!-- LISTA DE JOGADORES -->
     <div id="players-container">
-      <p style="text-align:center; color:#9999ab; padding:20px;">Carregando guerreiros...</p>
+      <p style="text-align:center; color:#8b949e; padding:20px;">Carregando guerreiros...</p>
     </div>
   </div>
 
@@ -73,10 +91,21 @@
   <!-- MODAL DE K.O. / ZOEIRA DA DERROTA (LISTA 1) -->
   <div id="ko-modal" class="modal-overlay modal-hidden">
     <div class="modal-card">
-      <div class="ko-header">💥 K.O.! 💥</div>
-      <p id="ko-player-name" style="font-size:0.85rem; font-weight:bold; color:#00b37e; margin-top:6px;"></p>
+      <div class="ko-header">💥 K.O. 💥</div>
+      <p id="ko-player-name" style="font-size:0.85rem; font-weight:600; color:var(--accent); margin-top:6px;"></p>
       <div id="ko-phrase" class="ko-quote">"..."</div>
       <button onclick="closeKoModal()" class="btn-ko-continue">CONTINUAR 🥊</button>
+    </div>
+  </div>
+
+  <!-- MODAL DE REGISTRO DE VÍTIMAS (CLIQUE NO JOGADOR) -->
+  <div id="victims-modal" class="modal-overlay modal-hidden">
+    <div class="modal-card">
+      <h3 id="victims-modal-title">Vítimas de [Nome]</h3>
+      <div id="victims-list-container" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;">
+        <!-- Preenchido via JS -->
+      </div>
+      <button onclick="closeVictimsModal()" class="btn-ko-continue" style="background:var(--border); color:var(--text-bright);">Fechar</button>
     </div>
   </div>
 
@@ -85,30 +114,30 @@
     <div class="modal-card" style="text-align:left;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 style="margin:0;">⚙️ Painel Admin</h3>
-        <button onclick="toggleAdminModal()" style="background:none; border:none; color:#aaa; font-size:1rem; cursor:pointer;">✕</button>
+        <button onclick="toggleAdminModal()" style="background:none; border:none; color:var(--text); font-size:1rem; cursor:pointer;">✕</button>
       </div>
 
       <div id="admin-auth">
         <input type="password" id="admin-pass-input" placeholder="Senha" class="admin-input">
-        <button onclick="loginAdmin()" class="btn-ko-continue" style="background:#00b37e; color:#fff;">Entrar</button>
+        <button onclick="loginAdmin()" class="btn-ko-continue" style="background:var(--green); color:#fff;">Entrar</button>
       </div>
 
       <div id="admin-controls" class="modal-hidden">
         <div style="margin-bottom:10px;">
-          <label style="font-size:0.7rem; color:#aaa;">Novo Guerreiro:</label>
+          <label style="font-size:0.7rem; color:#8b949e;">Novo Guerreiro:</label>
           <input type="text" id="new-player-name" placeholder="Nome" class="admin-input">
           <input type="text" id="new-player-photo" placeholder="URL da Foto" class="admin-input">
-          <button onclick="addPlayer()" class="btn-ko-continue" style="background:#00b37e; color:#fff;">Cadastrar</button>
+          <button onclick="addPlayer()" class="btn-ko-continue" style="background:var(--green); color:#fff;">Cadastrar</button>
         </div>
         <div>
-          <button onclick="resetScores()" style="width:100%; background:#f75a68; color:#fff; padding:6px; border:none; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;">Zerar Placar</button>
+          <button onclick="resetScores()" style="width:100%; background:var(--red); color:#fff; padding:6px; border:none; border-radius:6px; font-size:0.7rem; font-weight:600; cursor:pointer;">Zerar Placar</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // --- CONFIGURAÇÃO FIREBASE (URL REAL DO SEU PROJETO) ---
+    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
       databaseURL: "https://fightnerdmaua-default-rtdb.firebaseio.com/"
     };
@@ -166,7 +195,7 @@
       }));
 
       if (playersArray.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:#9999ab; padding:20px;">Nenhum guerreiro cadastrado.</p>`;
+        container.innerHTML = `<p style="text-align:center; color:#8b949e; padding:20px;">Nenhum guerreiro cadastrado.</p>`;
         return;
       }
 
@@ -175,11 +204,11 @@
 
       container.innerHTML = playersArray.map(p => `
         <div class="player-card">
-          <div class="player-info">
+          <div class="player-info" onclick="openVictimsModal('${p.id}')">
             <img src="${p.photo || 'https://via.placeholder.com/150'}" class="avatar">
             <div class="player-details">
               <h3>${p.name}</h3>
-              <p>Placar: <b style="color:#00b37e;">${p.wins || 0}V</b> / <b style="color:#f75a68;">${p.losses || 0}D</b></p>
+              <p>Placar: <b style="color:var(--accent);">${p.wins || 0}V</b> / <b style="color:var(--red);">${p.losses || 0}D</b></p>
             </div>
           </div>
           <button onclick="registerLoss('${p.id}')" class="btn-venceu">
@@ -241,6 +270,38 @@
       document.getElementById("ko-modal").classList.add("modal-hidden");
     }
 
+    // --- MODAL DE VÍTIMAS AO CLICAR NO REGISTRO ---
+    function openVictimsModal(playerId) {
+      const player = playersData[playerId];
+      if (!player) return;
+
+      document.getElementById("victims-modal-title").innerText = `Histórico de ${player.name}`;
+      const container = document.getElementById("victims-list-container");
+
+      const victims = player.victims || {};
+      const victimIds = Object.keys(victims);
+
+      if (victimIds.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#8b949e; font-size:0.8rem; padding:10px;">Nenhum registro de vítima ainda.</p>`;
+      } else {
+        container.innerHTML = victimIds.map(vId => {
+          const vName = playersData[vId] ? playersData[vId].name : "Oponente";
+          return `
+            <div class="victim-item">
+              <span>⚔️ Venceu <b>${vName}</b></span>
+              <span style="color:var(--accent); font-weight:bold;">${victims[vId]}x</span>
+            </div>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("victims-modal").classList.remove("modal-hidden");
+    }
+
+    function closeVictimsModal() {
+      document.getElementById("victims-modal").classList.add("modal-hidden");
+    }
+
     // --- ADMIN ---
     function toggleAdminModal() {
       document.getElementById("admin-modal").classList.toggle("modal-hidden");
@@ -279,6 +340,7 @@
         Object.keys(playersData).forEach(id => {
           db.ref(`players/${id}/wins`).set(0);
           db.ref(`players/${id}/losses`).set(0);
+          db.ref(`players/${id}/victims`).remove();
         });
       }
     }
