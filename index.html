@@ -162,7 +162,7 @@
       margin: 15px 0 10px 0;
     }
 
-    /* TELA DE EXPLOSÃO K.O. (COM ÊNFASE MOTIVACIONAL) */
+    /* TELA DE EXPLOSÃO K.O. */
     .ko-explosion-overlay {
       display: none;
       position: fixed;
@@ -622,7 +622,6 @@
   <div class="modal-overlay" id="victimModal">
     <div class="victim-zoom-box">
       <h3 style="color: var(--loss); font-family:'Orbitron'; margin:0; text-transform:uppercase;">🦆 Vítima em Destaque</h3>
-      <!-- IMPORTANTE: Usando tag <img> direta para preservar o WebP/GIF animado -->
       <img id="zoomVictimImg" class="victim-zoom-img" src="" alt="Vítima">
       <div id="zoomVictimName" style="font-family:'Orbitron'; font-size: 18px; font-weight: bold; color: #fff;"></div>
       <p id="zoomVictimQuote" style="font-size: 13px; font-style: italic; color: #ffd700; margin-top: 8px; font-weight: bold; line-height: 1.3; min-height: 36px; display: flex; align-items: center; justify-content: center;"></p>
@@ -630,7 +629,7 @@
     </div>
   </div>
 
-  <!-- TELA DE EXPLOSÃO K.O. (COM ÊNFASE TOTAL NA FRASE MOTIVACIONAL/CULT) -->
+  <!-- TELA DE EXPLOSÃO K.O. -->
   <div class="ko-explosion-overlay" id="koExplosionModal">
     <div class="ko-blast-container">
       <div class="ko-big-title">K.O.!</div>
@@ -705,25 +704,25 @@
       <!-- 1º LUGAR -->
       <div class="podium-slot slot-1">
         <div class="podium-badge-title" style="color: var(--gold);">🥇 1º LUGAR</div>
-        <div class="podium-subtitle">"Kakarotto Verme Miserável"</div>
+        <div class="podium-subtitle">"Rei da Arena"</div>
         <div id="podium-1">---</div>
       </div>
       <!-- 2º LUGAR -->
       <div class="podium-slot slot-2">
         <div class="podium-badge-title" style="color: var(--silver);">🥈 2º LUGAR</div>
-        <div class="podium-subtitle">"Vegeta Príncipe do Saia daí"</div>
+        <div class="podium-subtitle">"Príncipe do Combate"</div>
         <div id="podium-2">---</div>
       </div>
       <!-- 3º LUGAR -->
       <div class="podium-slot slot-3">
         <div class="podium-badge-title" style="color: var(--bronze);">🥉 3º LUGAR</div>
-        <div class="podium-subtitle">"Gohan Desperdício de Potencial Premium Plus"</div>
+        <div class="podium-subtitle">"Guerreiro de Ferro"</div>
         <div id="podium-3">---</div>
       </div>
       <!-- PATO -->
       <div class="podium-slot slot-duck">
-        <div class="podium-badge-title" style="color: var(--loss);">🦆 PATO DA TEMPORADA (QUAC!)</div>
-        <div class="podium-subtitle">"Por que você matou o Kuririn?"</div>
+        <div class="podium-badge-title" style="color: var(--loss);">🦆 PATO DA TEMPORADA</div>
+        <div class="podium-subtitle">"Saco de Pancada Oficial"</div>
         <div id="podium-duck">---</div>
       </div>
     </div>
@@ -792,44 +791,14 @@
 
     let myPlayerId = localStorage.getItem('fnm_player_id') || null;
 
-    // Lista exclusiva solicitada para a Tela de Explosão K.O. com foco motivacional / cult
     const frasesExplosaoMaster = [
-      "Vamos! Levante-se Seiya!",
-      "Coragem Seiya!",
-      "Força, Seiya!",
-      "Lute, Seiya!",
-      "Não morra Seiya!",
-      "Não cuspa os dentes, Seiya!",
-      "Não perca litros de sangue, Seiya!",
-      "Não tenha traumatismos, Seiya!",
-      "Saoori!",
-      "Por Athena!",
-      "Eu não desisto Nunca!",
-      "Preciso de milagre!",
-      "Esse é o meu jeito Ninja!",
-      "Queime Cosmo!",
-      "Alcance o sétimo sentido!",
-      "Não perca as esperanças, Seiya!",
-      "Não perca os sentidos, Seiya!",
-      "Não quebre as pernas, Seiya!",
-      "Pela Deusa!",
-      "Me dê sua força Pegasus!",
-      "Vamos ao encontro do mais forte!",
-      "Nem doeu!",
-      "Insolente!",
-      "Miserável é um gênio!",
-      "Kaioken aumentado 100 vezes!",
-      "Morra Seiya!",
-      "Levante as mãos para a Genki Dama",
-      "O Naruto é duro às vezes...",
-      "Booora!",
-      "UP!UP!",
-      "A flor tem que ser de cerejeira",
-      "Mais de 8 mil!"
+      "Vamos! Levante-se Seiya!", "Coragem Seiya!", "Força, Seiya!", "Lute, Seiya!",
+      "Não morra Seiya!", "Por Athena!", "Eu não desisto nunca!", "Preciso de um milagre!",
+      "Esse é o meu jeito ninja!", "Queime Cosmo!", "Alcance o sétimo sentido!",
+      "Kaioken aumentado 100 vezes!", "Morra Seiya!", "Bora pra cima!", "Mais de 8 mil!"
     ];
 
     let filaFrasesExplosao = [];
-
     function pegarProximaFraseExplosao() {
       if (filaFrasesExplosao.length === 0) {
         filaFrasesExplosao = [...frasesExplosaoMaster].sort(() => Math.random() - 0.5);
@@ -837,149 +806,28 @@
       return filaFrasesExplosao.pop();
     }
 
-    // Lista de zoeiras para o Zoom das Vítimas
     const frasesZoeiraMaster = [
       "Vamos tesouro, não se misture com essa gentalha...",
-      "Gentalha! Gentalha!",
-      "Volta o cão arrependido com suas orelhas tão fartas...",
-      "Mamãe!",
-      "Deixa acontecer, naturally...",
-      "Maionese, ele me bate, bate feito maionese...",
-      "Não estou suportando mais...",
-      "Não posso mais suportar... Esses seus abuuusos...",
-      "Índio quer apito se não der, pau vai comer!",
+      "Volta o cão arrependido...",
       "Anotaram a placa do caminhão?",
       "Vem, vem tranquilo!",
-      "É só uma picadinha!",
-      "Cacete de agulha!",
-      "Que horas passa o amarelinho?",
-      "E só não te dou outra porque...",
       "Tá bom, mas não se irrite!",
-      "Seu Madruga, sua vózinha sabe jogar melhor que você?",
       "Rapaaaaz!",
-      "É pau, é pedra, é o fim do caminho!",
-      "Ratinho-o-o-o!",
-      "Maravilha, Alberto!",
-      "Xaropinho: QUE NOJO!",
-      "Que deselegante!",
-      "Tapa na cara de quem tá no chão.",
-      "Isto é uma desgraça, tá me ouvindo? Uma desgraça!",
-      "Eu sou ricaaa!",
-      "Sabe de nada, inocente!",
-      "Errou! Ô loco, meu!",
-      "É uma cilada, Bino!",
       "Já acabou, Jéssica?",
-      "Aai, Pai! Páara...",
       "Receba! Graças a Deus, pai!",
       "Na cara não, pra não estragar o velório!",
-      "Tinha que ser o Chaves mesmo!",
-      "E lá vamos nós!",
-      "Que coisa feia, que coisa ridícula!",
-      "Que falta de decoro!",
-      "Já pode pedir música no Fantástico pela surra!",
       "Foi de F no chat!",
-      "Apanhou tanto que a mãe achou que era foto de ultrassom!",
-      "Apanhou tanto que o RG mudou de nome sozinho pra 'Presunto'!",
-      "Apanhou tanto que a cara virou mapa topográfico de relevo!",
-      "Apanhou tanto que o relógio inteligente marcou corrida de maratona!",
-      "Apanhou tanto que se chacoalhar faz barulho de chocalho por dentro!",
-      "Apanhou tanto que o sensor de colisão do carro disparou do lado de fora!",
-      "Apanhou tanto que até o Wi-Fi desconectou de desgosto!",
-      "Apanhou tanto que o Google Fotos identificou o rosto como obra do Picasso!",
-      "Apanhou tanto que a sombra se recusou a acompanhar no caminho de volta!",
-      "Apanhou tanto que virou estampa de camiseta de liquidação!",
-      "Apanhou tanto que o app do banco bloqueou o acesso por biometria facial!",
-      "Apanhou tanto que se soprar forte cai o que sobrou da dignidade!",
-      "Apanhou tanto que se virar de ponta-cabeça sai moeda da orelha!",
-      "Apanhou tanto que até o anjo da guarda pediu demissão sem aviso prévio!",
-      "Apanhou tanto que virou ponto de referência pra mapa de impacto!",
-      "Apanhou tanto que a cara ficou parecendo amassado de funilaria!",
-      "Apanhou tanto que o GPS recalculou a rota direto pro Pronto-Socorro!",
-      "Apanhou tanto que o sangue virou molho de pimenta pra temperar a derrota!",
-      "Apanhou tanto que nem o corretor do celular consegue consertar essa cara!",
-      "Apanhou tanto que até o Juiz do combate pediu desculpa por ter deixado acontecer!",
-      "Por que você matou o Kuririn?!",
-      "Sobra nada pro Betinha...",
-      "Ficou no cheirinho!",
+      "Apanhou tanto que pediu música no Fantástico!",
       "No céu tem pão?... E morreu!",
-      "SABOOOR de perdedor!",
       "Nem usei 30% do meu poder...",
-      "Venham na maciota!",
       "Você é fraco... lhe falta ódio.",
-      "Foi nada, segue o jogo!",
-      "Você é um estorvo, garoto!",
-      "Tô na área, se me derrubar é pênalti!",
-      "Não conheço o mundo sem você pra eu chutar a bunda!",
-      "Apanhou mais que saco de pancada em dia de treino.",
-      "Ah, poxa vida... levou uma surra pra aprender!",
-      "Caiu mais rápido que o Yamcha!",
-      "Nem precisou transformar em Super Saiyajin...",
-      "Onde foi parar todo aquele orgulho Sayajin?",
-      "Meteoro de Pégaso? Tá mais pra garoa de Pégaso!",
-      "Um mesmo golpe não funciona duas vezes... mas esse funcionou!",
-      "Nem a deusa Atena salva uma surra dessa.",
-      "Patético. Nem me fez gastar 1% do meu Ki.",
-      "Volte para a academia de ninjas, garoto.",
       "FLAWLESS VICTORY!",
-      "BRUTALITY!",
-      "BABALITY!",
-      "TOASTY!",
-      "Get over here... pra tomar mais uma!",
-      "Tomou um Uppercut que foi parar no teto!",
       "K.O. - PERFECT!",
       "Volta pro lobby que essa doeu!",
-      "GAME OVER! Insert Coin to Cry.",
-      "Tá jogando de controle desligado?",
-      "POW! BAM! CRASH! ZAP!",
-      "Foi tanto tapa que a cara virou do avesso!",
-      "Pediu pra sair!",
-      "Aperta o START pra reiniciar a vida.",
-      "Sobra nada! Passou o trator por cima!",
-      "Desliga o controle que o humilhado tá tonto!",
-      "Fui tapeado!",
-      "Fui jantado com farofa na arena!",
-      "Quac! Apanhei até de quem não jogava...",
-      "O entregador de vitórias da rodada.",
-      "Voou pena pra tudo quanto é lado!",
-      "Veio só pra marcar presença e tomar tático.",
-      "Falta de kit médico ou falta de braço?",
-      "Tomou um tático tão pesado que mudou de fuso horário!",
-      "Apanhou de pau mole pra aprender a ter respeito!",
-      "Nem a mãe reconhece se virar o rosto pro lado!",
-      "Foi humilhado em 4K 60FPS sem direito a replay!",
-      "Parece que jogaram uma granada de fezes no seu jogo!",
-      "Tomou um Combobreaker na alma!",
-      "Entregou o controle pro irmão mais novo jogar?",
-      "Apertou todos os botões, rezou um Pai Nosso e mesmo assim caiu!",
-      "Passou o campeonato inteiro no menu de opções!",
-      "Se liga o Wi-Fi melhora, porque a desculpa do lag tá feia!",
-      "Gaguejou no controle!",
-      "Esqueceu de ativar o tutorial?",
-      "Pediu pause pra chorar no banheiro!",
-      "Caiu mais fácil que o Freeza fatiado pelo Trunks!",
-      "O Buggy O Palhaço apanharia menos que você nessa!",
-      "Sinta o gostinho da Expansão de Domínio do K.O.!",
-      "Nem com Akuma no Mi despertada você arrumava algo aqui.",
-      "Isso porque eu tava jogando com uma mão só...",
-      "Respire fundo... e aceite o Game Over!",
-      "Veio só pra pagar a conta do evento!",
-      "Sua participação foi meramente ilustrativa!",
-      "Tá servindo só de saco de pancada e escada pro pódio!",
-      "Pede pra sair, 01!",
-      "Passaram o cerol sem dó!",
-      "Perdeu o rumo de casa no primeiro golpe!",
-      "Alguém chama o Samu que o presunto tá quente!",
-      "Nem o Procon resolve esse calote de gameplay!",
-      "Vai chorar na cama que é lugar quente!",
-      "Essa doeu até no meu RG!",
-      "Entrou mudo e saiu calado de tanta pisa!",
-      "Foi atropelado no acostamento!",
-      "Bateu fofo e apanhou pesado!",
-      "Tomou um sacode que soltou as parafusas!"
+      "Game Over! Insert Coin to Cry."
     ];
 
     let filaFrasesZoeira = [];
-
     function pegarProximaFraseZoeira() {
       if (filaFrasesZoeira.length === 0) {
         filaFrasesZoeira = [...frasesZoeiraMaster].sort(() => Math.random() - 0.5);
@@ -1106,7 +954,7 @@
       const fraseZoeira = pegarProximaFraseZoeira();
       const img = document.getElementById('zoomVictimImg');
       document.getElementById('zoomVictimName').innerText = nome;
-      img.src = fotoKO; // Atribui direto o WebP/GIF animado
+      img.src = fotoKO;
       img.style.objectPosition = `center ${posY || 50}%`;
       document.getElementById('zoomVictimQuote').innerText = `"${fraseZoeira}"`;
       document.getElementById('victimModal').style.display = 'flex';
@@ -1189,7 +1037,7 @@
     function applyCrop() {
       if (!cropper) return;
 
-      const canvas = cropper.croppedCanvas || cropper.getCroppedCanvas({
+      const canvas = cropper.getCroppedCanvas({
         width: 300,
         height: 300,
         imageSmoothingEnabled: true,
@@ -1243,11 +1091,8 @@
       document.getElementById('adm-edit-id').value = String(p.id);
       document.getElementById('adm-name').value = p.nome;
 
-      const imgN = document.getElementById('preview-normal');
-      imgN.src = p.fotoNormal;
-
-      const imgK = document.getElementById('preview-ko');
-      imgK.src = p.fotoKO;
+      document.getElementById('preview-normal').src = p.fotoNormal;
+      document.getElementById('preview-ko').src = p.fotoKO;
 
       newNormalBase64 = null;
       newKoBase64 = null;
@@ -1379,7 +1224,7 @@
 
           return `
             <div style="display:inline-block; margin:2px; vertical-align:top;">
-              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
+              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
                 <img src="${fotoKOAtual}" style="object-position: center ${posY}%"> ${nomeAtual}
                 ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
               </span>
