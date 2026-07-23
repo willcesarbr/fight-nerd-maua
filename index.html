@@ -162,6 +162,114 @@
       margin: 15px 0 10px 0;
     }
 
+    /* ESTILOS DA TELA DE EXPLOSÃO K.O. DE CONFIRMAÇÃO DE VOTO */
+    .ko-explosion-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 5, 8, 0.94);
+      backdrop-filter: blur(12px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: screenShock 0.4s ease-out;
+    }
+
+    @keyframes screenShock {
+      0% { transform: translate(-8px, 6px) scale(0.95); filter: hue-rotate(90deg) brightness(1.8); }
+      20% { transform: translate(8px, -6px) scale(1.05); filter: hue-rotate(-90deg) brightness(2); }
+      40% { transform: translate(-5px, -5px) scale(0.98); }
+      60% { transform: translate(5px, 5px) scale(1.02); }
+      80% { transform: translate(-2px, 2px) scale(1); }
+      100% { transform: translate(0, 0) scale(1); filter: none; }
+    }
+
+    .ko-blast-container {
+      position: relative;
+      text-align: center;
+      padding: 30px;
+      max-width: 450px;
+      width: 90%;
+      background: radial-gradient(circle, rgba(255, 0, 85, 0.35) 0%, rgba(157, 78, 221, 0.15) 60%, transparent 100%);
+      border: 4px solid var(--loss);
+      border-radius: 40px;
+      box-shadow: 0 0 60px rgba(255, 0, 85, 0.8), inset 0 0 30px rgba(255, 0, 85, 0.6);
+      animation: blastPulse 0.8s infinite alternate ease-in-out;
+    }
+
+    @keyframes blastPulse {
+      0% { box-shadow: 0 0 40px rgba(255, 0, 85, 0.6), inset 0 0 20px rgba(255, 0, 85, 0.4); transform: scale(1); }
+      100% { box-shadow: 0 0 70px rgba(255, 0, 85, 0.9), inset 0 0 40px rgba(255, 0, 85, 0.8); transform: scale(1.03); }
+    }
+
+    .ko-big-title {
+      font-family: 'Bangers', cursive;
+      font-size: 5.5rem;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      margin: 0;
+      line-height: 1;
+      text-shadow: 3px 3px 0px var(--loss), -3px -3px 0px var(--accent-neon), 0 0 30px #ff0055;
+      animation: titleShake 0.2s infinite alternate;
+    }
+
+    @keyframes titleShake {
+      0% { transform: rotate(-2deg) scale(1); }
+      100% { transform: rotate(2deg) scale(1.06); }
+    }
+
+    .ko-subtitle-action {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--accent-neon);
+      text-transform: uppercase;
+      margin: 15px 0 10px 0;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+    }
+
+    .ko-quote-box {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-style: italic;
+      color: var(--gold);
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px dashed var(--gold);
+      padding: 15px;
+      border-radius: 20px;
+      margin: 15px 0 25px 0;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      line-height: 1.4;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-close-blast {
+      background: linear-gradient(135deg, var(--loss), #b3003b);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(255, 0, 85, 0.6);
+      transition: all 0.2s;
+    }
+    .btn-close-blast:hover {
+      background: linear-gradient(135deg, #ff1a66, #e6004c);
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 0, 85, 0.9);
+    }
+
     .admin-panel {
       display: none;
       background: rgba(18, 18, 28, 0.95);
@@ -348,7 +456,6 @@
     .stats b.win { color: var(--win); }
     .stats b.loss { color: var(--loss); }
 
-    /* Container e frase de instrução ajustados para o botão */
     .voto-container-card {
       width: 100%;
       margin-top: 10px;
@@ -468,7 +575,6 @@
     th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; }
     th { background: rgba(0,0,0,0.4); color: var(--accent-neon); font-family: 'Orbitron', sans-serif; font-size: 11px; }
 
-    /* Estilos do Crop Modal */
     .crop-container {
       max-height: 350px;
       width: 100%;
@@ -524,6 +630,16 @@
       <div id="zoomVictimName" style="font-family:'Orbitron'; font-size: 18px; font-weight: bold; color: #fff;"></div>
       <p id="zoomVictimQuote" style="font-size: 13px; font-style: italic; color: #ffd700; margin-top: 8px; font-weight: bold; line-height: 1.3; min-height: 36px; display: flex; align-items: center; justify-content: center;"></p>
       <button onclick="closeVictimModal()" style="background: var(--loss); color:#fff; border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:10px;">Fechar Zoeira</button>
+    </div>
+  </div>
+
+  <!-- TELA DE EXPLOSÃO K.O. (CONFIRMAÇÃO DE VOTO) -->
+  <div class="ko-explosion-overlay" id="koExplosionModal">
+    <div class="ko-blast-container">
+      <div class="ko-big-title">K.O.!</div>
+      <div class="ko-subtitle-action" id="blastSubtitle">Resultado Registrado na Arena!</div>
+      <p id="blastRandomQuote" class="ko-quote-box"></p>
+      <button class="btn-close-blast" onclick="closeKoExplosionModal()">Continuar Carnificina 🔥</button>
     </div>
   </div>
 
@@ -680,6 +796,52 @@
 
     let myPlayerId = localStorage.getItem('fnm_player_id') || null;
 
+    // Lista exclusiva solicitada pelo usuário para a Tela de Explosão K.O.
+    const frasesExplosaoMaster = [
+      "Vamos! Levante-se Seiya!",
+      "Coragem Seiya!",
+      "Força, Seiya!",
+      "Lute, Seiya!",
+      "Não morra Seiya!",
+      "Não cuspa os dentes, Seiya!",
+      "Não perca litros de sangue, Seiya!",
+      "Não tenha traumatismos, Seiya!",
+      "Saoori!",
+      "Por Athena!",
+      "Eu não desisto Nunca!",
+      "Preciso de milagre!",
+      "Esse é o meu jeito Ninja!",
+      "Queime Cosmo!",
+      "Alcance o sétimo sentido!",
+      "Não perca as esperanças, Seiya!",
+      "Não perca os sentidos, Seiya!",
+      "Não quebre as pernas, Seiya!",
+      "Pela Deusa!",
+      "Me dê sua força Pegasus!",
+      "Vamos ao encontro do mais forte!",
+      "Nem doeu!",
+      "Insolente!",
+      "Miserável é um gênio!",
+      "Kaioken aumentado 100 vezes!",
+      "Morra Seiya!",
+      "Levante as mãos para a Genki Dama",
+      "O Naruto é duro às vezes...",
+      "Booora!",
+      "UP!UP!",
+      "A flor tem que ser de cerejeira",
+      "Mais de 8 mil!"
+    ];
+
+    let filaFrasesExplosao = [];
+
+    function pegarProximaFraseExplosao() {
+      if (filaFrasesExplosao.length === 0) {
+        filaFrasesExplosao = [...frasesExplosaoMaster].sort(() => Math.random() - 0.5);
+      }
+      return filaFrasesExplosao.pop();
+    }
+
+    // Lista original de zoeiras para o Zoom das Vítimas (mantida isolada)
     const frasesZoeiraMaster = [
       "Vamos tesouro, não se misture com essa gentalha...",
       "Gentalha! Gentalha!",
@@ -820,13 +982,13 @@
       "Tomou um sacode que soltou as parafusas!"
     ];
 
-    let filaFrases = [];
+    let filaFrasesZoeira = [];
 
-    function pegarProximaFraseSemRepetir() {
-      if (filaFrases.length === 0) {
-        filaFrases = [...frasesZoeiraMaster].sort(() => Math.random() - 0.5);
+    function pegarProximaFraseZoeira() {
+      if (filaFrasesZoeira.length === 0) {
+        filaFrasesZoeira = [...frasesZoeiraMaster].sort(() => Math.random() - 0.5);
       }
-      return filaFrases.pop();
+      return filaFrasesZoeira.pop();
     }
 
     db.ref('jogadores').on('value', (snapshot) => {
@@ -945,17 +1107,28 @@
     }
 
     function showVictimZoom(nome, fotoKO, posY) {
-      const fraseSemRepetir = pegarProximaFraseSemRepetir();
+      const fraseZoeira = pegarProximaFraseZoeira();
       const img = document.getElementById('zoomVictimImg');
       document.getElementById('zoomVictimName').innerText = nome;
       img.src = fotoKO;
       img.style.objectPosition = `center ${posY || 50}%`;
-      document.getElementById('zoomVictimQuote').innerText = `"${fraseSemRepetir}"`;
+      document.getElementById('zoomVictimQuote').innerText = `"${fraseZoeira}"`;
       document.getElementById('victimModal').style.display = 'flex';
     }
 
     function closeVictimModal() {
       document.getElementById('victimModal').style.display = 'none';
+    }
+
+    function showKoExplosionModal(vencedorNome, perdedorNome) {
+      const fraseExplosao = pegarProximaFraseExplosao();
+      document.getElementById('blastSubtitle').innerText = `${vencedorNome} amassou ${perdedorNome}!`;
+      document.getElementById('blastRandomQuote').innerText = `"${fraseExplosao}"`;
+      document.getElementById('koExplosionModal').style.display = 'flex';
+    }
+
+    function closeKoExplosionModal() {
+      document.getElementById('koExplosionModal').style.display = 'none';
     }
 
     function checkPassword() {
@@ -977,7 +1150,6 @@
       updateUI();
     }
 
-    // Funções do Cropper.js
     function initCrop(event, type) {
       const file = event.target.files[0];
       if (!file) return;
@@ -994,7 +1166,7 @@
         }
 
         cropper = new Cropper(imageElement, {
-          aspectRatio: 1, // Quadrado perfeito para círculo
+          aspectRatio: 1,
           viewMode: 1,
           dragMode: 'move',
           autoCropArea: 0.9,
@@ -1008,7 +1180,7 @@
         });
       };
       reader.readAsDataURL(file);
-      event.target.value = ''; // Limpa input para permitir re-seleção do mesmo arquivo
+      event.target.value = '';
     }
 
     function closeCropModal() {
@@ -1173,7 +1345,7 @@
         auditModo: modoRegistro
       });
 
-      alert(isAdminLoggedIn ? "✅ Vitória lançada pelo Administrador com sucesso!" : "✅ Vitória registrada com sucesso!");
+      showKoExplosionModal(vencedor.nome, perdedor.nome);
     }
 
     function removeVote(vencedorId, idVota, e) {
