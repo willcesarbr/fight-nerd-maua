@@ -7,6 +7,10 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- Cropper.js para a Foto Normal -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
 
@@ -115,6 +119,31 @@ h2 {
     box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
 }
 
+/* MODAL DE CROP DA FOTO NORMAL */
+.crop-modal-content {
+    background: #12121a;
+    border: 2px solid var(--accent-neon);
+    padding: 20px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.img-container {
+    max-height: 300px;
+    margin-bottom: 15px;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.img-container img {
+    max-width: 100%;
+    display: block;
+}
+
 /* MODAL DE ZOOM DA VÍTIMA */
 .victim-zoom-box {
     background: rgba(20, 20, 32, 0.95);
@@ -168,7 +197,6 @@ h2 {
     text-transform: uppercase;
 }
 
-/* PREVIEW E CONTROLES DE POSIÇÃO DA FOTO */
 .preview-container {
     display: flex;
     gap: 15px;
@@ -490,6 +518,20 @@ th {
     </div>
 </div>
 
+<!-- MODAL DE CROP DA FOTO NORMAL -->
+<div class="modal-overlay" id="cropModal">
+    <div class="crop-modal-content">
+        <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0; font-size: 16px;">✂️ Ajustar & Recortar Foto Normal</h3>
+        <div class="img-container">
+            <img id="imageToCrop" src="" alt="Para Recortar">
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button onclick="cropImage()" style="background: var(--win); border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">Concluir Corte</button>
+            <button onclick="closeCropModal()" style="background: #444; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL DE ZOOM DA VÍTIMA -->
 <div class="modal-overlay" id="victimModal">
     <div class="victim-zoom-box">
@@ -515,28 +557,26 @@ th {
     </div>
 
     <div class="form-group">
-        <label>Foto Normal (WebP Animado / GIF / JPG):</label>
-        <input type="file" id="adm-foto-normal" accept="image/*" onchange="handleFileSelect(event, 'normal')">
+        <label>Foto Normal (Com Crop/Zoom):</label>
+        <input type="file" id="adm-foto-normal" accept="image/*" onchange="openCropModal(event)">
     </div>
 
     <div class="form-group">
-        <label>Foto KO (Cara Machucada Animada/Estatica):</label>
-        <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleFileSelect(event, 'ko')">
+        <label>Foto KO (Animada / GIF / WebP c/ Ajuste de Posição):</label>
+        <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleKoFileSelect(event)">
     </div>
 
-    <!-- PREVIEWS COM SLIDER DE POSIÇÃO VERTICAL -->
+    <!-- PREVIEWS -->
     <div class="preview-container">
         <div class="preview-box">
             <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
-            <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
-            <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
-            <input type="range" id="posY-normal" min="0" max="100" value="50" oninput="updatePosPreview('normal')">
+            <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11">
         </div>
         <div class="preview-box">
             <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
             <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
-            <label style="font-size:9px; color:var(--accent-neon);">Ajustar Posição Vertical:</label>
-            <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updatePosPreview('ko')">
+            <label style="font-size:9px; color:var(--accent-neon);">Posição Vertical:</label>
+            <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updateKoPosPreview()" style="width: 100%;">
         </div>
     </div>
 
@@ -635,6 +675,7 @@ let isAdminLoggedIn = false;
 let jogadores = [];
 let newNormalBase64 = null;
 let newKoBase64 = null;
+let cropper = null;
 
 const frasesZoeiraMaster = [
     "Vamos tesouro, não se misture com essa gentalha...",
@@ -884,28 +925,67 @@ function logoutAdmin() {
     updateUI();
 }
 
-function handleFileSelect(event, type) {
+/* LÓGICA DO CROP DA FOTO NORMAL */
+function openCropModal(event) {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        if (type === 'normal') {
-            newNormalBase64 = e.target.result;
-            const img = document.getElementById('preview-normal');
-            img.src = e.target.result;
-        } else {
-            newKoBase64 = e.target.result;
-            const img = document.getElementById('preview-ko');
-            img.src = e.target.result;
+        const image = document.getElementById('imageToCrop');
+        image.src = e.target.result;
+        document.getElementById('cropModal').style.display = 'flex';
+
+        if (cropper) {
+            cropper.destroy();
         }
+        cropper = new Cropper(image, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 0.9,
+            responsive: true
+        });
     };
     reader.readAsDataURL(file);
 }
 
-function updatePosPreview(type) {
-    const val = document.getElementById(`posY-${type}`).value;
-    const img = document.getElementById(`preview-${type}`);
+function closeCropModal() {
+    document.getElementById('cropModal').style.display = 'none';
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    document.getElementById('adm-foto-normal').value = "";
+}
+
+function cropImage() {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+        width: 300,
+        height: 300
+    });
+    newNormalBase64 = canvas.toDataURL('image/jpeg');
+    document.getElementById('preview-normal').src = newNormalBase64;
+    closeCropModal();
+}
+
+/* LÓGICA DA FOTO KO COM SLIDER DE POSIÇÃO VERTICAL */
+function handleKoFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        newKoBase64 = e.target.result;
+        const img = document.getElementById('preview-ko');
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function updateKoPosPreview() {
+    const val = document.getElementById('posY-ko').value;
+    const img = document.getElementById('preview-ko');
     img.style.objectPosition = `center ${val}%`;
 }
 
@@ -922,8 +1002,6 @@ async function savePlayerAdm() {
 
     let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
     let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
-
-    let posYNormal = document.getElementById('posY-normal').value;
     let posYKO = document.getElementById('posY-ko').value;
 
     const playerData = {
@@ -931,12 +1009,11 @@ async function savePlayerAdm() {
         nome: nome,
         fotoNormal: fotoNormal,
         fotoKO: fotoKO,
-        posYNormal: posYNormal,
         posYKO: posYKO
     };
 
     db.ref('jogadores/' + id).update(playerData);
-    alert("✅ Jogador salvo com animação preservada!");
+    alert("✅ Jogador salvo com sucesso!");
     cancelEdit();
 }
 
@@ -949,8 +1026,6 @@ function editPlayer(id) {
 
     const imgN = document.getElementById('preview-normal');
     imgN.src = p.fotoNormal;
-    document.getElementById('posY-normal').value = p.posYNormal || 50;
-    imgN.style.objectPosition = `center ${p.posYNormal || 50}%`;
 
     const imgK = document.getElementById('preview-ko');
     imgK.src = p.fotoKO;
@@ -979,7 +1054,6 @@ function cancelEdit() {
     document.getElementById('adm-foto-ko').value = "";
     document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
     document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
-    document.getElementById('posY-normal').value = 50;
     document.getElementById('posY-ko').value = 50;
     newNormalBase64 = null;
     newKoBase64 = null;
@@ -1071,11 +1145,10 @@ function updateUI() {
         }).join('');
 
         let isKOClass = (player.derrotasCalculadas || 0) > 0 ? "ko" : "";
-        let posN = player.posYNormal || 50;
 
         grid.innerHTML += `
             <div class="card ${isKOClass}">
-                <img class="avatar" src="${player.fotoNormal}" style="object-position: center ${posN}%" alt="${player.nome}">
+                <img class="avatar" src="${player.fotoNormal}" alt="${player.nome}">
                 <div class="name">${player.nome}</div>
                 <div class="stats">
                     <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
@@ -1098,7 +1171,7 @@ function updateUI() {
 function renderCircleSlot(player, isDuck = false) {
     if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
     const foto = isDuck ? player.fotoKO : player.fotoNormal;
-    const posY = isDuck ? (player.posYKO || 50) : (player.posYNormal || 50);
+    const posY = isDuck ? (player.posYKO || 50) : 50;
     const statText = isDuck ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>` : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
 
     return `
