@@ -10,184 +10,105 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
   <style>
-    /* CSS Leve e Ultrarrápido - Sem scripts pesados */
+    /* Estilo Visual Anterior (Limpo, Rápido e Direto) */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #111116; color: #e5e7eb; padding-bottom: 40px; }
+    body { background-color: #121214; color: #e1e1e6; padding: 16px; }
     
-    header { background: #1c1c24; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3b2d54; position: sticky; top: 0; z-index: 40; }
-    header h1 { font-size: 1.15rem; color: #facc15; font-weight: 900; letter-spacing: 0.5px; }
-    .btn-admin { background: #2d2d3a; color: #d1d5db; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
-
-    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
-
-    /* Hall da Infâmia / Pódio */
-    .podium-box { background: #181820; border: 1px solid #7f1d1d44; border-radius: 12px; padding: 12px; margin-bottom: 20px; text-align: center; }
-    .infamy-title { color: #ef4444; font-weight: bold; font-size: 1.1rem; animation: blink 1.2s infinite alternate; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-    @keyframes blink { from { opacity: 1; } to { opacity: 0.4; } }
+    .container { max-width: 480px; margin: 0 auto; }
     
-    .podium-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-    .podium-card { background: #22222e; padding: 8px 4px; border-radius: 8px; text-align: center; border: 1px solid #333344; }
-    .podium-rank { font-size: 0.65rem; color: #facc15; font-weight: bold; display: block; margin-bottom: 6px; min-height: 42px; line-height: 1.2; }
-    .avatar-circle { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; margin: 0 auto 6px; border: 2px solid #facc15; position: relative; background: #000; }
-    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
-    .player-name { font-weight: bold; font-size: 0.82rem; color: #fff; word-break: break-word; }
-    .player-wins { font-size: 0.72rem; color: #c084fc; font-weight: bold; margin-top: 2px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #29292e; padding-bottom: 12px; }
+    h1 { font-size: 1.25rem; color: #00b37e; font-weight: bold; }
+    
+    .btn-admin { background: #29292e; color: #c4c4cc; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
 
-    /* Arena / Tabela */
-    .section-title { font-size: 1.1rem; color: #c084fc; font-weight: bold; margin-bottom: 12px; border-bottom: 1px solid #2d2d3a; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-    .card-player { background: #1c1c24; border: 1px solid #2d2d3a; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-    @media(min-width: 480px) {
-      .card-player { flex-direction: row; justify-content: space-between; align-items: center; }
-    }
-    .player-info { display: flex; align-items: center; gap: 12px; }
-    .avatar-main { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; border: 2px solid #a855f7; position: relative; flex-shrink: 0; background: #000; }
-    .avatar-main img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
-    .player-details h3 { font-size: 1.05rem; color: #facc15; font-weight: bold; }
-    .player-details p { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
-    .btn-crop-link { background: none; border: none; color: #c084fc; font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0; margin-top: 4px; display: block; }
+    /* Cards de Jogadores (Layout Anterior) */
+    .player-card { background: #202024; border: 1px solid #29292e; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    
+    .player-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #121214; flex-shrink: 0; }
+    .player-details h3 { font-size: 0.95rem; color: #fba94c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+    .player-details p { font-size: 0.75rem; color: #9999ab; margin-top: 2px; }
 
-    /* Botão de Registro de Derrota */
-    .action-container { text-align: center; }
-    .action-hint { font-size: 0.68rem; color: #facc15; font-weight: bold; margin-bottom: 4px; animation: bounce 1.5s infinite; }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-    .btn-venceu { background: linear-gradient(135deg, #7e22ce, #581c87); color: white; border: 1px solid #a855f7; padding: 10px 14px; border-radius: 8px; font-weight: bold; font-size: 0.82rem; cursor: pointer; width: 100%; transition: transform 0.1s; }
+    .btn-venceu { background: #00b37e; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
+    .btn-venceu:hover { background: #00875f; }
     .btn-venceu:active { transform: scale(0.96); }
 
     /* Toast de Feedback de Voto */
-    .toast-vote { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #16a34a; color: white; padding: 12px 20px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: 1px solid #4ade80; z-index: 200; transition: opacity 0.3s; }
+    .toast-vote { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #00b37e; color: white; padding: 10px 16px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 200; transition: opacity 0.3s; }
 
     /* Modais */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; }
     .modal-hidden { display: none !important; }
-    .modal-card { background: #1c1c24; border: 1px solid #3b2d54; border-radius: 16px; padding: 20px; width: 100%; max-width: 340px; text-align: center; }
-    .modal-card h3 { color: #facc15; margin-bottom: 12px; font-size: 1.1rem; font-weight: bold; }
-
-    /* Crop de Foto WhatsApp */
-    .crop-circle-frame { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 3px solid #a855f7; margin: 0 auto 12px; position: relative; background: #000; }
-    .crop-circle-frame img { position: absolute; max-width: none; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    .range-group { margin-bottom: 10px; text-align: left; }
-    .range-group label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px; }
-    .range-group input { width: 100%; accent-color: #a855f7; }
-
-    .btn-group { display: flex; gap: 8px; margin-top: 14px; }
-    .btn-modal { flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; border: none; cursor: pointer; }
-    .btn-cancel { background: #374151; color: #e5e7eb; }
-    .btn-save { background: #7e22ce; color: white; }
+    .modal-card { background: #202024; border: 1px solid #29292e; border-radius: 12px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
+    .modal-card h3 { color: #fba94c; margin-bottom: 12px; font-size: 1rem; }
 
     /* Modal K.O. */
-    .ko-header { font-size: 2.5rem; font-weight: 900; color: #facc15; text-shadow: 0 0 10px #ef4444; animation: koPop 0.4s ease-out; }
-    @keyframes koPop { 0% { transform: scale(0.2); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
-    .ko-quote { background: #111116; border: 1px solid #374151; padding: 12px; border-radius: 8px; font-style: italic; color: #fff; margin: 12px 0; font-size: 0.9rem; }
-    .btn-ko-continue { background: #facc15; color: #111; font-weight: bold; width: 100%; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.95rem; }
+    .ko-header { font-size: 2rem; font-weight: 900; color: #fba94c; text-shadow: 0 0 8px #f75a68; }
+    .ko-quote { background: #121214; border: 1px solid #29292e; padding: 10px; border-radius: 6px; font-style: italic; color: #e1e1e6; margin: 10px 0; font-size: 0.85rem; }
+    .btn-ko-continue { background: #fba94c; color: #121214; font-weight: bold; width: 100%; padding: 8px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; }
 
     /* Admin Inputs */
-    .admin-input { width: 100%; padding: 8px 12px; background: #111116; border: 1px solid #374151; border-radius: 6px; color: #fff; font-size: 0.85rem; margin-bottom: 8px; }
+    .admin-input { width: 100%; padding: 8px; background: #121214; border: 1px solid #29292e; border-radius: 6px; color: #fff; font-size: 0.8rem; margin-bottom: 8px; }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header>
-    <h1>⚔️ FIGHT NERD MAUÁ</h1>
-    <button onclick="toggleAdminModal()" class="btn-admin">⚙️ Admin</button>
-  </header>
-
   <div class="container">
-
-    <!-- SEÇÃO HALL DA INFÂMIA -->
-    <section id="podium-section" class="podium-box modal-hidden">
-      <div class="infamy-title">💀 HALL DA INFÂMIA 💀</div>
-      <div id="podium-cards" class="podium-grid">
-        <!-- Preenchido via JS -->
-      </div>
-    </section>
+    <header>
+      <h1>⚔️ Fight Nerd Mauá</h1>
+      <button onclick="toggleAdminModal()" class="btn-admin">⚙️ Admin</button>
+    </header>
 
     <!-- LISTA DE JOGADORES -->
-    <section>
-      <div class="section-title">
-        <span>TABELA DE CONFRONTOS</span>
-        <span style="font-size:0.65rem; color:#6b7280; font-family:monospace;">AO VIVO ⚡</span>
-      </div>
-      <div id="players-container">
-        <p style="text-align:center; color:#6b7280; padding:20px;">Carregando guerreiros...</p>
-      </div>
-    </section>
-
+    <div id="players-container">
+      <p style="text-align:center; color:#9999ab; padding:20px;">Carregando guerreiros...</p>
+    </div>
   </div>
 
-  <!-- TOAST DE CONFIRMAÇÃO DE VOTO -->
+  <!-- TOAST DE CONFIRMAÇÃO DE VOTO (LISTA 2) -->
   <div id="vote-toast" class="toast-vote modal-hidden">
     <span id="vote-toast-msg">Voto confirmado!</span>
   </div>
 
-  <!-- MODAL DE CONFIRMAÇÃO K.O. (ZOEIRA DA DERROTA) -->
+  <!-- MODAL DE K.O. / ZOEIRA DA DERROTA (LISTA 1) -->
   <div id="ko-modal" class="modal-overlay modal-hidden">
     <div class="modal-card">
       <div class="ko-header">💥 K.O.! 💥</div>
-      <p id="ko-player-name" style="font-size:0.9rem; font-weight:bold; color:#c084fc; margin-top:8px;"></p>
+      <p id="ko-player-name" style="font-size:0.85rem; font-weight:bold; color:#00b37e; margin-top:6px;"></p>
       <div id="ko-phrase" class="ko-quote">"..."</div>
-      <button onclick="closeKoModal()" class="btn-ko-continue">CONTINUAR A LUTA! 🥊</button>
-    </div>
-  </div>
-
-  <!-- MODAL CROP DE FOTO (WHATSAPP) -->
-  <div id="photo-modal" class="modal-overlay modal-hidden">
-    <div class="modal-card">
-      <h3>📷 Ajustar Foto do Perfil</h3>
-      <div class="crop-circle-frame">
-        <img id="crop-preview-img" src="" style="width:100%; top:50%; left:50%; transform:translate(-50%, -50%);">
-      </div>
-      <div class="range-group">
-        <label>Zoom <span id="zoom-val">100%</span></label>
-        <input type="range" id="crop-zoom" min="100" max="250" value="100" oninput="updateCropStyle()">
-      </div>
-      <div class="range-group">
-        <label>Posição Vertical (Y)</label>
-        <input type="range" id="crop-y" min="0" max="100" value="50" oninput="updateCropStyle()">
-      </div>
-      <div class="range-group">
-        <label>Posição Horizontal (X)</label>
-        <input type="range" id="crop-x" min="0" max="100" value="50" oninput="updateCropStyle()">
-      </div>
-      <div class="btn-group">
-        <button onclick="closePhotoModal()" class="btn-modal btn-cancel">Cancelar</button>
-        <button onclick="savePhotoCrop()" class="btn-modal btn-save">Salvar Foto</button>
-      </div>
+      <button onclick="closeKoModal()" class="btn-ko-continue">CONTINUAR 🥊</button>
     </div>
   </div>
 
   <!-- MODAL ADMIN -->
   <div id="admin-modal" class="modal-overlay modal-hidden">
     <div class="modal-card" style="text-align:left;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 style="margin:0;">⚙️ Painel Admin</h3>
-        <button onclick="toggleAdminModal()" style="background:none; border:none; color:#aaa; font-size:1.2rem; cursor:pointer;">✕</button>
+        <button onclick="toggleAdminModal()" style="background:none; border:none; color:#aaa; font-size:1rem; cursor:pointer;">✕</button>
       </div>
 
-      <!-- Auth Admin -->
       <div id="admin-auth">
-        <input type="password" id="admin-pass-input" placeholder="Senha de Admin" class="admin-input">
-        <button onclick="loginAdmin()" class="btn-modal btn-save" style="width:100%;">Entrar</button>
+        <input type="password" id="admin-pass-input" placeholder="Senha" class="admin-input">
+        <button onclick="loginAdmin()" class="btn-ko-continue" style="background:#00b37e; color:#fff;">Entrar</button>
       </div>
 
-      <!-- Controles Admin -->
       <div id="admin-controls" class="modal-hidden">
-        <div style="margin-bottom:12px;">
-          <label style="font-size:0.75rem; color:#aaa;">Novo Guerreiro:</label>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:0.7rem; color:#aaa;">Novo Guerreiro:</label>
           <input type="text" id="new-player-name" placeholder="Nome" class="admin-input">
-          <input type="text" id="new-player-photo" placeholder="URL da Foto (opcional)" class="admin-input">
-          <button onclick="addPlayer()" class="btn-modal btn-save" style="width:100%; background:#16a34a;">➕ Cadastrar</button>
+          <input type="text" id="new-player-photo" placeholder="URL da Foto" class="admin-input">
+          <button onclick="addPlayer()" class="btn-ko-continue" style="background:#00b37e; color:#fff;">Cadastrar</button>
         </div>
-
-        <div style="margin-top:16px;">
-          <button onclick="resetScores()" style="width:100%; background:#991b1b; color:#fff; padding:8px; border:none; border-radius:6px; font-size:0.75rem; font-weight:bold; cursor:pointer;">⚠️ Zerar Placar Geral</button>
+        <div>
+          <button onclick="resetScores()" style="width:100%; background:#f75a68; color:#fff; padding:6px; border:none; border-radius:6px; font-size:0.7rem; font-weight:bold; cursor:pointer;">Zerar Placar</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // --- CONFIGURAÇÃO FIREBASE ---
+    // --- CONFIGURAÇÃO FIREBASE (URL REAL DO SEU PROJETO) ---
     const firebaseConfig = {
       databaseURL: "https://fightnerdmaua-default-rtdb.firebaseio.com/"
     };
@@ -196,7 +117,7 @@
     }
     const db = firebase.database();
 
-    // --- LISTA 1: ZOANÇA DE DERROTA (POP-UP DO REGISTRO DAS VÍTIMAS) ---
+    // --- LISTA 1: ZOMBARIA DA DERROTA (EXIBIDA APENAS NO POP-UP K.O.) ---
     const DEFEAT_PHRASES = [
       "Vamos! Levante-se, Seiya!",
       "Coragem, Seiya! Lute, Seiya!",
@@ -218,7 +139,7 @@
       "No céu tem pão? E aqui só tem surra!"
     ];
 
-    // --- LISTA 2: CONFIRMAÇÃO DO ATO DA VOTAÇÃO (FEEDBACK DO VOTO) ---
+    // --- LISTA 2: CONFIRMAÇÃO DO ATO DA VOTAÇÃO (EXIBIDA APENAS NO TOAST) ---
     const VOTE_CONFIRMATIONS = [
       "⚡ Voto computado no placar com sucesso!",
       "🔥 Golpe limpo! Placar atualizado!",
@@ -230,113 +151,45 @@
     let lastDefeatIndex = -1;
     let lastVoteIndex = -1;
     let playersData = {};
-    let activeEditingPlayerId = null;
 
     // --- ESCUTAR DADOS EM TEMPO REAL ---
     db.ref("players").on("value", (snapshot) => {
       playersData = snapshot.val() || {};
-      renderAll();
+      renderPlayers();
     });
 
-    function renderAll() {
+    function renderPlayers() {
+      const container = document.getElementById("players-container");
       const playersArray = Object.keys(playersData).map(id => ({
         id,
         ...playersData[id]
       }));
 
+      if (playersArray.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#9999ab; padding:20px;">Nenhum guerreiro cadastrado.</p>`;
+        return;
+      }
+
+      // Ordena por maior número de vitórias
       playersArray.sort((a, b) => (b.wins || 0) - (a.wins || 0));
 
-      renderPodium(playersArray);
-      renderPlayersList(playersArray);
-    }
-
-    function renderPodium(players) {
-      const podiumContainer = document.getElementById("podium-cards");
-      const section = document.getElementById("podium-section");
-
-      if (players.length < 1) {
-        section.classList.add("modal-hidden");
-        return;
-      }
-      section.classList.remove("modal-hidden");
-
-      // TÍTULOS OFICIAIS DO HALL DA INFÂMIA
-      const titles = [
-        "🥇 1º LUGAR<br><span style='color:#facc15;'>\"Kakarotto Verme Miserável\"</span>",
-        "🥈 2º LUGAR<br><span style='color:#e5e7eb;'>\"Vegeta Príncipe do Saia daí\"</span>",
-        "🥉 3º LUGAR<br><span style='color:#d97706;'>\"Gohan Desperdício de Potencial Premium Plus\"</span>"
-      ];
-
-      let htmlContent = "";
-
-      // Renderiza os até 3 primeiros
-      const topCount = Math.min(players.length, 3);
-      for (let idx = 0; idx < topCount; idx++) {
-        const p = players[idx];
-        htmlContent += `
-          <div class="podium-card">
-            <span class="podium-rank">${titles[idx]}</span>
-            <div class="avatar-circle">
-              <img src="${p.photo || 'https://via.placeholder.com/150'}" style="transform: scale(${(p.zoom || 100)/100}); object-position: ${p.cropX || 50}% ${p.cropY || 50}%;">
-            </div>
-            <div class="player-name">${p.name}</div>
-            <div class="player-wins">${p.wins || 0}V</div>
-          </div>
-        `;
-      }
-
-      // Se houver 2 ou mais jogadores, o último vira o Pato da Temporada
-      if (players.length >= 2) {
-        const lastPlayer = players[players.length - 1];
-        htmlContent += `
-          <div class="podium-card" style="border-color: #ef4444; background: #2a1212;">
-            <span class="podium-rank" style="color: #ef4444;">
-              🦆 PATO DA TEMPORADA (QUAC!)<br>
-              <span style='color:#fca5a5;'>\"Por que você matou o Kuririn?\"</span>
-            </span>
-            <div class="avatar-circle" style="border-color: #ef4444;">
-              <img src="${lastPlayer.photo || 'https://via.placeholder.com/150'}" style="transform: scale(${(lastPlayer.zoom || 100)/100}); object-position: ${lastPlayer.cropX || 50}% ${lastPlayer.cropY || 50}%;">
-            </div>
-            <div class="player-name" style="color: #fca5a5;">${lastPlayer.name}</div>
-            <div class="player-wins" style="color: #ef4444;">${lastPlayer.losses || 0}D</div>
-          </div>
-        `;
-      }
-
-      podiumContainer.innerHTML = htmlContent;
-    }
-
-    function renderPlayersList(players) {
-      const container = document.getElementById("players-container");
-      if (players.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:#6b7280; padding:20px;">Nenhum guerreiro cadastrado.</p>`;
-        return;
-      }
-
-      container.innerHTML = players.map(p => `
-        <div class="card-player">
+      container.innerHTML = playersArray.map(p => `
+        <div class="player-card">
           <div class="player-info">
-            <div class="avatar-main">
-              <img src="${p.photo || 'https://via.placeholder.com/150'}" style="transform: scale(${(p.zoom || 100)/100}); object-position: ${p.cropX || 50}% ${p.cropY || 50}%;">
-            </div>
+            <img src="${p.photo || 'https://via.placeholder.com/150'}" class="avatar">
             <div class="player-details">
               <h3>${p.name}</h3>
-              <p>Placar: <b style="color:#22c55e;">${p.wins || 0}V</b> / <b style="color:#ef4444;">${p.losses || 0}D</b></p>
-              <button onclick="openPhotoModal('${p.id}')" class="btn-crop-link">📷 Ajustar Foto</button>
+              <p>Placar: <b style="color:#00b37e;">${p.wins || 0}V</b> / <b style="color:#f75a68;">${p.losses || 0}D</b></p>
             </div>
           </div>
-
-          <div class="action-container">
-            <div class="action-hint">👇 Clique aqui para registrar o resultado 👇</div>
-            <button onclick="registerLoss('${p.id}')" class="btn-venceu">
-              🥊 ${p.name} ME VENCEU!
-            </button>
-          </div>
+          <button onclick="registerLoss('${p.id}')" class="btn-venceu">
+            ME VENCEU!
+          </button>
         </div>
       `).join("");
     }
 
-    // --- REGISTRAR DERROTA / VOTAÇÃO ---
+    // --- REGISTRAR VITÓRIA / DERROTA ---
     function registerLoss(winnerId) {
       const winner = playersData[winnerId];
       if (!winner) return;
@@ -344,14 +197,14 @@
       const newWins = (winner.wins || 0) + 1;
       db.ref(`players/${winnerId}/wins`).set(newWins);
 
-      // Exibe a frase de confirmação de voto (Lista 2)
+      // Dispara o Toast da Lista 2 (Confirmação de Voto)
       showVoteToast();
 
-      // Exibe o Pop-up de zoeira K.O. (Lista 1)
+      // Dispara o Pop-up da Lista 1 (Zoeira de Derrota / K.O.)
       showKoModal(winner.name);
     }
 
-    // LISTA 2: Exibe o toast de votação cravada
+    // LISTA 2: Exibe o toast de feedback do voto
     function showVoteToast() {
       let randomIndex;
       do {
@@ -369,7 +222,7 @@
       }, 3000);
     }
 
-    // LISTA 1: Exibe a zombaria da derrota no Pop-up
+    // LISTA 1: Exibe o pop-up com a zoeira de K.O.
     function showKoModal(winnerName) {
       let randomIndex;
       do {
@@ -378,7 +231,7 @@
 
       lastDefeatIndex = randomIndex;
 
-      document.getElementById("ko-player-name").innerText = `Vitória Computada para ${winnerName}!`;
+      document.getElementById("ko-player-name").innerText = `${winnerName} levou a melhor!`;
       document.getElementById("ko-phrase").innerText = `"${DEFEAT_PHRASES[randomIndex]}"`;
 
       document.getElementById("ko-modal").classList.remove("modal-hidden");
@@ -386,49 +239,6 @@
 
     function closeKoModal() {
       document.getElementById("ko-modal").classList.add("modal-hidden");
-    }
-
-    // --- CROP DE FOTO (ESTILO WHATSAPP) ---
-    function openPhotoModal(playerId) {
-      activeEditingPlayerId = playerId;
-      const player = playersData[playerId];
-      if (!player) return;
-
-      const img = document.getElementById("crop-preview-img");
-      img.src = player.photo || 'https://via.placeholder.com/150';
-
-      document.getElementById("crop-zoom").value = player.zoom || 100;
-      document.getElementById("crop-y").value = player.cropY || 50;
-      document.getElementById("crop-x").value = player.cropX || 50;
-
-      updateCropStyle();
-      document.getElementById("photo-modal").classList.remove("modal-hidden");
-    }
-
-    function updateCropStyle() {
-      const zoom = document.getElementById("crop-zoom").value;
-      const cropY = document.getElementById("crop-y").value;
-      const cropX = document.getElementById("crop-x").value;
-
-      document.getElementById("zoom-val").innerText = zoom + "%";
-      const img = document.getElementById("crop-preview-img");
-      img.style.transform = `translate(-${cropX}%, -${cropY}%) scale(${zoom / 100})`;
-    }
-
-    function savePhotoCrop() {
-      if (!activeEditingPlayerId) return;
-
-      const zoom = parseInt(document.getElementById("crop-zoom").value);
-      const cropY = parseInt(document.getElementById("crop-y").value);
-      const cropX = parseInt(document.getElementById("crop-x").value);
-
-      db.ref(`players/${activeEditingPlayerId}`).update({ zoom, cropY, cropX });
-      closePhotoModal();
-    }
-
-    function closePhotoModal() {
-      document.getElementById("photo-modal").classList.add("modal-hidden");
-      activeEditingPlayerId = null;
     }
 
     // --- ADMIN ---
@@ -456,10 +266,7 @@
         name,
         photo: photo || "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300",
         wins: 0,
-        losses: 0,
-        zoom: 100,
-        cropX: 50,
-        cropY: 50
+        losses: 0
       });
 
       document.getElementById("new-player-name").value = "";
