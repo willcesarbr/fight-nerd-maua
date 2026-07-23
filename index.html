@@ -136,6 +136,28 @@
       box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
     }
 
+    /* POP-UP DE CONFIRMAÇÃO DE VITÓRIA (ESTILO IMPACTO K.O.) */
+    .success-ko-box {
+      background: rgba(20, 20, 32, 0.95);
+      border: 3px solid var(--win);
+      border-radius: 35px;
+      padding: 30px 20px;
+      text-align: center;
+      max-width: 340px;
+      box-shadow: 0 0 50px rgba(0, 255, 135, 0.6);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .success-ko-title {
+      font-family: 'Bangers', cursive;
+      font-size: 3rem;
+      color: var(--win);
+      text-transform: uppercase;
+      margin: 0;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(0, 255, 135, 0.8);
+      transform: skewX(-4deg);
+    }
+
     .victim-zoom-box {
       background: rgba(20, 20, 32, 0.95);
       border: 3px solid var(--loss);
@@ -182,7 +204,6 @@
     }
     .form-group label { font-size: 11px; color: var(--accent-neon); font-weight: bold; text-transform: uppercase; }
 
-    /* ESTILO WHATSAPP DE AJUSTE DE FOTO */
     .preview-container {
       display: flex;
       gap: 15px;
@@ -200,7 +221,6 @@
       border: 1px solid var(--border);
     }
 
-    /* Moldura Circular Estilo WhatsApp */
     .wa-crop-frame {
       width: 100px;
       height: 100px;
@@ -238,7 +258,6 @@
       accent-color: var(--accent-neon);
     }
 
-    /* Avatar nos Cards do Jogo */
     .avatar-wrapper {
       width: 110px;
       height: 110px;
@@ -402,24 +421,42 @@
     .stats b.win { color: var(--win); }
     .stats b.loss { color: var(--loss); }
 
-    .btn-vote {
-      background: linear-gradient(135deg, var(--accent), #5a00d2);
-      border: none;
-      color: #fff;
-      font-family: 'Orbitron', sans-serif;
+    /* ESTILO MELHORADO DO BOTÃO DE VOTO */
+    .vote-instruction-box {
+      width: 100%;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .vote-hint-text {
+      font-size: 10px;
+      color: var(--accent-neon);
+      text-transform: uppercase;
       font-weight: bold;
-      padding: 10px;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+    }
+    .btn-vote {
+      background: linear-gradient(135deg, #00f0ff, var(--accent));
+      border: 2px solid #fff;
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      padding: 12px;
       border-radius: 50px;
       width: 100%;
       cursor: pointer;
-      margin-top: 8px;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
-      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
+      transition: all 0.2s ease;
     }
-    .btn-vote:active { transform: scale(0.95); }
+    .btn-vote:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+      background: linear-gradient(135deg, #fff, var(--accent-neon));
+    }
+    .btn-vote:active { transform: scale(0.96); }
 
     .voters-container {
       width: 100%;
@@ -520,13 +557,23 @@
     </div>
   </div>
 
-  <!-- MODAL DE IDENTIFICAÇÃO DO APARELHO -->
+  <!-- MODAL DE IDENTIFICAÇÃO DO APARELHO (TRAVADO CONTRA FRAUDES) -->
   <div class="modal-overlay" id="deviceModal" style="display: flex;">
     <div class="modal-box" style="max-width: 320px;">
-      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🎮 Identifique-se</h3>
-      <p style="font-size: 12px; color: #a8a8b3; line-height: 1.4;">Digite exatamente o seu **nome de lutador** cadastrado para vincular este aparelho:</p>
+      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🎮 Quem é você?</h3>
+      <p style="font-size: 12px; color: #a8a8b3; line-height: 1.4;">Digite exatamente o seu **nome de lutador** cadastrado para vincular este aparelho ao torneio:</p>
       <input type="text" id="deviceInputName" placeholder="Seu nome no torneio..." style="width: 80%; text-align: center; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') registerDevice()">
       <button onclick="registerDevice()" style="background: var(--win); border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">Salvar Aparelho</button>
+      <p style="font-size: 10px; color: #777; margin-top: 12px;">* Aparelho travado. Errou o nome? Peca ao Administrador liberar para você de novo.</p>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO DE VITÓRIA (ESTILO K.O. / IMPACTO) -->
+  <div class="modal-overlay" id="successModal">
+    <div class="success-ko-box">
+      <div class="success-ko-title">VITÓRIA!</div>
+      <p style="font-size: 15px; color: #fff; font-weight: bold; margin: 10px 0 20px 0;">Resultado computado na arena com sucesso!</p>
+      <button onclick="closeSuccessModal()" style="background: var(--win); color:#000; border:none; padding:12px 30px; border-radius:30px; font-family:'Orbitron'; font-weight:900; cursor:pointer; text-transform:uppercase;">Continuar Treino</button>
     </div>
   </div>
 
@@ -600,7 +647,7 @@
 
     <hr style="border-color: var(--border); margin: 20px 0;">
     
-    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciar Jogadores:</h4>
+    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciar Jogadores e Aparelhos:</h4>
     <div id="admin-players-list"></div>
 
     <hr style="border-color: var(--border); margin: 20px 0;">
@@ -643,13 +690,13 @@
     </div>
   </div>
 
-  <!-- IDENTIFICAÇÃO FIXA DO APARELHO -->
+  <!-- IDENTIFICAÇÃO DO APARELHO (SEM BOTÃO DE TROCA PRA EVITAR BURLA) -->
   <div class="identity-bar" id="deviceBar" style="display: none;">
     <div>
-      <span style="font-size:11px; color:#a8a8b3; text-transform:uppercase;">Aparelho Vinculado:</span><br>
+      <span style="font-size:11px; color:#a8a8b3; text-transform:uppercase;">🎮 Jogador Identificado no Aparelho:</span><br>
       <b id="deviceNameDisplay" style="color: var(--accent-neon); font-family:'Orbitron'; font-size:15px;">---</b>
     </div>
-    <button onclick="resetDevice()" style="background:transparent; border:1px solid var(--loss); color:var(--loss); padding:4px 12px; border-radius:20px; font-size:10px; cursor:pointer; font-weight:bold;">Trocar Aparelho / Sair</button>
+    <div style="font-size:10px; color:#ffd700; text-align:right;">Aparelho Vinculado com Sucesso</div>
   </div>
 
   <!-- CARDS DOS JOGADORES -->
@@ -697,7 +744,6 @@
     let newNormalBase64 = null;
     let newKoBase64 = null;
 
-    // Estado dos Croppers (Armazena Posição X, Y e Zoom de cada tipo)
     let cropState = {
       normal: { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 },
       ko: { x: 0, y: 0, zoom: 100, natW: 100, natH: 100 }
@@ -805,6 +851,7 @@
           bar.style.display = 'flex';
           nameDisplay.innerText = p.nome;
         } else {
+          // Se o administrador apagou o lutador ou invalidou o aparelho, força nova identificação
           localStorage.removeItem('fnm_player_id');
           myPlayerId = null;
           modal.style.display = 'flex';
@@ -829,12 +876,12 @@
       updateUI();
     }
 
-    function resetDevice() {
-      if (confirm("Deseja desvincular este aparelho e entrar com outro nome?")) {
-        localStorage.removeItem('fnm_player_id');
-        myPlayerId = null;
-        checkDeviceRegistration();
-        updateUI();
+    // Função exclusiva do Admin para liberar o aparelho de um jogador
+    function resetDeviceForPlayer(playerId) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("Deseja liberar o aparelho deste lutador para que ele possa se cadastrar novamente?")) {
+        db.ref('jogadores/' + String(playerId) + '/linkedDevice').remove();
+        alert("✅ Aparelho liberado! Quando ele abrir a página, poderá escolher o nome de novo.");
       }
     }
 
@@ -901,6 +948,14 @@
       document.getElementById('loginModal').style.display = 'none';
     }
 
+    function showSuccessModal() {
+      document.getElementById('successModal').style.display = 'flex';
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successModal').style.display = 'none';
+    }
+
     function showVictimZoom(nome, fotoKO, cropDataStr) {
       const fraseSemRepetir = pegarProximaFraseSemRepetir();
       const img = document.getElementById('zoomVictimImg');
@@ -936,7 +991,6 @@
       updateUI();
     }
 
-    // Gerenciamento de Upload e Leitura de Dimensões Reais da Imagem
     function handleFileSelect(event, type) {
       const file = event.target.files[0];
       if (!file) return;
@@ -969,7 +1023,6 @@
       reader.readAsDataURL(file);
     }
 
-    // Atualiza visualmente o Cropper no Painel Admin
     function updateCropTransform(type) {
       const zoomVal = parseInt(document.getElementById(`zoom-${type}`).value);
       cropState[type].zoom = zoomVal;
@@ -977,7 +1030,6 @@
       const natW = cropState[type].natW || 100;
       const natH = cropState[type].natH || 100;
 
-      // Base width para caber no frame de 100px com o zoom
       let baseScale = Math.max(100 / natW, 100 / natH);
       let finalW = natW * baseScale * (zoomVal / 100);
       let finalH = natH * baseScale * (zoomVal / 100);
@@ -989,7 +1041,6 @@
       imgEl.style.top = cropState[type].y + 'px';
     }
 
-    // Funcionalidade de Arrastar com Mouse ou Touch (Estilo WhatsApp)
     function startDrag(e, type) {
       activeDrag = type;
       dragStartX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
@@ -1027,7 +1078,6 @@
       document.removeEventListener('touchend', stopDrag);
     }
 
-    // Aplica o crop salvo em qualquer elemento <img> do site de forma responsiva
     function applyCropStylesToImg(imgEl, cropDataStr, targetSize) {
       if (!cropDataStr) {
         imgEl.style.width = targetSize + 'px';
@@ -1047,7 +1097,6 @@
         let finalW = natW * baseScale * (zoom / 100);
         let finalH = natH * baseScale * (zoom / 100);
 
-        // Proporcionaliza o deslocamento (X, Y) do painel admin (100px) para o tamanho do alvo atual
         let scaleFactor = targetSize / 100;
         let finalX = (data.x || 0) * scaleFactor;
         let finalY = (data.y || 0) * scaleFactor;
@@ -1117,7 +1166,6 @@
       }
       document.getElementById('zoom-ko').value = cropState.ko.zoom || 100;
 
-      // Carrega dimensões para calcular o crop visual corretamente ao abrir edição
       let tempImgN = new Image();
       tempImgN.onload = function() { cropState.normal.natW = tempImgN.naturalWidth; cropState.normal.natH = tempImgN.naturalHeight; updateCropTransform('normal'); };
       tempImgN.src = p.fotoNormal;
@@ -1179,9 +1227,10 @@
         listEl.innerHTML += `
           <div class="admin-player-item">
             <span><b>${p.nome}</b> (${p.vitoriasCalculadas || 0}V / ${p.derrotasCalculadas || 0}D)</span>
-            <div>
-              <button onclick="editPlayer('${p.id}')" style="background:var(--accent); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Editar</button>
-              <button onclick="deletePlayer('${p.id}')" style="background:var(--loss); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Remover</button>
+            <div style="display:flex; gap:6px;">
+              <button onclick="editPlayer('${p.id}')" style="background:var(--accent); border:none; color:#fff; padding:5px 10px; border-radius:20px; cursor:pointer; font-size:11px;">Editar</button>
+              <button onclick="resetDeviceForPlayer('${p.id}')" style="background:#ffd700; border:none; color:#000; padding:5px 10px; border-radius:20px; cursor:pointer; font-size:11px; font-weight:bold;" title="Liberar aparelho deste jogador">Liberar Aparelho</button>
+              <button onclick="deletePlayer('${p.id}')" style="background:var(--loss); border:none; color:#fff; padding:5px 10px; border-radius:20px; cursor:pointer; font-size:11px;">Remover</button>
             </div>
           </div>
         `;
@@ -1230,7 +1279,8 @@
         auditModo: modoRegistro
       });
 
-      alert(isAdminLoggedIn ? "✅ Vitória lançada pelo Administrador com sucesso!" : "✅ Vitória registrada com sucesso!");
+      // Exibe o Pop-up animado de Confirmação (Estilo Impacto K.O.)
+      showSuccessModal();
     }
 
     function removeVote(vencedorId, idVota, e) {
@@ -1305,9 +1355,12 @@
               <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
             </div>
             
-            <button class="btn-vote" onclick="votar('${player.id}')">
-              ${player.nome} me venceu
-            </button>
+            <div class="vote-instruction-box">
+              <div class="vote-hint-text">Tomou coro desse mano?</div>
+              <button class="btn-vote" onclick="votar('${player.id}')">
+                Registrar Derrota p/ ${player.nome}
+              </button>
+            </div>
 
             <div class="voters-container">
               <div style="font-size:10px; color:#a8a8b3; text-transform:uppercase; font-weight:bold;">Vítimas (Clique p/ Zoom):</div>
