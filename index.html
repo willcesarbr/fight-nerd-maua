@@ -162,7 +162,6 @@
       margin: 15px 0 10px 0;
     }
 
-    /* TELA DE EXPLOSÃO K.O. */
     .ko-explosion-overlay {
       display: none;
       position: fixed;
@@ -355,7 +354,24 @@
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .podium-subtitle-display {
+      font-size: 11px;
+      color: #ffd700;
+      font-style: italic;
+      font-weight: bold;
+      margin-bottom: 10px;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.1;
+      padding: 0 2px;
+      transition: opacity 0.5s ease-in-out;
     }
 
     .podium-circle-wrapper { position: relative; margin-bottom: 10px; }
@@ -400,7 +416,7 @@
     }
     textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 90px;
     }
 
     .grid {
@@ -481,10 +497,6 @@
       background: linear-gradient(135deg, #b065ff, #6b00f7);
       box-shadow: 0 6px 18px rgba(157, 78, 221, 0.6);
       transform: translateY(-2px);
-    }
-    .btn-vote:active { 
-      transform: translateY(1px);
-      box-shadow: 0 2px 6px rgba(157, 78, 221, 0.4);
     }
 
     .voters-container {
@@ -576,6 +588,14 @@
     .crop-container img {
       max-width: 100%;
       display: block;
+    }
+
+    .conjunto-bloco {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -684,19 +704,28 @@
     </div>
 
     <hr style="border-color: var(--border); margin: 20px 0;">
-    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciamento de Frases Personalizadas</h4>
+    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciador de Conjuntos de Frases do Pódio (Alternância Minuto a Minuto)</h4>
+    <p style="font-size: 11px; color: #a8a8b3; margin-bottom: 12px;">Cadastre quantos conjuntos quiser. A cada minuto o sistema rodará para o próximo conjunto sequencialmente em sincronia com os 4 campos!</p>
+    
+    <div id="conjuntos-container"></div>
+
+    <button onclick="addConjuntoRow()" style="background: transparent; border: 1px dashed var(--accent-neon); color: var(--accent-neon); padding: 8px; border-radius: 20px; font-family:'Orbitron'; font-size: 11px; font-weight:bold; cursor:pointer; width:100%; margin-bottom: 12px;">+ Adicionar Novo Conjunto de Frases</button>
+    <button onclick="savePodiumSubtitles()" style="background: var(--gold); border:none; color:#000; padding:12px 20px; border-radius:30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; width:100%; margin-top:5px; text-transform:uppercase;">💾 Salvar Conjuntos de Frases</button>
+
+    <hr style="border-color: var(--border); margin: 20px 0;">
+    <h4 style="color: var(--accent-neon); margin: 8px 0;">Frases da Tela de K.O. e Zoeira da Vítima</h4>
     
     <div class="form-group">
       <label>💬 Frases da Tela de K.O. (1 por linha):</label>
-      <textarea id="adm-frases-ko" placeholder="Digite ou cole aqui as frases da explosão de K.O. (uma em cada linha)..."></textarea>
+      <textarea id="adm-frases-ko" placeholder="Frases da explosão de K.O...."></textarea>
     </div>
 
     <div class="form-group">
       <label>🦆 Frases de Zoeira da Vítima - Hall da Infâmia (1 por linha):</label>
-      <textarea id="adm-frases-zoeira" placeholder="Digite ou cole aqui as frases separadas para o zoom da vítima (uma em cada linha)..."></textarea>
+      <textarea id="adm-frases-zoeira" placeholder="Frases separadas para o zoom da vítima..."></textarea>
     </div>
 
-    <button onclick="savePhrasesConfig()" style="background: var(--accent-neon); border:none; color:#000; padding:12px 20px; border-radius:30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; width:100%; margin-top:5px; text-transform:uppercase;">💾 Salvar Frases no Sistema</button>
+    <button onclick="savePhrasesConfig()" style="background: var(--accent-neon); border:none; color:#000; padding:12px 20px; border-radius:30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; width:100%; margin-top:5px; text-transform:uppercase;">💾 Salvar Listas de Frases</button>
 
     <hr style="border-color: var(--border); margin: 20px 0;">
     <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciar Jogadores:</h4>
@@ -713,21 +742,25 @@
       <!-- 1º LUGAR -->
       <div class="podium-slot slot-1">
         <div class="podium-badge-title" style="color: var(--gold);">1º LUGAR</div>
+        <div class="podium-subtitle-display" id="disp-sub-1">"Kakarotto Verme Miserável"</div>
         <div id="podium-1">---</div>
       </div>
       <!-- 2º LUGAR -->
       <div class="podium-slot slot-2">
         <div class="podium-badge-title" style="color: var(--silver);">2º LUGAR</div>
+        <div class="podium-subtitle-display" id="disp-sub-2">"Vegeta Príncipe do Saia daí"</div>
         <div id="podium-2">---</div>
       </div>
       <!-- 3º LUGAR -->
       <div class="podium-slot slot-3">
         <div class="podium-badge-title" style="color: var(--bronze);">3º LUGAR</div>
+        <div class="podium-subtitle-display" id="disp-sub-3">"Gohan Desperdício de Potencial Premium Plus"</div>
         <div id="podium-3">---</div>
       </div>
       <!-- PATO -->
       <div class="podium-slot slot-duck">
         <div class="podium-badge-title" style="color: var(--loss);">PATO DA TEMPORADA</div>
+        <div class="podium-subtitle-display" id="disp-sub-duck">"Por que você matou o Kuririn?"</div>
         <div id="podium-duck">---</div>
       </div>
     </div>
@@ -785,6 +818,17 @@
     let jogadores = [];
     let frasesExplosaoMaster = [];
     let frasesZoeiraMaster = [];
+    
+    // Conjuntos de frases padrão (Dragon Ball + outras mídias iniciais)
+    let conjunctsList = [
+      {
+        sub1: '"Kakarotto Verme Miserável"',
+        sub2: '"Vegeta Príncipe do Saia daí"',
+        sub3: '"Gohan Desperdício de Potencial Premium Plus"',
+        subDuck: '"Por que você matou o Kuririn?"'
+      }
+    ];
+
     let newNormalBase64 = null;
     let newKoBase64 = null;
     let cropper = null;
@@ -805,6 +849,15 @@
       recalcularPontosEAtualizar();
     });
 
+    db.ref('configuracoes/subtitulosConjuntos').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && Array.isArray(data) && data.length > 0) {
+        conjunctsList = data;
+      }
+      renderAdminConjuntosInputs();
+      updateActivePodiumSubtitleByTime();
+    });
+
     db.ref('configuracoes/frases').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -820,10 +873,116 @@
           zoeiraTextarea.value = frasesZoeiraMaster.join('\n');
         }
       } else {
-        frasesExplosaoMaster = ["K.O.!", "Vitória esmagadora!"];
-        frasesZoeiraMaster = ["FLAWLESS VICTORY!", "Volta pro lobby!"];
+        frasesExplosaoMaster = ["K.O.!"];
+        frasesZoeiraMaster = ["FLAWLESS VICTORY!"];
       }
     });
+
+    // Função que calcula qual conjunto exibir com base no minuto atual do relógio do sistema
+    function updateActivePodiumSubtitleByTime() {
+      if (!conjunctsList || conjunctsList.length === 0) return;
+
+      const now = new Date();
+      const totalMinutes = now.getHours() * 60 + now.getMinutes();
+      const activeIndex = totalMinutes % conjunctsList.length;
+      const activeSet = conjunctsList[activeIndex];
+
+      const el1 = document.getElementById('disp-sub-1');
+      const el2 = document.getElementById('disp-sub-2');
+      const el3 = document.getElementById('disp-sub-3');
+      const elDuck = document.getElementById('disp-sub-duck');
+
+      // Aplicação suave com transição de opacidade
+      [el1, el2, el3, elDuck].forEach(el => { if(el) el.style.opacity = '0'; });
+
+      setTimeout(() => {
+        if(el1) el1.innerText = activeSet.sub1 || "";
+        if(el2) el2.innerText = activeSet.sub2 || "";
+        if(el3) el3.innerText = activeSet.sub3 || "";
+        if(elDuck) elDuck.innerText = activeSet.subDuck || "";
+        [el1, el2, el3, elDuck].forEach(el => { if(el) el.style.opacity = '1'; });
+      }, 250);
+    }
+
+    // Executa a verificação a cada 10 segundos para pegar a virada exata do minuto
+    setInterval(updateActivePodiumSubtitleByTime, 10000);
+
+    function renderAdminConjuntosInputs() {
+      const container = document.getElementById('conjuntos-container');
+      if (!container || document.activeElement.tagName === 'INPUT') return; // Evita perder foco enquanto digita
+      container.innerHTML = "";
+
+      conjunctsList.forEach((conj, index) => {
+        container.innerHTML += `
+          <div class="conjunto-bloco" id="conj-bloco-${index}">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family:'Orbitron'; font-size:11px; color:var(--accent-neon); font-weight:bold;">✨ Conjunto Alternativo #${index + 1}</span>
+              ${conjunctsList.length > 1 ? `<button onclick="removeConjuntoRow(${index})" style="background:var(--loss); border:none; color:#fff; padding:2px 8px; border-radius:10px; font-size:10px; cursor:pointer;">Remover</button>` : ''}
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color: var(--gold); font-size:9px;">1º Lugar:</label>
+              <input type="text" class="inp-sub-1" data-index="${index}" value="${conj.sub1 || ''}" placeholder="Ex: Kakarotto Verme Miserável">
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color: var(--silver); font-size:9px;">2º Lugar:</label>
+              <input type="text" class="inp-sub-2" data-index="${index}" value="${conj.sub2 || ''}" placeholder="Ex: Vegeta Príncipe do Saia daí">
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color: var(--bronze); font-size:9px;">3º Lugar:</label>
+              <input type="text" class="inp-sub-3" data-index="${index}" value="${conj.sub3 || ''}" placeholder="Ex: Gohan Desperdício...">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="color: var(--loss); font-size:9px;">Pato da Temporada:</label>
+              <input type="text" class="inp-sub-duck" data-index="${index}" value="${conj.subDuck || ''}" placeholder="Ex: Por que você matou o Kuririn?">
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function addConjuntoRow() {
+      conjunctsList.push({
+        sub1: '',
+        sub2: '',
+        sub3: '',
+        subDuck: ''
+      });
+      renderAdminConjuntosInputs();
+    }
+
+    function removeConjuntoRow(index) {
+      if (conjunctsList.length <= 1) return alert("Você precisa manter pelo menos 1 conjunto!");
+      conjunctsList.splice(index, 1);
+      renderAdminConjuntosInputs();
+    }
+
+    function savePodiumSubtitles() {
+      if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
+
+      // Coleta os valores direto dos inputs atuais do painel admin
+      const blocos = document.querySelectorAll('.conjunto-bloco');
+      let novosConjuntos = [];
+
+      blocos.forEach((bloco) => {
+        novosConjuntos.push({
+          sub1: bloco.querySelector('.inp-sub-1').value.trim(),
+          sub2: bloco.querySelector('.inp-sub-2').value.trim(),
+          sub3: bloco.querySelector('.inp-sub-3').value.trim(),
+          subDuck: bloco.querySelector('.inp-sub-duck').value.trim()
+        });
+      });
+
+      conjunctsList = novosConjuntos;
+
+      db.ref('configuracoes/subtitulosConjuntos').set(conjunctsList, (error) => {
+        if (error) {
+          alert("❌ Erro ao salvar conjuntos de frases: " + error.message);
+        } else {
+          alert("✅ Todos os conjuntos de frases foram salvos e sincronizados com sucesso!");
+          updateActivePodiumSubtitleByTime();
+        }
+      });
+    }
 
     function savePhrasesConfig() {
       if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
@@ -841,7 +1000,7 @@
         if (error) {
           alert("❌ Erro ao salvar frases: " + error.message);
         } else {
-          alert(`✅ Frases salvas com sucesso!\n- K.O.: ${koList.length} frases\n- Zoeira: ${zoeiraList.length} frases`);
+          alert(`✅ Listas de frases salvas com sucesso!`);
         }
       });
     }
@@ -1002,6 +1161,7 @@
         closeLoginModal();
         document.getElementById('adminPanel').style.display = 'block';
         document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+        renderAdminConjuntosInputs();
         updateUI();
       } else {
         alert("⚠️ Senha incorreta!");
@@ -1279,7 +1439,7 @@
     }
 
     function renderCircleSlot(player, isDuck = false) {
-      if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+      if (!player) return '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
       const foto = isDuck ? player.fotoKO : player.fotoNormal;
       const statText = isDuck ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>` : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
 
@@ -1297,12 +1457,12 @@
 
       const ranking = ordenarJogadores();
 
-      document.getElementById('podium-1').innerHTML = (ranking[0] && ranking[0].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[0]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-      document.getElementById('podium-2').innerHTML = (ranking[1] && ranking[1].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[1]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
-      document.getElementById('podium-3').innerHTML = (ranking[2] && ranking[2].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[2]) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+      document.getElementById('podium-1').innerHTML = (ranking[0] && ranking[0].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[0]) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+      document.getElementById('podium-2').innerHTML = (ranking[1] && ranking[1].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[1]) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+      document.getElementById('podium-3').innerHTML = (ranking[2] && ranking[2].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[2]) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
 
       const worstPlayer = [...jogadores].sort((a,b) => b.derrotasCalculadas - a.derrotasCalculadas)[0];
-      document.getElementById('podium-duck').innerHTML = (worstPlayer && worstPlayer.derrotasCalculadas > 0) ? renderCircleSlot(worstPlayer, true) : '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
+      document.getElementById('podium-duck').innerHTML = (worstPlayer && worstPlayer.derrotasCalculadas > 0) ? renderCircleSlot(worstPlayer, true) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
 
       const leaderboard = document.getElementById('leaderboard');
       leaderboard.innerHTML = "";
