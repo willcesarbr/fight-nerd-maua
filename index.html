@@ -358,9 +358,14 @@
       text-align: center;
     }
 
+    /* Cores das frases conforme o pódio solicitado */
+    #disp-sub-1 { color: var(--gold); }
+    #disp-sub-2 { color: var(--silver); }
+    #disp-sub-3 { color: var(--bronze); }
+    #disp-sub-duck { color: var(--loss); }
+
     .podium-subtitle-display {
       font-size: 11px;
-      color: #ffd700;
       font-style: italic;
       font-weight: bold;
       margin-bottom: 10px;
@@ -819,7 +824,6 @@
     let frasesExplosaoMaster = [];
     let frasesZoeiraMaster = [];
     
-    // Conjuntos de frases padrão (Dragon Ball + outras mídias iniciais)
     let conjunctsList = [
       {
         sub1: '"Kakarotto Verme Miserável"',
@@ -878,7 +882,6 @@
       }
     });
 
-    // Função que calcula qual conjunto exibir com base no minuto atual do relógio do sistema
     function updateActivePodiumSubtitleByTime() {
       if (!conjunctsList || conjunctsList.length === 0) return;
 
@@ -892,7 +895,6 @@
       const el3 = document.getElementById('disp-sub-3');
       const elDuck = document.getElementById('disp-sub-duck');
 
-      // Aplicação suave com transição de opacidade
       [el1, el2, el3, elDuck].forEach(el => { if(el) el.style.opacity = '0'; });
 
       setTimeout(() => {
@@ -904,12 +906,11 @@
       }, 250);
     }
 
-    // Executa a verificação a cada 10 segundos para pegar a virada exata do minuto
     setInterval(updateActivePodiumSubtitleByTime, 10000);
 
     function renderAdminConjuntosInputs() {
       const container = document.getElementById('conjuntos-container');
-      if (!container || document.activeElement.tagName === 'INPUT') return; // Evita perder foco enquanto digita
+      if (!container || document.activeElement.tagName === 'INPUT') return;
       container.innerHTML = "";
 
       conjunctsList.forEach((conj, index) => {
@@ -959,7 +960,6 @@
     function savePodiumSubtitles() {
       if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
 
-      // Coleta os valores direto dos inputs atuais do painel admin
       const blocos = document.querySelectorAll('.conjunto-bloco');
       let novosConjuntos = [];
 
@@ -1131,11 +1131,15 @@
       document.getElementById('loginModal').style.display = 'none';
     }
 
-    function showVictimZoom(nome, fotoKO) {
+    // Solução definitiva: busca o perdedor diretamente pelo ID no array global atualizado em tempo real
+    function showVictimZoom(perdedorId) {
+      const perdedor = jogadores.find(p => String(p.id) === String(perdedorId));
+      if (!perdedor) return;
+
       const fraseZoeira = pegarProximaFraseZoeira();
       const img = document.getElementById('zoomVictimImg');
-      document.getElementById('zoomVictimName').innerText = nome;
-      img.src = fotoKO;
+      document.getElementById('zoomVictimName').innerText = perdedor.nome;
+      img.src = perdedor.fotoKO; // Garante a foto KO mais recente do banco
       document.getElementById('zoomVictimQuote').innerText = `"${fraseZoeira}"`;
       document.getElementById('victimModal').style.display = 'flex';
     }
@@ -1392,8 +1396,8 @@
           let perdedor = jogadores.find(p => String(p.id) === String(v.perdedorId));
           if (!perdedor) return '';
 
-          let fotoKOAtual = perdedor.fotoKO;
           let nomeAtual = perdedor.nome;
+          let fotoKOAtual = perdedor.fotoKO;
 
           let auditHtml = "";
           if (isAdminLoggedIn) {
@@ -1402,7 +1406,7 @@
 
           return `
             <div style="display:inline-block; margin:2px; vertical-align:top;">
-              <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}')" title="Clique para dar zoom em ${nomeAtual}">
+              <span class="voter-badge" onclick="showVictimZoom('${perdedor.id}')" title="Clique para dar zoom em ${nomeAtual}">
                 <img src="${fotoKOAtual}"> ${nomeAtual}
                 ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
               </span>
