@@ -355,18 +355,7 @@
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 4px;
-    }
-    .podium-subtitle {
-      font-size: 10px;
-      font-weight: bold;
-      color: #a8a8b3;
       margin-bottom: 12px;
-      min-height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.2;
     }
 
     .podium-circle-wrapper { position: relative; margin-bottom: 10px; }
@@ -723,26 +712,22 @@
     <div class="podium-grid">
       <!-- 1º LUGAR -->
       <div class="podium-slot slot-1">
-        <div class="podium-badge-title" style="color: var(--gold);">🥇 1º LUGAR</div>
-        <div class="podium-subtitle">"Rei da Arena"</div>
+        <div class="podium-badge-title" style="color: var(--gold);">1º LUGAR</div>
         <div id="podium-1">---</div>
       </div>
       <!-- 2º LUGAR -->
       <div class="podium-slot slot-2">
-        <div class="podium-badge-title" style="color: var(--silver);">🥈 2º LUGAR</div>
-        <div class="podium-subtitle">"Príncipe do Combate"</div>
+        <div class="podium-badge-title" style="color: var(--silver);">2º LUGAR</div>
         <div id="podium-2">---</div>
       </div>
       <!-- 3º LUGAR -->
       <div class="podium-slot slot-3">
-        <div class="podium-badge-title" style="color: var(--bronze);">🥉 3º LUGAR</div>
-        <div class="podium-subtitle">"Guerreiro de Ferro"</div>
+        <div class="podium-badge-title" style="color: var(--bronze);">3º LUGAR</div>
         <div id="podium-3">---</div>
       </div>
       <!-- PATO -->
       <div class="podium-slot slot-duck">
-        <div class="podium-badge-title" style="color: var(--loss);">🦆 PATO DA TEMPORADA</div>
-        <div class="podium-subtitle">"Saco de Pancada Oficial"</div>
+        <div class="podium-badge-title" style="color: var(--loss);">PATO DA TEMPORADA</div>
         <div id="podium-duck">---</div>
       </div>
     </div>
@@ -813,7 +798,6 @@
 
     let myPlayerId = localStorage.getItem('fnm_player_id') || null;
 
-    // Listener para carregar dados dos jogadores do Firebase
     db.ref('jogadores').on('value', (snapshot) => {
       const data = snapshot.val();
       jogadores = data ? Object.values(data) : [];
@@ -821,14 +805,12 @@
       recalcularPontosEAtualizar();
     });
 
-    // Listener para carregar as frases cadastradas no Firebase
     db.ref('configuracoes/frases').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         frasesExplosaoMaster = data.koList || [];
         frasesZoeiraMaster = data.zoeiraList || [];
         
-        // Preenche os textareas no painel admin caso estejam abertos/vazios
         const koTextarea = document.getElementById('adm-frases-ko');
         const zoeiraTextarea = document.getElementById('adm-frases-zoeira');
         if (koTextarea && document.activeElement !== koTextarea) {
@@ -838,7 +820,6 @@
           zoeiraTextarea.value = frasesZoeiraMaster.join('\n');
         }
       } else {
-        // Fallback padrão se não houver nada salvo ainda
         frasesExplosaoMaster = ["K.O.!", "Vitória esmagadora!"];
         frasesZoeiraMaster = ["FLAWLESS VICTORY!", "Volta pro lobby!"];
       }
