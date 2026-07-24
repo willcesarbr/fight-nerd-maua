@@ -7,10 +7,6 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<!-- Cropper.js para a Foto Normal -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
 
@@ -119,32 +115,6 @@ h2 {
     box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
 }
 
-/* MODAL DE CROP DA FOTO NORMAL */
-.crop-modal-content {
-    background: #12121a;
-    border: 2px solid var(--accent-neon);
-    padding: 20px;
-    border-radius: 25px;
-    width: 90%;
-    max-width: 420px;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
-}
-
-.img-container {
-    max-height: 300px;
-    margin-bottom: 15px;
-    background: #000;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.img-container img {
-    max-width: 100%;
-    display: block;
-}
-
-/* MODAL DE ZOOM DA VÍTIMA */
 .victim-zoom-box {
     background: rgba(20, 20, 32, 0.95);
     border: 3px solid var(--loss);
@@ -203,6 +173,12 @@ h2 {
     margin-bottom: 15px;
 }
 
+@media (max-width: 600px) {
+    .preview-container {
+        flex-direction: column;
+    }
+}
+
 .preview-box {
     flex: 1;
     text-align: center;
@@ -220,6 +196,23 @@ h2 {
     border: 2px solid var(--accent-neon);
     margin: 5px 0;
     background: #000;
+}
+
+.sliders-pos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+.sliders-pos label {
+    font-size: 8px;
+    color: #a8a8b3;
+}
+
+.sliders-pos input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent-neon);
 }
 
 .podium-panel {
@@ -518,20 +511,6 @@ th {
     </div>
 </div>
 
-<!-- MODAL DE CROP DA FOTO NORMAL -->
-<div class="modal-overlay" id="cropModal">
-    <div class="crop-modal-content">
-        <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0; font-size: 16px;">✂️ Ajustar & Recortar Foto Normal</h3>
-        <div class="img-container">
-            <img id="imageToCrop" src="" alt="Para Recortar">
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button onclick="cropImage()" style="background: var(--win); border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">Concluir Corte</button>
-            <button onclick="closeCropModal()" style="background: #444; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
-        </div>
-    </div>
-</div>
-
 <!-- MODAL DE ZOOM DA VÍTIMA -->
 <div class="modal-overlay" id="victimModal">
     <div class="victim-zoom-box">
@@ -557,26 +536,36 @@ th {
     </div>
 
     <div class="form-group">
-        <label>Foto Normal (Com Crop/Zoom):</label>
-        <input type="file" id="adm-foto-normal" accept="image/*" onchange="openCropModal(event)">
+        <label>Foto Normal (WebP / GIF / PNG / JPG):</label>
+        <input type="file" id="adm-foto-normal" accept="image/*" onchange="handleFileSelect(event, 'normal')">
     </div>
 
     <div class="form-group">
-        <label>Foto KO (Animada / GIF / WebP c/ Ajuste de Posição):</label>
-        <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleKoFileSelect(event)">
+        <label>Foto KO (Cara Machucada / WebP / GIF / PNG):</label>
+        <input type="file" id="adm-foto-ko" accept="image/*" onchange="handleFileSelect(event, 'ko')">
     </div>
 
-    <!-- PREVIEWS -->
+    <!-- PREVIEWS COM SLIDER DE POSIÇÃO CROP (X e Y) -->
     <div class="preview-container">
         <div class="preview-box">
             <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
-            <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11">
+            <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
+            <div class="sliders-pos">
+                <label>Ajustar X (<span id="valX-normal">50</span>%)</label>
+                <input type="range" id="posX-normal" min="0" max="100" value="50" oninput="updatePosPreview('normal')">
+                <label>Ajustar Y (<span id="valY-normal">50</span>%)</label>
+                <input type="range" id="posY-normal" min="0" max="100" value="50" oninput="updatePosPreview('normal')">
+            </div>
         </div>
         <div class="preview-box">
             <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
             <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
-            <label style="font-size:9px; color:var(--accent-neon);">Posição Vertical:</label>
-            <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updateKoPosPreview()" style="width: 100%;">
+            <div class="sliders-pos">
+                <label>Ajustar X (<span id="valX-ko">50</span>%)</label>
+                <input type="range" id="posX-ko" min="0" max="100" value="50" oninput="updatePosPreview('ko')">
+                <label>Ajustar Y (<span id="valY-ko">50</span>%)</label>
+                <input type="range" id="posY-ko" min="0" max="100" value="50" oninput="updatePosPreview('ko')">
+            </div>
         </div>
     </div>
 
@@ -675,7 +664,6 @@ let isAdminLoggedIn = false;
 let jogadores = [];
 let newNormalBase64 = null;
 let newKoBase64 = null;
-let cropper = null;
 
 const frasesZoeiraMaster = [
     "Vamos tesouro, não se misture com essa gentalha...",
@@ -892,12 +880,12 @@ function closeLoginModal() {
     document.getElementById('loginModal').style.display = 'none';
 }
 
-function showVictimZoom(nome, fotoKO, posY) {
+function showVictimZoom(nome, fotoKO, posX, posY) {
     const fraseSemRepetir = pegarProximaFraseSemRepetir();
     const img = document.getElementById('zoomVictimImg');
     document.getElementById('zoomVictimName').innerText = nome;
     img.src = fotoKO;
-    img.style.objectPosition = `center ${posY || 50}%`;
+    img.style.objectPosition = `${posX || 50}% ${posY || 50}%`;
     document.getElementById('zoomVictimQuote').innerText = `"${fraseSemRepetir}"`;
     document.getElementById('victimModal').style.display = 'flex';
 }
@@ -925,68 +913,85 @@ function logoutAdmin() {
     updateUI();
 }
 
-/* LÓGICA DO CROP DA FOTO NORMAL */
-function openCropModal(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+/* OTIMIZADOR INTELIGENTE DE FOTO: CROP QUADRADO, REDIMENSIONAMENTO E CONVERSÃO WEBP */
+function processarImagemParaWebP(file, maxWidth = 300, maxHeight = 300, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const image = document.getElementById('imageToCrop');
-        image.src = e.target.result;
-        document.getElementById('cropModal').style.display = 'flex';
+                // Crop central quadrado automático
+                let size = Math.min(width, height);
+                let startX = (width - size) / 2;
+                let startY = (height - size) / 2;
 
-        if (cropper) {
-            cropper.destroy();
-        }
-        cropper = new Cropper(image, {
-            aspectRatio: 1,
-            viewMode: 1,
-            autoCropArea: 0.9,
-            responsive: true
-        });
-    };
-    reader.readAsDataURL(file);
-}
+                canvas.width = maxWidth;
+                canvas.height = maxHeight;
+                const ctx = canvas.getContext('2d');
+                
+                // Desenha reajustando perfeitamente num quadrado escalado
+                ctx.drawImage(img, startX, startY, size, size, 0, 0, maxWidth, maxHeight);
 
-function closeCropModal() {
-    document.getElementById('cropModal').style.display = 'none';
-    if (cropper) {
-        cropper.destroy();
-        cropper = null;
-    }
-    document.getElementById('adm-foto-normal').value = "";
-}
-
-function cropImage() {
-    if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({
-        width: 300,
-        height: 300
+                // Exporta otimizado em webp leve
+                const dataUrl = canvas.toDataURL('image/webp', quality);
+                resolve(dataUrl);
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
     });
-    newNormalBase64 = canvas.toDataURL('image/jpeg');
-    document.getElementById('preview-normal').src = newNormalBase64;
-    closeCropModal();
 }
 
-/* LÓGICA DA FOTO KO COM SLIDER DE POSIÇÃO VERTICAL */
-function handleKoFileSelect(event) {
+async function handleFileSelect(event, type) {
     const file = event.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        newKoBase64 = e.target.result;
-        const img = document.getElementById('preview-ko');
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    try {
+        // Se for GIF animado, preserva o original; caso contrário, comprime e otimiza para WebP eficiente
+        let optimizedData;
+        if (file.type === 'image/gif') {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (type === 'normal') {
+                    newNormalBase64 = e.target.result;
+                    document.getElementById('preview-normal').src = e.target.result;
+                } else {
+                    newKoBase64 = e.target.result;
+                    document.getElementById('preview-ko').src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+
+        optimizedData = await processarImagemParaWebP(file);
+        if (type === 'normal') {
+            newNormalBase64 = optimizedData;
+            document.getElementById('preview-normal').src = optimizedData;
+        } else {
+            newKoBase64 = optimizedData;
+            document.getElementById('preview-ko').src = optimizedData;
+        }
+    } catch (err) {
+        alert("Erro ao processar imagem.");
+    }
 }
 
-function updateKoPosPreview() {
-    const val = document.getElementById('posY-ko').value;
-    const img = document.getElementById('preview-ko');
-    img.style.objectPosition = `center ${val}%`;
+function updatePosPreview(type) {
+    const valX = document.getElementById(`posX-${type}`).value;
+    const valY = document.getElementById(`posY-${type}`).value;
+    
+    document.getElementById(`valX-${type}`).innerText = valX;
+    document.getElementById(`valY-${type}`).innerText = valY;
+
+    const img = document.getElementById(`preview-${type}`);
+    img.style.objectPosition = `${valX}% ${valY}%`;
 }
 
 async function savePlayerAdm() {
@@ -1002,6 +1007,10 @@ async function savePlayerAdm() {
 
     let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
     let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
+
+    let posXNormal = document.getElementById('posX-normal').value;
+    let posYNormal = document.getElementById('posY-normal').value;
+    let posXKO = document.getElementById('posX-ko').value;
     let posYKO = document.getElementById('posY-ko').value;
 
     const playerData = {
@@ -1009,6 +1018,9 @@ async function savePlayerAdm() {
         nome: nome,
         fotoNormal: fotoNormal,
         fotoKO: fotoKO,
+        posXNormal: posXNormal,
+        posYNormal: posYNormal,
+        posXKO: posXKO,
         posYKO: posYKO
     };
 
@@ -1026,11 +1038,19 @@ function editPlayer(id) {
 
     const imgN = document.getElementById('preview-normal');
     imgN.src = p.fotoNormal;
+    document.getElementById('posX-normal').value = p.posXNormal || 50;
+    document.getElementById('posY-normal').value = p.posYNormal || 50;
+    document.getElementById('valX-normal').innerText = p.posXNormal || 50;
+    document.getElementById('valY-normal').innerText = p.posYNormal || 50;
+    imgN.style.objectPosition = `${p.posXNormal || 50}% ${p.posYNormal || 50}%`;
 
     const imgK = document.getElementById('preview-ko');
     imgK.src = p.fotoKO;
+    document.getElementById('posX-ko').value = p.posXKO || 50;
     document.getElementById('posY-ko').value = p.posYKO || 50;
-    imgK.style.objectPosition = `center ${p.posYKO || 50}%`;
+    document.getElementById('valX-ko').innerText = p.posXKO || 50;
+    document.getElementById('valY-ko').innerText = p.posYKO || 50;
+    imgK.style.objectPosition = `${p.posXKO || 50}% ${p.posYKO || 50}%`;
 
     newNormalBase64 = null;
     newKoBase64 = null;
@@ -1054,7 +1074,14 @@ function cancelEdit() {
     document.getElementById('adm-foto-ko').value = "";
     document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
     document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
+    document.getElementById('posX-normal').value = 50;
+    document.getElementById('posY-normal').value = 50;
+    document.getElementById('posX-ko').value = 50;
     document.getElementById('posY-ko').value = 50;
+    document.getElementById('valX-normal').innerText = 50;
+    document.getElementById('valY-normal').innerText = 50;
+    document.getElementById('valX-ko').innerText = 50;
+    document.getElementById('valY-ko').innerText = 50;
     newNormalBase64 = null;
     newKoBase64 = null;
     document.getElementById('admin-form-title').innerText = "⚙️ Painel do Administrador";
@@ -1134,21 +1161,24 @@ function updateUI() {
             if (!perdedor) return '';
             let fotoKOAtual = perdedor.fotoKO;
             let nomeAtual = perdedor.nome;
+            let posX = perdedor.posXKO || 50;
             let posY = perdedor.posYKO || 50;
 
             return `
-                <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posY})" title="Clique para dar zoom em ${nomeAtual}">
-                    <img src="${fotoKOAtual}" style="object-position: center ${posY}%"> ${nomeAtual}
+                <span class="voter-badge" onclick="showVictimZoom('${nomeAtual.replace(/'/g, "\\'")}', '${fotoKOAtual}', ${posX}, ${posY})" title="Clique para dar zoom em ${nomeAtual}">
+                    <img src="${fotoKOAtual}" style="object-position: ${posX}% ${posY}%"> ${nomeAtual}
                     ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
                 </span>
             `;
         }).join('');
 
         let isKOClass = (player.derrotasCalculadas || 0) > 0 ? "ko" : "";
+        let posXN = player.posXNormal || 50;
+        let posNN = player.posYNormal || 50;
 
         grid.innerHTML += `
             <div class="card ${isKOClass}">
-                <img class="avatar" src="${player.fotoNormal}" alt="${player.nome}">
+                <img class="avatar" src="${player.fotoNormal}" style="object-position: ${posXN}% ${posNN}%" alt="${player.nome}">
                 <div class="name">${player.nome}</div>
                 <div class="stats">
                     <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
@@ -1171,12 +1201,13 @@ function updateUI() {
 function renderCircleSlot(player, isDuck = false) {
     if (!player) return '<div style="font-size:12px; color:#555; margin-top:20px;">---</div>';
     const foto = isDuck ? player.fotoKO : player.fotoNormal;
-    const posY = isDuck ? (player.posYKO || 50) : 50;
+    const posX = isDuck ? (player.posXKO || 50) : (player.posXNormal || 50);
+    const posY = isDuck ? (player.posYKO || 50) : (player.posYNormal || 50);
     const statText = isDuck ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>` : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
 
     return `
         <div class="podium-circle-wrapper">
-            <img class="podium-circle-avatar" src="${foto}" style="object-position: center ${posY}%" alt="${player.nome}">
+            <img class="podium-circle-avatar" src="${foto}" style="object-position: ${posX}% ${posY}%" alt="${player.nome}">
         </div>
         <div style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff;">${player.nome}</div>
         <div>${statText}</div>
