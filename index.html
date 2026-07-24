@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador de Imagens Profissional (Suporte Completo a WEBP)</title>
+    <title>Fight Nerd Mauá - Painel de Torneio e Gerenciamento</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-red: #ef4444;
+            --accent-gold: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,203 +25,313 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             min-height: 100vh;
             padding: 20px;
         }
 
-        .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            max-width: 700px;
-            width: 100%;
+        header {
             text-align: center;
+            margin-bottom: 30px;
         }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #1a1a1a;
-            font-size: 24px;
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .upload-area {
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
-            padding: 25px;
-            background-color: #f8fafc;
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel h2 {
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--accent-red);
+            padding-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-red), #b91c1c);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
+            width: 100%;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
         }
 
-        .upload-area:hover {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
+        .btn:hover {
+            opacity: 0.9;
         }
 
-        input[type="file"] {
-            display: none;
-        }
-
-        .upload-label {
-            font-size: 16px;
-            color: #475569;
-            cursor: pointer;
+        /* Seção do Visualizador / Avatar WEBP */
+        .viewer-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
         }
 
-        .upload-label span.highlight {
-            color: #2563eb;
-            font-weight: 600;
-        }
-
-        .file-info {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 5px;
-        }
-
-        .viewer-box {
+        .upload-dropzone {
             width: 100%;
-            height: 450px;
-            border: 1px solid #e2e8f0;
+            height: 250px;
+            border: 2px dashed #475569;
             border-radius: 8px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
             background-color: #0f172a;
+            cursor: pointer;
             position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
         }
 
-        .viewer-box img {
+        .upload-dropzone:hover {
+            border-color: var(--accent-gold);
+        }
+
+        .upload-dropzone input[type="file"] {
+            display: none;
+        }
+
+        .upload-dropzone img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
             display: block;
         }
 
-        .placeholder-text {
-            color: #94a3b8;
-            font-size: 15px;
+        .placeholder-hint {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0 10px;
         }
 
-        .image-details {
-            margin-top: 15px;
-            text-align: left;
-            background: #f8fafc;
-            padding: 12px 16px;
+        /* Leaderboard e Hall da Infâmia */
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px 15px;
             border-radius: 6px;
-            font-size: 14px;
-            color: #475569;
-            border-left: 4px solid #3b82f6;
-            display: none;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--accent-gold);
         }
 
-        .image-details p {
-            margin: 4px 0;
+        .infamy-item {
+            border-left-color: var(--accent-red);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Visualizador Avançado de Imagens</h2>
-        
-        <!-- Área de Upload Personalizada -->
-        <div class="upload-area" onclick="document.getElementById('fileInput').click();">
-            <input type="file" id="fileInput" accept="image/webp,image/png,image/jpeg,image/gif,image/svg+xml">
-            <label class="upload-label" for="fileInput">
-                <svg width="36" height="36" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <span>Clique para selecionar ou arraste sua imagem</span>
-                <span class="file-info">Suporta WEBP (estático e animado), PNG, JPEG, GIF, SVG</span>
-            </label>
-        </div>
-        
-        <!-- Caixa de Exibição -->
-        <div class="viewer-box" id="viewerBox">
-            <span class="placeholder-text" id="placeholderText">Nenhuma imagem carregada</span>
+    <header>
+        <h1>Fight Nerd Mauá</h1>
+        <p>Painel de Controle, Votação e Visualizador WEBP Integrado</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Coluna de Administração / Upload -->
+        <div class="panel">
+            <h2>Gerenciador e Avatar</h2>
+            <div class="form-group">
+                <label>Nome do Jogador</label>
+                <input type="text" id="playerName" placeholder="Ex: Player 1">
+            </div>
+
+            <div class="form-group">
+                <label>Avatar (Suporta WEBP Animado / GIF / PNG)</label>
+                <div class="viewer-container">
+                    <div class="upload-dropzone" onclick="document.getElementById('fileInput').click();">
+                        <input type="file" id="fileInput" accept="image/webp,image/png,image/jpeg,image/gif">
+                        <span class="placeholder-hint" id="placeholderText">Clique aqui ou arraste a imagem WEBP/GIF</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" id="savePlayerBtn">Salvar Jogador</button>
         </div>
 
-        <!-- Detalhes do arquivo carregado -->
-        <div class="image-details" id="imageDetails">
-            <p><strong>Nome:</strong> <span id="fileName">-</span></p>
-            <p><strong>Tipo:</strong> <span id="fileType">-</span></p>
-            <p><strong>Tamanho:</strong> <span id="fileSize">-</span></p>
+        <!-- Coluna do Dashboard / Leaderboard / Hall da Infâmia -->
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h2>Ranking em Tempo Real</h2>
+                <ul class="leaderboard-list" id="leaderboardList">
+                    <li class="leaderboard-item">
+                        <span>Nenhum lutador registrado</span>
+                        <span>0pts</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel">
+                <h2>Hall da Infâmia (Vítimas / K.O.)</h2>
+                <ul class="leaderboard-list" id="infamyList">
+                    <li class="leaderboard-item infamy-item">
+                        <span>Nenhum registro de K.O.</span>
+                        <span>-</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const viewerBox = document.getElementById('viewerBox');
-        const placeholderText = document.getElementById('placeholderText');
-        const imageDetails = document.getElementById('imageDetails');
-        const fileNameEl = document.getElementById('fileName');
-        const fileTypeEl = document.getElementById('fileType');
-        const fileSizeEl = document.getElementById('fileSize');
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY_AQUI",
+            authDomain: "seu-projeto.firebaseapp.com",
+            databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com",
+            projectId: "seu-projeto",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "000000000000",
+            appId: "1:000000000000:web:0000000000000000"
+        };
 
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        // Lógica de Visualização e Renderização Nativa para WEBP Animado e GIFs
+        const fileInput = document.getElementById('fileInput');
+        const dropzone = document.querySelector('.upload-dropzone');
+        const placeholderText = document.getElementById('placeholderText');
         let currentObjectUrl = null;
 
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
+            if (!file) return;
 
-            if (!file) {
-                return;
-            }
-
-            // Validação rigorosa de tipo de imagem (incluindo explicitamente webp)
             if (!file.type.startsWith('image/')) {
-                alert('Por favor, selecione um arquivo de imagem válido (WEBP, PNG, JPG, etc.).');
+                alert('Selecione um arquivo de imagem válido (WEBP, PNG, GIF).');
                 return;
             }
 
-            // Remove imagem ou objeto anterior para evitar vazamento de memória
-            const existingImage = viewerBox.querySelector('img');
-            if (existingImage) {
-                existingImage.remove();
-            }
+            const existingImg = dropzone.querySelector('img');
+            if (existingImg) existingImg.remove();
+
             if (currentObjectUrl) {
                 URL.revokeObjectURL(currentObjectUrl);
             }
 
-            // Criação segura da URL de objeto nativa do navegador para renderizar WEBP perfeitamente
+            // O uso de createObjectURL assegura o comportamento fluido de WebPs animados
             currentObjectUrl = URL.createObjectURL(file);
             
             const img = document.createElement('img');
             img.src = currentObjectUrl;
             
-            // Esconde o placeholder e insere a imagem
             placeholderText.style.display = 'none';
-            viewerBox.appendChild(img);
-
-            // Preenche os metadados da imagem
-            fileNameEl.textContent = file.name;
-            fileTypeEl.textContent = file.type || 'Desconhecido';
-            fileSizeEl.textContent = formatBytes(file.size);
-            imageDetails.style.display = 'block';
+            dropzone.appendChild(img);
         });
 
-        // Função utilitária para formatar o tamanho do arquivo legivelmente
-        function formatBytes(bytes, decimals = 2) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-        }
-    </script>
+        // Salvamento no Firebase Realtime Database
+        document.getElementById('savePlayerBtn').addEventListener('click', function() {
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
+                alert('Insira o nome do lutador!');
+                return;
+            }
 
+            const playerRef = database.ref('fighters').push();
+            playerRef.set({
+                name: name,
+                score: 0,
+                status: 'ativo',
+                createdAt: Date.now()
+            }, (error) => {
+                if (error) {
+                    alert('Erro ao salvar no banco de dados.');
+                } else {
+                    alert('Lutador cadastrado com sucesso!');
+                    document.getElementById('playerName').value = '';
+                }
+            });
+        });
+
+        // Sincronização em tempo real do Leaderboard
+        database.ref('fighters').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+
+            if (!data) {
+                leaderboardList.innerHTML = '<li class="leaderboard-item"><span>Nenhum lutador registrado</span><span>0pts</span></li>';
+                return;
+            }
+
+            Object.keys(data).forEach(key => {
+                const fighter = data[key];
+                const li = document.createElement('li');
+                li.className = 'leaderboard-item';
+                li.innerHTML = `<span>${fighter.name}</span><span>${fighter.score || 0} pts</span>`;
+                leaderboardList.appendChild(li);
+            });
+        });
+    </script>
 </body>
 </html>
