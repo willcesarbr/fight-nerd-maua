@@ -1,337 +1,1513 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fight Nerd Mauá - Painel de Torneio e Gerenciamento</title>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-red: #ef4444;
-            --accent-gold: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fight Nerd Mauá - Arcade Arena</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <!-- Cropper.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <!-- Cropper.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 20px;
-        }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@600;900&family=Montserrat:wght@400;700;900&display=swap');
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    :root {
+      --bg: #0a0a10;
+      --card: rgba(20, 20, 32, 0.85);
+      --accent: #9d4edd;
+      --accent-neon: #00f0ff;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+      --text: #f1f1f6;
+      --win: #00ff87;
+      --loss: #ff0055;
+      --border: rgba(255, 255, 255, 0.15);
+    }
 
-        header h1 {
-            font-size: 2.5rem;
-            color: var(--accent-gold);
-            text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.15) 0%, transparent 40%),
+        linear-gradient(rgba(10, 10, 16, 0.9), rgba(10, 10, 16, 0.95)),
+        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      color: var(--text);
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-        }
+    h1.main-title {
+      font-family: 'Bangers', cursive;
+      font-size: 3.8rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin: 0;
+      text-align: center;
+      background: linear-gradient(180deg, #fff 20%, var(--accent-neon) 60%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.6));
+      transform: skewX(-4deg);
+    }
 
-        @media (max-width: 900px) {
-            .main-container {
-                grid-template-columns: 1fr;
-            }
-        }
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-neon);
+      margin-bottom: 15px;
+      text-align: center;
+    }
 
-        .panel {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    .blink-infamy {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--loss);
+      text-align: center;
+      margin-bottom: 15px;
+      text-shadow: 0 0 10px rgba(255, 0, 85, 0.9), 0 0 20px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.4);
+      animation: neonBlink 1.2s infinite alternate;
+    }
 
-        .panel h2 {
-            margin-bottom: 15px;
-            font-size: 1.25rem;
-            border-bottom: 2px solid var(--accent-red);
-            padding-bottom: 8px;
-            color: var(--text-main);
-        }
+    @keyframes neonBlink {
+      0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 0, 85, 0.9), 0 0 20px rgba(255, 0, 85, 0.6), 0 0 30px rgba(255, 0, 85, 0.4); }
+      50% { opacity: 0.3; text-shadow: none; }
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-        .form-group label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-        }
+    .btn-admin-toggle {
+      background: rgba(31, 31, 46, 0.8);
+      color: var(--accent-neon);
+      border: 1px solid var(--accent-neon);
+      padding: 6px 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+    .btn-admin-toggle:hover {
+      background: var(--accent-neon);
+      color: #000;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+    }
 
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #475569;
-            background-color: #0f172a;
-            color: #fff;
-            font-size: 1rem;
-        }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .btn {
-            background: linear-gradient(135deg, var(--accent-red), #b91c1c);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            text-transform: uppercase;
-            transition: opacity 0.2s;
-        }
+    .modal-box {
+      background: #12121a;
+      border: 2px solid var(--accent-neon);
+      padding: 25px;
+      border-radius: 30px;
+      text-align: center;
+      width: 90%;
+      max-width: 380px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+    }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
+    .victim-zoom-box {
+      background: rgba(20, 20, 32, 0.95);
+      border: 3px solid var(--loss);
+      border-radius: 35px;
+      padding: 25px;
+      text-align: center;
+      max-width: 340px;
+      box-shadow: 0 0 40px rgba(255, 0, 85, 0.6);
+      animation: popIn 0.3s ease-out;
+    }
 
-        /* Seção do Visualizador / Avatar WEBP */
-        .viewer-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
-        .upload-dropzone {
-            width: 100%;
-            height: 250px;
-            border: 2px dashed #475569;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: #0f172a;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s;
-        }
+    .victim-zoom-img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid var(--loss);
+      box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+      margin: 15px 0 10px 0;
+    }
 
-        .upload-dropzone:hover {
-            border-color: var(--accent-gold);
-        }
+    .ko-explosion-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 5, 8, 0.94);
+      backdrop-filter: blur(12px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: screenShock 0.4s ease-out;
+    }
 
-        .upload-dropzone input[type="file"] {
-            display: none;
-        }
+    @keyframes screenShock {
+      0% { transform: translate(-8px, 6px) scale(0.95); filter: hue-rotate(90deg) brightness(1.8); }
+      20% { transform: translate(8px, -6px) scale(1.05); filter: hue-rotate(-90deg) brightness(2); }
+      40% { transform: translate(-5px, -5px) scale(0.98); }
+      60% { transform: translate(5px, 5px) scale(1.02); }
+      80% { transform: translate(-2px, 2px) scale(1); }
+      100% { transform: translate(0, 0) scale(1); filter: none; }
+    }
 
-        .upload-dropzone img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
-        }
+    .ko-blast-container {
+      position: relative;
+      text-align: center;
+      padding: 30px;
+      max-width: 480px;
+      width: 90%;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, rgba(157, 78, 221, 0.2) 60%, transparent 100%);
+      border: 4px solid var(--accent-neon);
+      border-radius: 40px;
+      box-shadow: 0 0 60px rgba(0, 240, 255, 0.7), inset 0 0 30px rgba(0, 240, 255, 0.5);
+      animation: blastPulse 0.8s infinite alternate ease-in-out;
+    }
 
-        .placeholder-hint {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            text-align: center;
-            padding: 0 10px;
-        }
+    @keyframes blastPulse {
+      0% { box-shadow: 0 0 40px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.3); transform: scale(1); }
+      100% { box-shadow: 0 0 70px rgba(0, 240, 255, 0.9), inset 0 0 40px rgba(0, 240, 255, 0.7); transform: scale(1.03); }
+    }
 
-        /* Leaderboard e Hall da Infâmia */
-        .dashboard-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .ko-big-title {
+      font-family: 'Bangers', cursive;
+      font-size: 5rem;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      margin: 0;
+      line-height: 1;
+      text-shadow: 3px 3px 0px var(--accent-neon), -3px -3px 0px var(--accent), 0 0 30px #00f0ff;
+      animation: titleShake 0.2s infinite alternate;
+    }
 
-        .leaderboard-list {
-            list-style: none;
-            max-height: 350px;
-            overflow-y: auto;
-        }
+    @keyframes titleShake {
+      0% { transform: rotate(-2deg) scale(1); }
+      100% { transform: rotate(2deg) scale(1.06); }
+    }
 
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            border-left: 4px solid var(--accent-gold);
-        }
+    .ko-quote-box {
+      font-family: 'Bangers', cursive;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      background: rgba(0, 0, 0, 0.75);
+      border: 3px solid var(--gold);
+      padding: 20px;
+      border-radius: 25px;
+      margin: 20px 0 25px 0;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+      line-height: 1.2;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 2px 2px 0px #000;
+      animation: textGlow 1.5s infinite alternate;
+    }
 
-        .infamy-item {
-            border-left-color: var(--accent-red);
-        }
-    </style>
+    @keyframes textGlow {
+      0% { text-shadow: 2px 2px 0px #000, 0 0 10px rgba(255, 215, 0, 0.5); }
+      100% { text-shadow: 2px 2px 0px #000, 0 0 25px rgba(255, 215, 0, 0.9); }
+    }
+
+    .btn-close-blast {
+      background: linear-gradient(135deg, var(--accent-neon), var(--accent));
+      color: #000;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(0, 240, 255, 0.6);
+      transition: all 0.2s;
+    }
+    .btn-close-blast:hover {
+      background: linear-gradient(135deg, #33f3ff, #b065ff);
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 240, 255, 0.9);
+    }
+
+    .admin-panel {
+      display: none;
+      background: rgba(18, 18, 28, 0.95);
+      border: 2px solid var(--accent-neon);
+      padding: 22px;
+      border-radius: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .form-group label {
+      font-size: 11px;
+      color: var(--accent-neon);
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .preview-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .preview-box {
+      flex: 1;
+      text-align: center;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .preview-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent-neon);
+      margin: 5px 0;
+      background: #000;
+    }
+
+    .podium-panel {
+      background: rgba(15, 15, 25, 0.9);
+      border: 2px solid var(--accent);
+      border-radius: 35px;
+      padding: 20px 10px;
+      margin-bottom: 35px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 25px rgba(157, 78, 221, 0.25);
+    }
+
+    .podium-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+    @media (max-width: 650px) {
+      .podium-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 10px; }
+    }
+
+    .podium-slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      padding: 0 5px;
+    }
+    .podium-slot:not(:last-child) {
+      border-right: 1px dashed rgba(255, 255, 255, 0.12);
+    }
+    @media (max-width: 650px) {
+      .podium-slot:not(:last-child) { border-right: none; }
+    }
+
+    .podium-badge-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    #disp-sub-1 { color: var(--gold); }
+    #disp-sub-2 { color: var(--silver); }
+    #disp-sub-3 { color: var(--bronze); }
+    #disp-sub-duck { color: var(--loss); }
+
+    .podium-subtitle-display {
+      font-size: 11px;
+      font-style: italic;
+      font-weight: bold;
+      margin-bottom: 10px;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.1;
+      padding: 0 2px;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .podium-circle-wrapper { position: relative; margin-bottom: 10px; }
+    .podium-circle-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--border);
+      background: #12121a;
+      transition: transform 0.3s ease;
+    }
+    .podium-circle-avatar:hover { transform: scale(1.08); }
+
+    .slot-1 .podium-circle-avatar { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+    .slot-2 .podium-circle-avatar { border-color: var(--silver); box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); }
+    .slot-3 .podium-circle-avatar { border-color: var(--bronze); box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
+    .slot-duck .podium-circle-avatar { border-color: var(--loss); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+
+    .identity-bar {
+      background: var(--card);
+      border: 2px solid var(--accent);
+      padding: 14px 20px;
+      border-radius: 50px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
+    }
+
+    input[type="text"], input[type="password"], textarea {
+      background: #12121a;
+      color: #fff;
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 15px;
+      font-size: 13px;
+      font-family: 'Montserrat', sans-serif;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 35px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-neon);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--accent);
+      margin-bottom: 10px;
+      box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+    }
+    .card.ko .avatar {
+      border-color: var(--loss);
+      box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+      filter: grayscale(20%);
+    }
+
+    .name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px; }
+    .stats { font-size: 13px; margin: 6px 0; color: #a8a8b3; }
+    .stats b.win { color: var(--win); }
+    .stats b.loss { color: var(--loss); }
+
+    .voto-container-card {
+      width: 100%;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .instrucao-clique {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-neon);
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-vote {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), #5a00d2);
+      border: none;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      padding: 12px 14px;
+      border-radius: 50px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-vote:hover {
+      background: linear-gradient(135deg, #b065ff, #6b00f7);
+      box-shadow: 0 6px 18px rgba(157, 78, 221, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .voters-container {
+      width: 100%;
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      text-align: center;
+    }
+
+    .voter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 0, 85, 0.15);
+      border: 1px solid var(--loss);
+      padding: 3px 8px;
+      border-radius: 50px;
+      font-size: 10px;
+      margin: 2px;
+      color: #ff4d7d;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .voter-badge:hover {
+      transform: scale(1.1);
+      background: rgba(255, 0, 85, 0.35);
+    }
+    .voter-badge img {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .btn-remove-vote {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 3px;
+      font-size: 12px;
+    }
+    .btn-remove-vote:hover { color: var(--loss); }
+
+    .audit-info {
+      font-size: 9px;
+      color: var(--accent-neon);
+      margin-top: 2px;
+      text-align: center;
+      background: rgba(0, 240, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px dashed rgba(0, 240, 255, 0.3);
+    }
+
+    .admin-player-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      padding: 10px 16px;
+      border-radius: 30px;
+      margin-bottom: 8px;
+    }
+
+    .table-wrapper {
+      background: var(--card);
+      border-radius: 25px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border); font-size: 13px; }
+    th { background: rgba(0,0,0,0.4); color: var(--accent-neon); font-family: 'Orbitron', sans-serif; font-size: 11px; }
+
+    .crop-container {
+      max-height: 350px;
+      width: 100%;
+      margin-bottom: 15px;
+      background: #000;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .crop-container img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .conjunto-bloco {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>Fight Nerd Mauá</h1>
-        <p>Painel de Controle, Votação e Visualizador WEBP Integrado</p>
-    </header>
+  <div class="top-bar">
+    <div style="flex: 1;"></div>
+    <h1 class="main-title" style="flex: 2;">Fight Nerd Mauá</h1>
+    <div style="flex: 1; text-align: right;">
+      <button class="btn-admin-toggle" onclick="openLoginModal()">⚙️ Admin</button>
+    </div>
+  </div>
 
-    <div class="main-container">
-        <!-- Coluna de Administração / Upload -->
-        <div class="panel">
-            <h2>Gerenciador e Avatar</h2>
-            <div class="form-group">
-                <label>Nome do Jogador</label>
-                <input type="text" id="playerName" placeholder="Ex: Player 1">
-            </div>
+  <!-- MODAL DE SENHA -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box">
+      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🔒 Acesso Restrito</h3>
+      <p style="font-size: 13px; color: #a8a8b3;">Digite a senha de administrador:</p>
+      <input type="password" id="modalPassInput" placeholder="•••••" style="text-align: center; width: 180px; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') checkPassword()">
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button onclick="checkPassword()" style="background: var(--win); border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Entrar</button>
+        <button onclick="closeLoginModal()" style="background: #444; color:#fff; border:none; padding:10px 20px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
-            <div class="form-group">
-                <label>Avatar (Suporta WEBP Animado / GIF / PNG)</label>
-                <div class="viewer-container">
-                    <div class="upload-dropzone" onclick="document.getElementById('fileInput').click();">
-                        <input type="file" id="fileInput" accept="image/webp,image/png,image/jpeg,image/gif">
-                        <span class="placeholder-hint" id="placeholderText">Clique aqui ou arraste a imagem WEBP/GIF</span>
-                    </div>
-                </div>
-            </div>
+  <!-- MODAL DE IDENTIFICAÇÃO DO APARELHO -->
+  <div class="modal-overlay" id="deviceModal" style="display: flex;">
+    <div class="modal-box" style="max-width: 320px;">
+      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">🎮 Identifique-se</h3>
+      <p style="font-size: 12px; color: #a8a8b3; line-height: 1.4;">Digite exatamente o seu <b>nome de lutador</b> cadastrado para vincular este aparelho:</p>
+      <input type="text" id="deviceInputName" placeholder="Seu nome no torneio..." style="width: 80%; text-align: center; margin-bottom: 15px;" onkeyup="if(event.key==='Enter') registerDevice()">
+      <button onclick="registerDevice()" style="background: var(--win); border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">Salvar Aparelho</button>
+    </div>
+  </div>
 
-            <button class="btn" id="savePlayerBtn">Salvar Jogador</button>
-        </div>
+  <!-- MODAL DE ZOOM DA VÍTIMA -->
+  <div class="modal-overlay" id="victimModal">
+    <div class="victim-zoom-box">
+      <h3 style="color: var(--loss); font-family:'Orbitron'; margin:0; text-transform:uppercase;">🦆 Vítima em Destaque</h3>
+      <img id="zoomVictimImg" class="victim-zoom-img" src="" alt="Vítima">
+      <div id="zoomVictimName" style="font-family:'Orbitron'; font-size: 18px; font-weight: bold; color: #fff;"></div>
+      <p id="zoomVictimQuote" style="font-size: 13px; font-style: italic; color: #ffd700; margin-top: 8px; font-weight: bold; line-height: 1.3; min-height: 36px; display: flex; align-items: center; justify-content: center;"></p>
+      <button onclick="closeVictimModal()" style="background: var(--loss); color:#fff; border:none; padding:10px 25px; border-radius:30px; font-weight:bold; cursor:pointer; margin-top:10px;">Fechar Zoeira</button>
+    </div>
+  </div>
 
-        <!-- Coluna do Dashboard / Leaderboard / Hall da Infâmia -->
-        <div class="dashboard-grid">
-            <div class="panel">
-                <h2>Ranking em Tempo Real</h2>
-                <ul class="leaderboard-list" id="leaderboardList">
-                    <li class="leaderboard-item">
-                        <span>Nenhum lutador registrado</span>
-                        <span>0pts</span>
-                    </li>
-                </ul>
-            </div>
+  <!-- TELA DE EXPLOSÃO K.O. -->
+  <div class="ko-explosion-overlay" id="koExplosionModal">
+    <div class="ko-blast-container">
+      <div class="ko-big-title">K.O.!</div>
+      <p id="blastRandomQuote" class="ko-quote-box"></p>
+      <button class="btn-close-blast" onclick="closeKoExplosionModal()">Continuar Carnificina 🔥</button>
+    </div>
+  </div>
 
-            <div class="panel">
-                <h2>Hall da Infâmia (Vítimas / K.O.)</h2>
-                <ul class="leaderboard-list" id="infamyList">
-                    <li class="leaderboard-item infamy-item">
-                        <span>Nenhum registro de K.O.</span>
-                        <span>-</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
+  <!-- MODAL DE CROP DE IMAGEM -->
+  <div class="modal-overlay" id="cropModal">
+    <div class="modal-box" style="max-width: 420px;">
+      <h3 style="color: var(--accent-neon); font-family:'Orbitron'; margin-top:0;">✂️ Ajustar e Recortar Foto</h3>
+      <p style="font-size: 11px; color: #a8a8b3; margin-bottom: 10px;">Enquadre perfeitamente no formato circular/quadrado:</p>
+      <div class="crop-container">
+        <img id="imageToCrop" src="" alt="Cortar">
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button onclick="applyCrop()" style="background: var(--win); border:none; padding:10px 22px; border-radius:30px; font-weight:bold; cursor:pointer; color:#000;">✓ Recortar e Usar</button>
+        <button onclick="closeCropModal()" style="background: #444; color:#fff; border:none; padding:10px 22px; border-radius:30px; font-weight:bold; cursor:pointer;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL DE ADMIN -->
+  <div class="admin-panel" id="adminPanel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h3 style="margin:0; color: var(--accent-neon);" id="admin-form-title">⚙️ Painel do Administrador</h3>
+      <button onclick="logoutAdmin()" style="background: var(--loss); border:none; color:#fff; padding:6px 14px; border-radius:30px; font-size:12px; cursor:pointer; font-weight:bold;">Sair do Admin</button>
+    </div>
+    
+    <input type="hidden" id="adm-edit-id" value="">
+    <div class="form-group">
+      <input type="text" id="adm-name" placeholder="Nome do Jogador">
+    </div>
+    <div class="form-group">
+      <label>Foto Normal (WEBP, PNG, JPG, GIF):</label>
+      <input type="file" id="adm-foto-normal" accept="image/webp, image/png, image/jpeg, image/gif" onchange="initCrop(event, 'normal')">
+    </div>
+    <div class="form-group">
+      <label>Foto KO - Cara Machucada (WEBP, PNG, JPG, GIF):</label>
+      <input type="file" id="adm-foto-ko" accept="image/webp, image/png, image/jpeg, image/gif" onchange="initCrop(event, 'ko')">
     </div>
 
-    <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "seu-projeto.firebaseapp.com",
-            databaseURL: "https://seu-projeto-default-rtdb.firebaseio.com",
-            projectId: "seu-projeto",
-            storageBucket: "seu-projeto.appspot.com",
-            messagingSenderId: "000000000000",
-            appId: "1:000000000000:web:0000000000000000"
-        };
+    <div class="preview-container">
+      <div class="preview-box">
+        <label style="font-size:10px; color:#aaa;">PREVIEW NORMAL</label><br>
+        <img id="preview-normal" class="preview-thumb" src="https://i.pravatar.cc/150?img=11"><br>
+      </div>
+      <div class="preview-box">
+        <label style="font-size:10px; color:#aaa;">PREVIEW KO</label><br>
+        <img id="preview-ko" class="preview-thumb" src="https://i.pravatar.cc/150?img=33"><br>
+      </div>
+    </div>
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+    <div style="display: flex; gap: 8px;">
+      <button id="btn-save-player" onclick="savePlayerAdm()" style="flex:1; background: var(--win); border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#000;">+ Salvar / Cadastrar Jogador</button>
+      <button id="btn-cancel-edit" onclick="cancelEdit()" style="display:none; background: #555; border:none; padding:12px; font-weight:bold; cursor:pointer; border-radius:30px; color:#fff;">Cancelar</button>
+    </div>
+
+    <hr style="border-color: var(--border); margin: 20px 0;">
+    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciador de Conjuntos de Frases do Pódio (Alternância Minuto a Minuto)</h4>
+    <p style="font-size: 11px; color: #a8a8b3; margin-bottom: 12px;">Cadastre quantos conjuntos quiser. A cada minuto o sistema rodará para o próximo conjunto sequencialmente em sincronia com os 4 campos!</p>
+    
+    <div id="conjuntos-container"></div>
+
+    <button onclick="addConjuntoRow()" style="background: transparent; border: 1px dashed var(--accent-neon); color: var(--accent-neon); padding: 8px; border-radius: 20px; font-family:'Orbitron'; font-size: 11px; font-weight:bold; cursor:pointer; width:100%; margin-bottom: 12px;">+ Adicionar Novo Conjunto de Frases</button>
+    <button onclick="savePodiumSubtitles()" style="background: var(--gold); border:none; color:#000; padding:12px 20px; border-radius:30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; width:100%; margin-top:5px; text-transform:uppercase;">💾 Salvar Conjuntos de Frases</button>
+
+    <hr style="border-color: var(--border); margin: 20px 0;">
+    <h4 style="color: var(--accent-neon); margin: 8px 0;">Frases da Tela de K.O. e Zoeira da Vítima</h4>
+    
+    <div class="form-group">
+      <label>💬 Frases da Tela de K.O. (1 por linha):</label>
+      <textarea id="adm-frases-ko" placeholder="Frases da explosão de K.O...."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>🦆 Frases de Zoeira da Vítima - Hall da Infâmia (1 por linha):</label>
+      <textarea id="adm-frases-zoeira" placeholder="Frases separadas para o zoom da vítima..."></textarea>
+    </div>
+
+    <button onclick="savePhrasesConfig()" style="background: var(--accent-neon); border:none; color:#000; padding:12px 20px; border-radius:30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; width:100%; margin-top:5px; text-transform:uppercase;">💾 Salvar Listas de Frases</button>
+
+    <hr style="border-color: var(--border); margin: 20px 0;">
+    <h4 style="color: var(--accent-neon); margin: 8px 0;">Gerenciar Jogadores:</h4>
+    <div id="admin-players-list"></div>
+
+    <hr style="border-color: var(--border); margin: 20px 0;">
+    <button onclick="resetTournament()" style="background: var(--loss); border:none; color:#fff; padding:10px 18px; border-radius:30px; cursor:pointer; font-weight:bold;">⚠️ Zerar Campeonato</button>
+  </div>
+
+  <!-- PAINEL DE DESTAQUES -->
+  <div class="blink-infamy">Hall da Infâmia</div>
+  <div class="podium-panel">
+    <div class="podium-grid">
+      <!-- 1º LUGAR -->
+      <div class="podium-slot slot-1">
+        <div class="podium-badge-title" style="color: var(--gold);">1º LUGAR</div>
+        <div class="podium-subtitle-display" id="disp-sub-1">"Kakarotto Verme Miserável"</div>
+        <div id="podium-1">---</div>
+      </div>
+      <!-- 2º LUGAR -->
+      <div class="podium-slot slot-2">
+        <div class="podium-badge-title" style="color: var(--silver);">2º LUGAR</div>
+        <div class="podium-subtitle-display" id="disp-sub-2">"Vegeta Príncipe do Saia daí"</div>
+        <div id="podium-2">---</div>
+      </div>
+      <!-- 3º LUGAR -->
+      <div class="podium-slot slot-3">
+        <div class="podium-badge-title" style="color: var(--bronze);">3º LUGAR</div>
+        <div class="podium-subtitle-display" id="disp-sub-3">"Gohan Desperdício de Potencial Premium Plus"</div>
+        <div id="podium-3">---</div>
+      </div>
+      <!-- PATO -->
+      <div class="podium-slot slot-duck">
+        <div class="podium-badge-title" style="color: var(--loss);">PATO DA TEMPORADA</div>
+        <div class="podium-subtitle-display" id="disp-sub-duck">"Por que você matou o Kuririn?"</div>
+        <div id="podium-duck">---</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDENTIFICAÇÃO FIXA DO APARELHO -->
+  <div class="identity-bar" id="deviceBar" style="display: none;">
+    <div>
+      <span style="font-size:11px; color:#a8a8b3; text-transform:uppercase;">Aparelho Vinculado:</span><br>
+      <b id="deviceNameDisplay" style="color: var(--accent-neon); font-family:'Orbitron'; font-size:15px;">---</b>
+    </div>
+    <button onclick="resetDevice()" style="background:transparent; border:1px solid var(--loss); color:var(--loss); padding:4px 12px; border-radius:20px; font-size:10px; cursor:pointer; font-weight:bold;">Trocar Aparelho / Sair</button>
+  </div>
+
+  <!-- CARDS DOS JOGADORES -->
+  <h2>Registrar Vitória</h2>
+  <div class="grid" id="players-grid"></div>
+
+  <!-- TABELA DE CLASSIFICAÇÃO -->
+  <div style="margin-top: 40px;">
+    <h2>Classificação Geral</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Pos.</th>
+            <th style="text-align:left;">Lutador</th>
+            <th>Vitórias 🏆</th>
+            <th>Derrotas 🦆</th>
+            <th>Saldo ⚖️</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQ2sZ6do1PKMbGmGQj0dprbvUUrC4lINg",
+      authDomain: "fight-nerd-maua.firebaseapp.com",
+      databaseURL: "https://fight-nerd-maua-default-rtdb.firebaseio.com",
+      projectId: "fight-nerd-maua",
+      storageBucket: "fight-nerd-maua.firebasestorage.app",
+      messagingSenderId: "606341642412",
+      appId: "1:606341642412:web:b1f84bada3181610ee8709",
+      measurementId: "G-67DZHFJXPX"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let adminPassword = "86675";
+    let isAdminLoggedIn = false;
+    let jogadores = [];
+    let frasesExplosaoMaster = [];
+    let frasesZoeiraMaster = [];
+    
+    let conjunctsList = [
+      {
+        sub1: '"Kakarotto Verme Miserável"',
+        sub2: '"Vegeta Príncipe do Saia daí"',
+        sub3: '"Gohan Desperdício de Potencial Premium Plus"',
+        subDuck: '"Por que você matou o Kuririn?"'
+      }
+    ];
+
+    let newNormalBase64 = null;
+    let newKoBase64 = null;
+    let cropper = null;
+    let currentCropType = null;
+    let activeCropObjectUrl = null;
+
+    let deviceId = localStorage.getItem('fnm_device_id');
+    if (!deviceId) {
+      deviceId = 'dev_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+      localStorage.setItem('fnm_device_id', deviceId);
+    }
+
+    let myPlayerId = localStorage.getItem('fnm_player_id') || null;
+
+    db.ref('jogadores').on('value', (snapshot) => {
+      const data = snapshot.val();
+      jogadores = data ? Object.values(data) : [];
+      checkDeviceRegistration();
+      recalcularPontosEAtualizar();
+    });
+
+    db.ref('configuracoes/subtitulosConjuntos').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && Array.isArray(data) && data.length > 0) {
+        conjunctsList = data;
+      }
+      renderAdminConjuntosInputs();
+      updateActivePodiumSubtitleByTime();
+    });
+
+    db.ref('configuracoes/frases').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        frasesExplosaoMaster = data.koList || [];
+        frasesZoeiraMaster = data.zoeiraList || [];
+        
+        const koTextarea = document.getElementById('adm-frases-ko');
+        const zoeiraTextarea = document.getElementById('adm-frases-zoeira');
+        if (koTextarea && document.activeElement !== koTextarea) {
+          koTextarea.value = frasesExplosaoMaster.join('\n');
         }
-        const database = firebase.database();
+        if (zoeiraTextarea && document.activeElement !== zoeiraTextarea) {
+          zoeiraTextarea.value = frasesZoeiraMaster.join('\n');
+        }
+      } else {
+        frasesExplosaoMaster = ["K.O.!"];
+        frasesZoeiraMaster = ["FLAWLESS VICTORY!"];
+      }
+    });
 
-        // Lógica de Visualização e Renderização Nativa para WEBP Animado e GIFs
-        const fileInput = document.getElementById('fileInput');
-        const dropzone = document.querySelector('.upload-dropzone');
-        const placeholderText = document.getElementById('placeholderText');
-        let currentObjectUrl = null;
+    function updateActivePodiumSubtitleByTime() {
+      if (!conjunctsList || conjunctsList.length === 0) return;
 
-        fileInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+      const now = new Date();
+      const totalMinutes = now.getHours() * 60 + now.getMinutes();
+      const activeIndex = totalMinutes % conjunctsList.length;
+      const activeSet = conjunctsList[activeIndex];
 
-            if (!file.type.startsWith('image/')) {
-                alert('Selecione um arquivo de imagem válido (WEBP, PNG, GIF).');
-                return;
-            }
+      const el1 = document.getElementById('disp-sub-1');
+      const el2 = document.getElementById('disp-sub-2');
+      const el3 = document.getElementById('disp-sub-3');
+      const elDuck = document.getElementById('disp-sub-duck');
 
-            const existingImg = dropzone.querySelector('img');
-            if (existingImg) existingImg.remove();
+      [el1, el2, el3, elDuck].forEach(el => { if(el) el.style.opacity = '0'; });
 
-            if (currentObjectUrl) {
-                URL.revokeObjectURL(currentObjectUrl);
-            }
+      setTimeout(() => {
+        if(el1) el1.innerText = activeSet.sub1 || "";
+        if(el2) el2.innerText = activeSet.sub2 || "";
+        if(el3) el3.innerText = activeSet.sub3 || "";
+        if(elDuck) elDuck.innerText = activeSet.subDuck || "";
+        [el1, el2, el3, elDuck].forEach(el => { if(el) el.style.opacity = '1'; });
+      }, 250);
+    }
 
-            // O uso de createObjectURL assegura o comportamento fluido de WebPs animados
-            currentObjectUrl = URL.createObjectURL(file);
-            
-            const img = document.createElement('img');
-            img.src = currentObjectUrl;
-            
-            placeholderText.style.display = 'none';
-            dropzone.appendChild(img);
+    setInterval(updateActivePodiumSubtitleByTime, 10000);
+
+    function renderAdminConjuntosInputs() {
+      const container = document.getElementById('conjuntos-container');
+      if (!container || (document.activeElement && document.activeElement.tagName === 'INPUT')) return;
+      container.innerHTML = "";
+
+      conjunctsList.forEach((conj, index) => {
+        container.innerHTML += `
+          <div class="conjunto-bloco" id="conj-bloco-${index}">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family:'Orbitron'; font-size:11px; color:var(--accent-neon); font-weight:bold;">✨ Conjunto Alternativo #${index + 1}</span>
+              ${conjunctsList.length > 1 ? `<button onclick="removeConjuntoRow(${index})" style="background:var(--loss); border:none; color:#fff; padding:2px 8px; border-radius:10px; font-size:10px; cursor:pointer;">Remover</button>` : ''}
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color: var(--gold); font-size:9px;">1º Lugar:</label>
+              <input type="text" class="inp-sub-1" data-index="${index}" value="${conj.sub1 || ''}" placeholder="Ex: Kakarotto Verme Miserável">
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color: var(--silver); font-size:9px;">2º Lugar:</label>
+              <input type="text" class="inp-sub-2" data-index="${index}" value="${conj.sub2 || ''}" placeholder="Ex: Vegeta Príncipe do Saia daí">
+            </div>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label style="color: var(--bronze); font-size:9px;">3º Lugar:</label>
+              <input type="text" class="inp-sub-3" data-index="${index}" value="${conj.sub3 || ''}" placeholder="Ex: Gohan Desperdício...">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="color: var(--loss); font-size:9px;">Pato da Temporada:</label>
+              <input type="text" class="inp-sub-duck" data-index="${index}" value="${conj.subDuck || ''}" placeholder="Ex: Por que você matou o Kuririn?">
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function addConjuntoRow() {
+      conjunctsList.push({
+        sub1: '',
+        sub2: '',
+        sub3: '',
+        subDuck: ''
+      });
+      renderAdminConjuntosInputs();
+    }
+
+    function removeConjuntoRow(index) {
+      if (conjunctsList.length <= 1) return alert("Você precisa manter pelo menos 1 conjunto!");
+      conjunctsList.splice(index, 1);
+      renderAdminConjuntosInputs();
+    }
+
+    function savePodiumSubtitles() {
+      if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
+
+      const blocos = document.querySelectorAll('.conjunto-bloco');
+      let novosConjuntos = [];
+
+      blocos.forEach((bloco) => {
+        novosConjuntos.push({
+          sub1: bloco.querySelector('.inp-sub-1').value.trim(),
+          sub2: bloco.querySelector('.inp-sub-2').value.trim(),
+          sub3: bloco.querySelector('.inp-sub-3').value.trim(),
+          subDuck: bloco.querySelector('.inp-sub-duck').value.trim()
         });
+      });
 
-        // Salvamento no Firebase Realtime Database
-        document.getElementById('savePlayerBtn').addEventListener('click', function() {
-            const name = document.getElementById('playerName').value.trim();
-            if (!name) {
-                alert('Insira o nome do lutador!');
-                return;
-            }
+      conjunctsList = novosConjuntos;
 
-            const playerRef = database.ref('fighters').push();
-            playerRef.set({
-                name: name,
-                score: 0,
-                status: 'ativo',
-                createdAt: Date.now()
-            }, (error) => {
-                if (error) {
-                    alert('Erro ao salvar no banco de dados.');
-                } else {
-                    alert('Lutador cadastrado com sucesso!');
-                    document.getElementById('playerName').value = '';
-                }
-            });
+      db.ref('configuracoes/subtitulosConjuntos').set(conjunctsList, (error) => {
+        if (error) {
+          alert("❌ Erro ao salvar conjuntos de frases: " + error.message);
+        } else {
+          alert("✅ Todos os conjuntos de frases foram salvos e sincronizados com sucesso!");
+          updateActivePodiumSubtitleByTime();
+        }
+      });
+    }
+
+    function savePhrasesConfig() {
+      if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
+
+      const koRaw = document.getElementById('adm-frases-ko').value;
+      const zoeiraRaw = document.getElementById('adm-frases-zoeira').value;
+
+      const koList = koRaw.split('\n').map(f => f.trim()).filter(f => f.length > 0);
+      const zoeiraList = zoeiraRaw.split('\n').map(f => f.trim()).filter(f => f.length > 0);
+
+      db.ref('configuracoes/frases').set({
+        koList: koList,
+        zoeiraList: zoeiraList
+      }, (error) => {
+        if (error) {
+          alert("❌ Erro ao salvar frases: " + error.message);
+        } else {
+          alert(`✅ Listas de frases salvas com sucesso!`);
+        }
+      });
+    }
+
+    let filaFrasesExplosao = [];
+    function pegarProximaFraseExplosao() {
+      if (filaFrasesExplosao.length === 0) {
+        let lista = frasesExplosaoMaster.length > 0 ? frasesExplosaoMaster : ["K.O.!"];
+        filaFrasesExplosao = [...lista].sort(() => Math.random() - 0.5);
+      }
+      return filaFrasesExplosao.pop();
+    }
+
+    let filaFrasesZoeira = [];
+    function pegarProximaFraseZoeira() {
+      if (filaFrasesZoeira.length === 0) {
+        let lista = frasesZoeiraMaster.length > 0 ? frasesZoeiraMaster : ["FLAWLESS VICTORY!"];
+        filaFrasesZoeira = [...lista].sort(() => Math.random() - 0.5);
+      }
+      return filaFrasesZoeira.pop();
+    }
+
+    function checkDeviceRegistration() {
+      const modal = document.getElementById('deviceModal');
+      const bar = document.getElementById('deviceBar');
+      const nameDisplay = document.getElementById('deviceNameDisplay');
+
+      if (!myPlayerId) {
+        modal.style.display = 'flex';
+        bar.style.display = 'none';
+      } else {
+        const p = jogadores.find(item => String(item.id) === String(myPlayerId));
+        if (p) {
+          modal.style.display = 'none';
+          bar.style.display = 'flex';
+          nameDisplay.innerText = p.nome;
+        } else {
+          localStorage.removeItem('fnm_player_id');
+          myPlayerId = null;
+          modal.style.display = 'flex';
+          bar.style.display = 'none';
+        }
+      }
+    }
+
+    function registerDevice() {
+      const typedName = document.getElementById('deviceInputName').value.trim().toLowerCase();
+      if (!typedName) return alert("Digite um nome!");
+
+      const found = jogadores.find(item => item.nome.trim().toLowerCase() === typedName);
+      if (!found) {
+        alert("⚠️ Nome não encontrado no cadastro do torneio! Verifique com o Administrador.");
+        return;
+      }
+
+      myPlayerId = found.id;
+      localStorage.setItem('fnm_player_id', myPlayerId);
+      checkDeviceRegistration();
+      updateUI();
+    }
+
+    function resetDevice() {
+      if (confirm("Deseja desvincular este aparelho e entrar com outro nome?")) {
+        localStorage.removeItem('fnm_player_id');
+        myPlayerId = null;
+        checkDeviceRegistration();
+        updateUI();
+      }
+    }
+
+    function recalcularPontosEAtualizar() {
+      jogadores.forEach(p => {
+        p.vitoriasCalculadas = 0;
+        p.derrotasCalculadas = 0;
+      });
+
+      jogadores.forEach(vencedor => {
+        let vitimasObj = vencedor.vitimas || {};
+        let vitimasList = Object.values(vitimasObj);
+        vencedor.vitoriasCalculadas = vitimasList.length;
+
+        vitimasList.forEach(voto => {
+          let perdedor = jogadores.find(p => String(p.id) === String(voto.perdedorId));
+          if (perdedor) {
+            perdedor.derrotasCalculadas = (perdedor.derrotasCalculadas || 0) + 1;
+          }
         });
+      });
 
-        // Sincronização em tempo real do Leaderboard
-        database.ref('fighters').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const leaderboardList = document.getElementById('leaderboardList');
-            leaderboardList.innerHTML = '';
+      updateUI();
+    }
 
-            if (!data) {
-                leaderboardList.innerHTML = '<li class="leaderboard-item"><span>Nenhum lutador registrado</span><span>0pts</span></li>';
-                return;
-            }
+    function ordenarJogadores() {
+      return [...jogadores].sort((a, b) => {
+        if (b.vitoriasCalculadas !== a.vitoriasCalculadas) {
+          return b.vitoriasCalculadas - a.vitoriasCalculadas;
+        }
+        let aVenceuB = Object.values(a.vitimas || {}).some(v => String(v.perdedorId) === String(b.id));
+        let bVenceuA = Object.values(b.vitimas || {}).some(v => String(v.perdedorId) === String(a.id));
+        if (aVenceuB && !bVenceuA) return -1;
+        if (bVenceuA && !aVenceuB) return 1;
 
-            Object.keys(data).forEach(key => {
-                const fighter = data[key];
-                const li = document.createElement('li');
-                li.className = 'leaderboard-item';
-                li.innerHTML = `<span>${fighter.name}</span><span>${fighter.score || 0} pts</span>`;
-                leaderboardList.appendChild(li);
-            });
+        if (a.derrotasCalculadas !== b.derrotasCalculadas) {
+          return a.derrotasCalculadas - b.derrotasCalculadas;
+        }
+
+        let saldoA = a.vitoriasCalculadas - a.derrotasCalculadas;
+        let saldoB = b.vitoriasCalculadas - b.derrotasCalculadas;
+        if (saldoB !== saldoA) {
+          return saldoB - saldoA;
+        }
+
+        return a.nome.localeCompare(b.nome);
+      });
+    }
+
+    function openLoginModal() {
+      if (isAdminLoggedIn) {
+        document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('modalPassInput').value = '';
+        document.getElementById('modalPassInput').focus();
+      }
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function showVictimZoom(perdedorId) {
+      const perdedor = jogadores.find(p => String(p.id) === String(perdedorId));
+      if (!perdedor) return;
+
+      const fraseZoeira = pegarProximaFraseZoeira();
+      const img = document.getElementById('zoomVictimImg');
+      document.getElementById('zoomVictimName').innerText = perdedor.nome;
+      img.src = perdedor.fotoKO;
+      document.getElementById('zoomVictimQuote').innerText = `"${fraseZoeira}"`;
+      document.getElementById('victimModal').style.display = 'flex';
+    }
+
+    function closeVictimModal() {
+      document.getElementById('victimModal').style.display = 'none';
+    }
+
+    function showKoExplosionModal() {
+      const fraseExplosao = pegarProximaFraseExplosao();
+      document.getElementById('blastRandomQuote').innerText = `"${fraseExplosao}"`;
+      document.getElementById('koExplosionModal').style.display = 'flex';
+    }
+
+    function closeKoExplosionModal() {
+      document.getElementById('koExplosionModal').style.display = 'none';
+    }
+
+    function checkPassword() {
+      const pass = document.getElementById('modalPassInput').value;
+      if (pass === adminPassword) {
+        isAdminLoggedIn = true;
+        closeLoginModal();
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+        renderAdminConjuntosInputs();
+        updateUI();
+      } else {
+        alert("⚠️ Senha incorreta!");
+      }
+    }
+
+    function logoutAdmin() {
+      isAdminLoggedIn = false;
+      document.getElementById('adminPanel').style.display = 'none';
+      updateUI();
+    }
+
+    // AJUSTE CRÍTICO: Suporte Nativo de Alta Performance para WEBP, PNG, JPG e GIF
+    function initCrop(event, type) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert("Por favor, selecione um arquivo de imagem válido.");
+        return;
+      }
+
+      currentCropType = type;
+
+      if (activeCropObjectUrl) {
+        URL.revokeObjectURL(activeCropObjectUrl);
+      }
+
+      activeCropObjectUrl = URL.createObjectURL(file);
+      const imageElement = document.getElementById('imageToCrop');
+      imageElement.src = activeCropObjectUrl;
+      document.getElementById('cropModal').style.display = 'flex';
+
+      if (cropper) {
+        cropper.destroy();
+      }
+
+      cropper = new Cropper(imageElement, {
+        aspectRatio: 1,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 0.9,
+        restore: false,
+        guides: true,
+        center: true,
+        highlight: false,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        toggleDragModeOnDblclick: false,
+      });
+
+      event.target.value = '';
+    }
+
+    function closeCropModal() {
+      document.getElementById('cropModal').style.display = 'none';
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      if (activeCropObjectUrl) {
+        URL.revokeObjectURL(activeCropObjectUrl);
+        activeCropObjectUrl = null;
+      }
+    }
+
+    function applyCrop() {
+      if (!cropper) return;
+
+      const canvas = cropper.getCroppedCanvas({
+        width: 300,
+        height: 300,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      });
+
+      // Exportação otimizada
+      const croppedDataBase64 = canvas.toDataURL('image/webp', 0.88) || canvas.toDataURL('image/jpeg', 0.9);
+
+      if (currentCropType === 'normal') {
+        newNormalBase64 = croppedDataBase64;
+        document.getElementById('preview-normal').src = croppedDataBase64;
+      } else if (currentCropType === 'ko') {
+        newKoBase64 = croppedDataBase64;
+        document.getElementById('preview-ko').src = croppedDataBase64;
+      }
+
+      closeCropModal();
+    }
+
+    async function savePlayerAdm() {
+      if (!isAdminLoggedIn) return alert("Acesso não autorizado!");
+
+      const editId = String(document.getElementById('adm-edit-id').value);
+      const nome = document.getElementById('adm-name').value.trim();
+      if (!nome) return alert("Digite o nome do jogador!");
+
+      let id = editId ? editId : 'p_' + Date.now();
+      let existingPlayer = jogadores.find(p => String(p.id) === String(id));
+
+      let fotoNormal = newNormalBase64 || (existingPlayer ? existingPlayer.fotoNormal : "https://i.pravatar.cc/150?img=11");
+      let fotoKO = newKoBase64 || (existingPlayer ? existingPlayer.fotoKO : "https://i.pravatar.cc/150?img=33");
+
+      const playerData = {
+        id: String(id),
+        nome: nome,
+        fotoNormal: fotoNormal,
+        fotoKO: fotoKO
+      };
+
+      db.ref('jogadores/' + id).update(playerData);
+      alert("✅ Jogador salvo!");
+      cancelEdit();
+    }
+
+    function editPlayer(id) {
+      const p = jogadores.find(item => String(item.id) === String(id));
+      if (!p) return;
+
+      document.getElementById('adm-edit-id').value = String(p.id);
+      document.getElementById('adm-name').value = p.nome;
+
+      document.getElementById('preview-normal').src = p.fotoNormal;
+      document.getElementById('preview-ko').src = p.fotoKO;
+
+      newNormalBase64 = null;
+      newKoBase64 = null;
+
+      document.getElementById('admin-form-title').innerText = "✏️ Editar Jogador: " + p.nome;
+      document.getElementById('btn-save-player').innerText = "Salvar Alterações";
+      document.getElementById('btn-cancel-edit').style.display = "block";
+    }
+
+    function deletePlayer(id) {
+      if (!isAdminLoggedIn) return;
+      if (confirm("Deseja realmente remover este jogador do campeonato?")) {
+        db.ref('jogadores/' + String(id)).remove();
+      }
+    }
+
+    function cancelEdit() {
+      document.getElementById('adm-edit-id').value = "";
+      document.getElementById('adm-name').value = "";
+      document.getElementById('adm-foto-normal').value = "";
+      document.getElementById('adm-foto-ko').value = "";
+      document.getElementById('preview-normal').src = "https://i.pravatar.cc/150?img=11";
+      document.getElementById('preview-ko').src = "https://i.pravatar.cc/150?img=33";
+      newNormalBase64 = null;
+      newKoBase64 = null;
+      document.getElementById('admin-form-title').innerText = "⚙️ Painel do Administrador";
+      document.getElementById('btn-save-player').innerText = "+ Salvar / Cadastrar Jogador";
+      document.getElementById('btn-cancel-edit').style.display = "none";
+    }
+
+    function renderAdminList() {
+      const listEl = document.getElementById('admin-players-list');
+      if (!listEl) return;
+      listEl.innerHTML = "";
+
+      const jogadoresOrdenadosAdmin = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
+
+      jogadoresOrdenadosAdmin.forEach(p => {
+        listEl.innerHTML += `
+          <div class="admin-player-item">
+            <span><b>${p.nome}</b> (${p.vitoriasCalculadas || 0}V / ${p.derrotasCalculadas || 0}D)</span>
+            <div>
+              <button onclick="editPlayer('${p.id}')" style="background:var(--accent); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Editar</button>
+              <button onclick="deletePlayer('${p.id}')" style="background:var(--loss); border:none; color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer;">Remover</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function votar(vencedorId) {
+      let perdedorId = myPlayerId;
+
+      if (isAdminLoggedIn) {
+        let nomePerdedorManual = prompt("⚙️ [PAINEL ADMIN] Digite o nome exato do lutador que sofreu a derrota (perdedor):");
+        if (!nomePerdedorManual) return;
+
+        let foundPerdedor = jogadores.find(item => item.nome.trim().toLowerCase() === nomePerdedorManual.trim().toLowerCase());
+        if (!foundPerdedor) {
+          alert("⚠️ Lutador perdedor não encontrado!");
+          return;
+        }
+        perdedorId = foundPerdedor.id;
+      }
+
+      if (!perdedorId) {
+        alert("⚠️ Aparelho não vinculado! Reinicie ou identifique-se.");
+        return;
+      }
+
+      if (String(perdedorId) === String(vencedorId)) {
+        alert("⚠️ TRAPAÇA DETECTADA! Você não pode registrar derrota em si mesmo.");
+        return;
+      }
+
+      const perdedor = jogadores.find(p => String(p.id) === String(perdedorId));
+      const vencedor = jogadores.find(p => String(p.id) === String(vencedorId));
+
+      if (!perdedor || !vencedor) return;
+
+      const idVota = 'v_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const dataHoraAtual = new Date().toLocaleString('pt-BR');
+      const modoRegistro = isAdminLoggedIn ? "Admin (Manual)" : `Dispositivo (${perdedor.nome})`;
+
+      db.ref(`jogadores/${vencedor.id}/vitimas/${idVota}`).set({
+        idVota: idVota,
+        perdedorId: String(perdedor.id),
+        auditData: dataHoraAtual,
+        auditDevice: deviceId,
+        auditModo: modoRegistro
+      });
+
+      showKoExplosionModal();
+    }
+
+    function removeVote(vencedorId, idVota, e) {
+      if (e) e.stopPropagation();
+      if (!isAdminLoggedIn) {
+        alert("Apenas o Administrador pode remover votos!");
+        return;
+      }
+      if (!confirm("Deseja anular este voto especificamente e ajustar a pontuação?")) return;
+
+      db.ref(`jogadores/${vencedorId}/vitimas/${idVota}`).remove();
+    }
+
+    function updateUI() {
+      const grid = document.getElementById('players-grid');
+      grid.innerHTML = "";
+
+      const jogadoresOrdenadosCards = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
+
+      jogadoresOrdenadosCards.forEach(player => {
+        let vitimasObj = player.vitimas || {};
+        let vitimasList = Object.values(vitimasObj);
+
+        let votersHtml = vitimasList.map(v => {
+          let perdedor = jogadores.find(p => String(p.id) === String(v.perdedorId));
+          if (!perdedor) return '';
+
+          let nomeAtual = perdedor.nome;
+          let fotoKOAtual = perdedor.fotoKO;
+
+          let auditHtml = "";
+          if (isAdminLoggedIn) {
+            auditHtml = `<div class="audit-info">🕒 ${v.auditData || 'N/D'} | 📱 ${v.auditModo || 'App'}</div>`;
+          }
+
+          return `
+            <div style="display:inline-block; margin:2px; vertical-align:top;">
+              <span class="voter-badge" onclick="showVictimZoom('${perdedor.id}')" title="Clique para dar zoom em ${nomeAtual}">
+                <img src="${fotoKOAtual}"> ${nomeAtual}
+                ${isAdminLoggedIn ? `<button class="btn-remove-vote" onclick="removeVote('${player.id}', '${v.idVota}', event)">✕</button>` : ''}
+              </span>
+              ${auditHtml}
+            </div>
+          `;
+        }).join('');
+
+        let isKOClass = (player.derrotasCalculadas || 0) > 0 ? "ko" : "";
+
+        grid.innerHTML += `
+          <div class="card ${isKOClass}">
+            <img class="avatar" src="${player.fotoNormal}" alt="${player.nome}">
+            <div class="name">${player.nome}</div>
+            <div class="stats">
+              <b class="win">${player.vitoriasCalculadas || 0}V</b> | <b class="loss">${player.derrotasCalculadas || 0}D</b>
+            </div>
+            <div class="voto-container-card">
+              <p class="instrucao-clique">Clique aqui 👇🏼 para registrar resultado</p>
+              <button class="btn-vote" onclick="votar('${player.id}')">
+                ${player.nome} me venceu
+              </button>
+            </div>
+            <div class="voters-container">
+              <div style="font-size:10px; color:#a8a8b3; text-transform:uppercase; font-weight:bold;">Vítimas (Clique p/ Zoom):</div>
+              <div style="margin-top:4px;">${votersHtml || '<span style="font-size:10px; color:#555">Nenhuma ainda</span>'}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      if (isAdminLoggedIn) renderAdminList();
+      updatePodiumAndTable();
+    }
+
+    function renderCircleSlot(player, isDuck = false) {
+      if (!player) return '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+      const foto = isDuck ? player.fotoKO : player.fotoNormal;
+      const statText = isDuck ? `<small style="color:var(--loss); font-weight:bold;">${player.derrotasCalculadas} Derrotas</small>` : `<small style="color:var(--win); font-weight:bold;">${player.vitoriasCalculadas} Vitórias</small>`;
+
+      return `
+        <div class="podium-circle-wrapper">
+          <img class="podium-circle-avatar" src="${foto}" alt="${player.nome}">
+        </div>
+        <div style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff;">${player.nome}</div>
+        <div>${statText}</div>
+      `;
+    }
+
+    function updatePodiumAndTable() {
+      if(jogadores.length === 0) return;
+
+      const ranking = ordenarJogadores();
+
+      document.getElementById('podium-1').innerHTML = (ranking[0] && ranking[0].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[0]) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+      document.getElementById('podium-2').innerHTML = (ranking[1] && ranking[1].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[1]) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+      document.getElementById('podium-3').innerHTML = (ranking[2] && ranking[2].vitoriasCalculadas > 0) ? renderCircleSlot(ranking[2]) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+
+      const worstPlayer = [...jogadores].sort((a,b) => b.derrotasCalculadas - a.derrotasCalculadas)[0];
+      document.getElementById('podium-duck').innerHTML = (worstPlayer && worstPlayer.derrotasCalculadas > 0) ? renderCircleSlot(worstPlayer, true) : '<div style="font-size:12px; color:#555; margin-top:10px;">---</div>';
+
+      const leaderboard = document.getElementById('leaderboard');
+      leaderboard.innerHTML = "";
+
+      ranking.forEach((p, idx) => {
+        let saldo = p.vitoriasCalculadas - p.derrotasCalculadas;
+        let saldoFormatted = saldo > 0 ? `+${saldo}` : saldo;
+
+        leaderboard.innerHTML += `
+          <tr>
+            <td><b>${idx + 1}º</b></td>
+            <td style="text-align:left;"><b>${p.nome}</b></td>
+            <td style="color: var(--win); font-weight:bold;">${p.vitoriasCalculadas || 0}</td>
+            <td style="color: var(--loss); font-weight:bold;">${p.derrotasCalculadas || 0}</td>
+            <td style="font-weight:bold;">${saldoFormatted}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function resetTournament() {
+      if (!isAdminLoggedIn) return;
+      if (confirm("Deseja ZERAR todas as vitórias e derrotas do campeonato?")) {
+        jogadores.forEach(p => {
+          db.ref('jogadores/' + String(p.id) + '/vitimas').remove();
         });
-    </script>
+      }
+    }
+  </script>
 </body>
 </html>
